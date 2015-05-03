@@ -1,0 +1,64 @@
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais,english]{babel}
+\usepackage{xcolor}
+\usepackage[top=2.5cm, bottom=1.5cm, left=2.5cm, right=1cm]{geometry}
+\usepackage[pdftex]{graphicx}
+\usepackage{tikz}
+
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{picture}
+\usepackage{epic}
+\usepackage{verbatim}
+\usepackage{textcomp}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{array}
+% \usepackage[breaklinks=true,hidelinks]{hyperref}
+\usepackage[breaklinks=true]{hyperref}
+\usepackage{memhfixc}
+
+
+
+% ----------------------
+% Cover page
+% ----------------------
+
+% Logos
+\newcommand{\ulb}{\includegraphics[scale=1.1]{logo_ULB2.pdf}}
+\newcommand{\polytech}{\includegraphics[scale=0.35]{logo_polytech_FR.pdf}}
+
+% Polices
+\definecolor{ULBblue}{rgb}{0,0.2196,0.5765}
+\newcommand{\fontTitle}{\sffamily \Huge\selectfont \color{ULBblue}}
+\newcommand{\fontSubtitle}{\sffamily \LARGE \selectfont \color{ULBblue}}
+\newcommand{\fontText}{\sffamily \selectfont}
+\newcommand{\fontColor}{\sffamily \selectfont \color{ULBblue}}
+
+% Titre
+\newcommand{\titleA}{\fontTitle{Implementation of High-Level Cryptographic}} % Titre identique au titre remis au secrétariat
+\newcommand{\titleB}{\fontTitle{Protocols using a SoC Plateform}} % (dans la langue de rédaction a priori)
+% Sous-titre
+%\newcommand{\subtitle}{\fontSubtitle{Ligne du sous-titre du mémoire}}
+% Titre du diplôme
+\newcommand{\diplomaA}{\fontText{Mémoire présenté en vue de l’obtention du diplôme}} % A laisser en Français
+\newcommand{\diplomaB}{\fontText{d'Ingénieur Civil en informatique à finalité spécialisée}}
+
+% Etudiant
+\newcommand{\student}{\textbf{\sffamily \large Quentin Delhaye}}
+
+% Supervision
+\newcommand{\promAa}{\fontColor{Directeur}}
+\newcommand{\promAb}{\fontText{Professeur Frédéric Robert}}
+% \newcommand{\promBa}{\fontColor{Co-Promoteur}}
+% \newcommand{\promBb}{\fontText{Professeur [Prénom Nom]}}
+\newcommand{\promCa}{\fontColor{Superviseur}}
+\newcommand{\promCb}{\fontText{Sébastien Rabou (Barco Silex)}}
+\newcommand{\deptA}{\fontColor{Service}}
+\newcommand{\deptB}{\fontText{BEAMS}}
+
+% Année académique
+\newcommand{\yearA}{\fontColor{Année académique}}
+\newcommand{\yearB}{\fontText{2014 - 2015}}
