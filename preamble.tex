@@ -1,9 +1,11 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{charter}
+% \usepackage[bitstream-charter]{mathdesign}
 \usepackage[francais,english]{babel}
 \usepackage{xcolor}
-\usepackage[top=2.5cm, bottom=1.5cm, left=2.5cm, right=1cm]{geometry}
+\usepackage{geometry}
 \usepackage[pdftex]{graphicx}
 \usepackage{tikz}
 
@@ -21,6 +23,11 @@
 \usepackage{memhfixc}
 
 \usepackage{framed}
+\usepackage{listings}
+\definecolor{colKeys}{rgb}{0,0,1}  % couleurs des mots-clés propres au language
+\definecolor{colIdentifier}{rgb}{0,0,0}  % couleurs des mots à identifier
+\definecolor{colComments}{rgb}{0,0.6,0}  % couleurs des commentaires
+\definecolor{colString}{rgb}{0.6,0.1,0.1}
 
 \setcounter{secnumdepth}{3}% Number up to subsubsection
 \maxsecnumdepth{subsubsection}% 'secnumdepth' is reset by \mainmatter. You should use 'maxsecnumdepth'.

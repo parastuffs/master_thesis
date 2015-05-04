@@ -1,0 +1,60 @@
+\chapter{Conclusion}
+
+\section{Future work}
+
+Although the present work presents some promissing results, the implementation can certainly be improved in several ways and some further experiments should be conducted.
+
+\paragraph{Driver improvement}
+The driver of the BA411E can be made less ressources hungry by improving the initialisation of the descriptors and their linking, but the gain would not be significant enough to justify the time investment at this point.
+% TODO refer to a stack analysis of an ipsec file transfer, showing the most expensive instructions. If I remember correctly, it was something like the DMA transfer and DMA something freeing.
+A better alternative would be to avoid descriptors altogether by modifiying the interface with the IP so that it can use the scatterlist directly.
+We would then spare a lot of DMA mapping instruction and thus some precious cycles on the software side.
+
+As we already remarked in \ref{sec:section-where-we-see-the-CPU-usage-of-ba411e-usage-with-active-polling}, the use cases involving IPSec were conducted using a previous revision of the driver still activelly polling the IP for its results.
+A better and cleaner way to proceed is to use interruption routines, as shown in \ref{sec:section-ba411e-with-irq}.
+However, the kernel does not support their current implementation and panics upon usage.
+If one were to be willing to spend the time replacing the active polling by clean asynchronous interruptions, he should be aware of the overhead imposed by an interruption.
+In some cases, when the operation is just a few clock cycle long for the IP, an active polling could still be the better way to go.
+A more thorough comparison of the mutual trade-off deserves some investigation, and as a starting point, the packet size could be treated as a branching point between the two solutions.
+
+
+\paragraph{Registering public key verification with the crypto API}
+As we saw in \ref{sec:section-with-RSA-BA414}, the driver is already capable of offloading a large portion of public key operations to the IP, but only with very specific libraries at the time being -- openSSL in our case.
+The next step is to register the very same operations with the crypto API so it can be used without having to rely on a custom openSSL engine.
+
+\paragraph{Conditional offloading in cryptodev}
+%Note this is still under heavy criticism. If the hardware lags so far behind, why the relatively good score in openvpn?
+The figure \ref{fig:openssl-benchmark-cbc} clearly shows a threshold on the packet size from which the hardware has a clear advantage, and below which the user mode software implementation is to go for.
+%TODO include a listing to where it could be a good place to branch on the packet size. I already found it.
+%TODO at least add a pseudo-code to illustrate this shit.
+Using this tipping point, one could set a conditional branch as shown in listing~\ref{list:cryptodev-conditional-offload-pseudocode}
+
+\lstset{language=c}
+\lstset{commentstyle=\color{colComments}\textit,
+float=hbp,%
+basicstyle=\ttfamily\small, %
+identifierstyle=\color{colIdentifier}, %
+keywordstyle=\color{colKeys}, %
+stringstyle=\color{colString}, %
+columns=flexible, %
+tabsize=2, %
+extendedchars=true, %
+showspaces=false, %
+showstringspaces=false, %
+numbers=left, %
+numberstyle=\tiny, %
+breaklines=true, %
+breakautoindent=true, %
+captionpos=b}
+\begin{lstlisting}[caption=cryptodev conditional offloading, label=list:cryptodev-conditional-offload-pseudocode]
+int some_function() {
+	if(packet_size < 1024*1024) {
+		callback_function();
+	}
+}
+\end{lstlisting}
+
+He should however be aware that as the tipping point is around 1024kB, the performance for a network application should very close to those of a full software implementation, knowing that the ethernet frame size, the MTU, is set by default at 1500kB.
+
+
+% This work is just the beginning of something far larger. The aim is to build a fully secured platform, from software to hardware, using maximum security at each stage.
