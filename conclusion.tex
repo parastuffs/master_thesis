@@ -56,14 +56,15 @@ int some_function() {
 
 He should however be aware that as the tipping point is around 1024kB, the performance for a network application should very close to those of a full software implementation, knowing that the ethernet frame size, the MTU, is set by default at 1500kB.
 
-\citet{Xenakis20063225}
-
 \paragraph{Disk encryption}
 As the hardware is better used with larger blocks of data, disk encryption could be an interesting application to look into.
 
 \paragraph{Cryptographic libraries}
-OpenSSL is not the only cryptographic library available; PolarSSL and GnuTLS could also be viable solutions.
-%TODO see if they can use cryptodev, that would be perfect.
+OpenSSL is not the only cryptographic library available; GnuTLS is also a very popular alternative and supports cryptodev engines too.
+
+However, one library definitely worth to keep an eye on is mbed TLS, formally known as PolarSSL, recently bought by ARM~\cite{2015-arm-buy-polarssl}.
+We can expect the future releases of this library to be more optimized for ARM platforms, and maybe the software footprint and overhead to be reduced.
+
 
 \paragraph{Cryptodev}
 If patches adding the GCM support to cryptodev have already been released, those are not compatible with Barco Silex' driver.
