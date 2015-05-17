@@ -61,14 +61,26 @@ void encrypt_sign (struct context *c, bool comp_frag)
 
 
 \subsection{Strongswan}
+Strongswan is a full implementation of IPSec relying on the kernel drivers for the networking part, on the crypto API for the cryptographic part, and on user space crypto libraries for the connection negociation.
+An other popular implementation is ipsec-tools, but its development lags behind modern Linux and is not up-to-date with the 3.14 Linux kernel headers, making its cross-compilation painfull.
+%Use strongswan 5.3.0
+Strongswan as two advantages: it has a tremendous and exhaustive documentation, and its uer interface is straightforward.
+Once configured, a simple \texttt{ipsec start \&\& ipsec up <connection>} on both sides is enough to create a ready to use VPN.
+
+The figure~\ref{fig:ipsec-workflow} illustrates the workflow of Alice communicating with Bob via an IPSec ESP tunnel.
+The XFRM, read "transform", framework is implementing IPSec and handles the incomming and outgoing packets for established VPNs~\cite{rosen2014}.
+Its name comes from the fact that the kernel transforms packet frames to incorporate IPSec security.
+Depending on the configuration, XFRM uses the AH or ESP kernel module, which in turn calls the crypto API to encrypt and/or sign the IP packet.
+
+We can also clearly see one of the main advantages of IPSec: it works in the kernel space.
+Since it does not require a virtual network interface like OpenVPN, the only transfer between the user/kernel space happens when the former wishes to send a packet on the network, passing it to the later -- or \textit{vice versa} for incomming packets.
 
 \begin{figure}[ht]
 \Large
 \resizebox{\linewidth}{!}{%
 \input{ipsec-transfer}
 }
-% \includegraphics[width=\linewidth]{ipsec-tr1ansfer}
-\caption{IPSec ping workflow.}
+\caption{IPSec user/kernel space workflow, using \texttt{ping} as a test case.}
 \label{fig:ipsec-workflow}
 \end{figure}
 
