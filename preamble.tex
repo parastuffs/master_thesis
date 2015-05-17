@@ -24,6 +24,9 @@
 \usepackage{memhfixc}
 \usepackage[breaklinks=true]{hyperref}
 
+\usepackage{amsmath}
+\usepackage{dsfont} %Needed for \mathds{N}
+
 \usepackage[numbers]{natbib}
 
 \usepackage{framed}
@@ -37,6 +40,16 @@
 \maxsecnumdepth{subsubsection}% 'secnumdepth' is reset by \mainmatter. You should use 'maxsecnumdepth'.
 % \seccounter{tocdepth}{3}% Add subsubsection to the table of content.
 
+% ----------------------
+% lists
+% ----------------------
+\usepackage{enumitem}
+% \setlist{nosep} % remove all vertical sep inside and around the list
+\setlist{noitemsep} % remove all vertical spaces inside the list
+% \setlist[2]{noitemsep} % set the itemsep and parsep for all level two lists to 0
+% \setenumerate{noitemsep} % set noitemseponly for enumerate
+% \begin{description}[noitemsep] % if the \setlist{noitemsep} as not been defined, use 'noitemsep' only for this list.
+% \end{description}
 
 
 % ----------------------

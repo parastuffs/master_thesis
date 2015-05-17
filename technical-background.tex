@@ -6,10 +6,39 @@ This chapter will address the technical ground inherent to this work: first the 
 
 \section{Cryptography}
 
+\subsection{Symetric cryptography}
+
 \subsection{Asymetric cryptography}
 % Diffie-Hellman: show the math about the shared key, maybe from the course INFOH405 or RFC2631, and point which operation will be offloaded.
+Asymetric cryptography relies on a pair of keys: one private known only to the owner of the certificate, and one public available to anyone.
+Such cryptography uses two kinds of operations: encryption using the public key of the recipient and digital signature using the private key of the sender.
 
-\subsection{Symetric cryptography}
+\subsubsection{RSA}
+
+
+\subsubsection{Diffie-Hellman}
+Diffie-Hellman is a secret key exchange protocol: two parties compute a shared secret $ZZ$ that can be used as a symetric key during the following exchanges.
+It uses the same kind of operation as RSA, that is modular exponentiation.
+The RFC 2631~\cite{rfc2631} decribes the protocol:
+
+\begin{enumerate}
+	\item Alice generates once $p$ and $g$ (using precomputed parameters):
+	\begin{description}[nosep]
+		\item[p] large prime number
+		\item[g] a generator of $\mathds{Z}_p^*$
+	\end{description}
+	\item Alice picks a random integer $x_a$ and computes $g^{x_a} mod\ p = y_a$.
+	\item Alice sends $p$, $g$ and $y_a$ to Bob, signing everything using her private certificate.
+	\item Bob checks the signature and picks $x_b$.
+	\item Bob computes $y_a^{x_b} mod\ p = g^{x_a x_b} mod\ p = ZZ$, the shared secret to use as a premaster key from which will be derived the symetric key for further communications.
+	\item Bob sends $y_b = g^{x_b} mod\ p$, signing everything with his private certificate.
+	\item Alice checks the signature and computes the same shared secret: $ZZ = y_b^{x_a} mod\ p = g^{x_a x_b}$
+\end{enumerate}
+
+If the server is Alice, it has to do at least one signature, one signature verification and two modular exponentiations.
+If the certificate use RSA, we end up with four modular exponentiations, which can become quite heavy computing wise for certain sizes of prime numbers.
+We will see in chapter~\ref{chap:results} that while a 1024-bit prime is easily manageable by full software implementation, hardware offloading become a necessity for 4096-bit primes.
+Moreover, 1024-bit parameter size, both RSA and Diffie-Hellman, are disallowed by the NIST recommandations since 2013~\cite{nist-sp800-131A}.
 
 \section{Network and VPN implementation}
 
