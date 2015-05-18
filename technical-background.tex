@@ -4,6 +4,23 @@ This chapter will address the technical ground inherent to this work: first the 
 
 \section{Operating system}
 
+%User/kernel space. Networking application: need to send the data through the kernel: huge overhead.
+
+%Crypto API
+
+\subsection{Device Driver}\label{sec:theory-driver}
+% General idea of it works
+% device driver in userspace: linux userspace i/o (/dev/mem)
+Userspace I/O~\cite{koch2011}
+
+There are two ways to get the results from a hardware device: either by using interruption, or by actively polling the device, relentlessly asking it if it finished its operations.
+The first case is the cleanest and the most common: when the device has something to send to the driver, or if anything unexpected happened, it sends an interruption request (IRQ) to the processor, which will in turn execute the interruption routine registered by the driver~\citep[chap. 10]{Corbet:2005:LDD:1209083}.
+The second case is the easiest and is always guaranteed to work, but won't let go off the processor willingly, loading it at 100\%, and avoiding any other task to be executed.
+Hopefully, modern monolithic kernels such as the Linux kernel from 2.6 provide preemptive scheduling~\cite{Santhanam2003}, that is the scheduler interrupts the running task and assigns the processor ressources it used to an other one.
+Hence, systems with a lot of processes in need for CPU ressources would not be stalled, but it would not change anything if the only process heavily requesting processor time is the one using the driver.
+
+\section{FPGA}
+
 \section{Cryptography}
 
 \subsection{Symetric cryptography}

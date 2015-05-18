@@ -1,5 +1,23 @@
 \chapter{Implementation}
 
+\begin{figure}[ht]
+\center
+\subfloat[\label{fig:os-path-generic-a}Generic]{%
+	\Large
+	\resizebox{.4\linewidth}{!}{%
+	\input{os-path-generic}
+	}
+}
+\subfloat[\label{fig:os-path-generic-b}Specific]{%
+	\Large
+	\resizebox{.4\linewidth}{!}{%
+	\input{os-path-specific}
+	}
+}
+\caption{OS path generic}
+\label{fig:os-path-generic}
+\end{figure}
+
 \section{Software}
 
 \subsection{OpenVPN}
@@ -22,7 +40,7 @@ numberstyle=\tiny, %
 breaklines=true, %
 breakautoindent=true, %
 captionpos=b}
-\begin{lstlisting}[caption=openvpn compress then encrypt -- sample from \texttt{forward.c}, label=list:]
+\begin{lstlisting}[caption=openvpn compress then encrypt -- sample from \texttt{forward.c}, label=list:openvpn-workflow]
 /* Compress, fragment, encrypt and HMAC-sign an outgoing packet. */
 void encrypt_sign (struct context *c, bool comp_frag)
 {
@@ -50,7 +68,7 @@ void encrypt_sign (struct context *c, bool comp_frag)
 \end{figure}
 
 \subsection{OpenSSL}
-% Talk about the debug flags in the compilation and show it has close to none impact on the performance (using openssl speed. openssl speed is a relevant test because openssl uses 100% of the CPU, hence maximizing the potential performance reduction.)
+
 
 It is to be noted that the present work uses an implementation with all the debug flags activated.
 If it does have an impact on the performance, it is minimal: in the worst case of the benchmark, the throughput drops only by 2.4\%.
@@ -136,8 +154,29 @@ Since it does not require a virtual network interface like OpenVPN, the only tra
 
 \section{Offload}
 
-\subsection{Silex engine}
+\begin{table}[ht]
+\begin{tabular}{|l|c|}\hline
+IP & Ciphers \\ \hline
+BA414E & RSA, DH, DSA, EC \\ 
+BA411E & AES modes CBC, CTR, GCM, CCM, CFB, OFB, CTS, ECB \\ \hline
+\end{tabular}
+\caption{Summary of the ciphers supported by two of Barco Silex' IPs.}
+\label{tab:ip-ciphers}
+\end{table}
 
 \subsection{BA411E Driver}
+Takes the rightern path, which is the cleanest because the most versatile.
+By pluging the driver into the crypto API, we offer a standard kernel interface that can be used by any other kernel driver, such as the ESP driver, or user-space application via the cryptodev driver and OpenSSL engine.
 
-\subsection{BA414E Driver}
+However, at the current state of development, the user-space and the kernel applications do not share the same driver.
+The former is using an IRQ-based driver, whilst the latter is actively polling the hardware.
+The reason why the IRQ-based driver can not be used by kernel-space application is because the current implementation uses sleep methods that, when called on other kernel drivers, put the kernel in panic mode and require the system to reboot.
+An alternative is under development and is further discussed in the last part of this work, in section~\ref{sec:future-work}.
+
+Be it IRQ or polling, the inner workings are the same and follow the exact same canvas as the default software implementation the different AES modes.
+
+
+\subsection{BA414E Driver and Silex engine}
+At the moment of development, there is no asymetric cryptography interface in the crypto API.
+The BA414E can thus not be accessed using the same path as the BA411E and a user-space driver will be needed, that is the leftern path of figure~\ref{fig:os-path-generic-b}.
+As presented in section~\ref{sec:theory-driver}, we will need to rely on an UIO driver to access the device from the user space.
