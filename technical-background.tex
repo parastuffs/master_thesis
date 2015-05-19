@@ -81,6 +81,8 @@ The RFC 2631~\cite{rfc2631} decribes the protocol:
 \end{enumerate}
 
 If the server is Alice, it has to do at least one signature, one signature verification and two modular exponentiations.
+Note that the client, B in our case, could have one signature less because RFC 5246~\cite{rfc5246} leave it as an optional feature, and the server would then have one verification less.
+However, any sane configuration will have both actors signing their ephemeral public key.
 If the certificate use RSA, we end up with four modular exponentiations, which can become quite heavy computing wise for certain sizes of prime numbers.
 We will see in chapter~\ref{chap:results} that while a 1024-bit prime is easily manageable by full software implementation, hardware offloading become a necessity for 4096-bit primes.
 Moreover, 1024-bit parameter size, both RSA and Diffie-Hellman, are disallowed by the NIST recommandations since 2013~\cite{nist-sp800-131A}.
