@@ -1,7 +1,109 @@
 \chapter{Stuff}
 
 
+\begin{figure}[ht]
+\begin{tikzpicture}
 
+\begin{axis}[
+        width  = 0.95*\textwidth,
+        height = 8cm,
+        major x tick style = transparent,
+        ybar=10pt,%space between the bars
+        bar width=8pt,
+        enlarge x limits={abs=1},
+        ylabel = {},
+        hide x axis,
+        axis y line*=right,
+        ymin=0, ymax=100,
+        symbolic x coords={oot, none:none, aes256cbc:none, aes256cbc:sha256},
+        xtick = data,
+        scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
+        legend style={at={(0.5,-0.25)}, anchor=north,legend columns=2},
+        enlarge x limits=0.1,
+    ]
+
+\addplot[style={gray,fill=gray,mark=none}]
+    coordinates {
+        (oot, 10)
+        (none:none, 0)
+        (aes256cbc:none, 0)
+        (aes256cbc:sha256, 0)
+    };
+    \label{}
+
+% \addplot[style={LimeGreen,fill=LimeGreen,mark=none}, bar shift=.1cm]
+\addplot[style={LimeGreen,fill=LimeGreen,mark=none}]
+    coordinates {
+        (oot, 0)
+        (none:none, 25)
+        (aes256cbc:none, 82)
+        (aes256cbc:sha256, 80)
+    };
+    \label{}
+
+\addplot[style={RedOrange,fill=RedOrange,mark=none}]
+    coordinates {
+        (oot, 0)
+        (none:none, 25)
+        (aes256cbc:none, 82)
+        (aes256cbc:sha256, 80)
+    };
+    \label{}
+\legend{}
+\end{axis}
+
+\begin{axis}[
+        title = {},
+        width  = 0.95*\textwidth,
+        height = 8cm,
+        major x tick style = transparent,
+        ybar=10pt,
+        bar width=8pt,
+        enlarge x limits={abs=1},
+        ymajorgrids = true,
+        ylabel = {},
+        xlabel = {},
+        ymin=0, ymax=800,
+        symbolic x coords={oot, none:none, aes256cbc:none, aes256cbc:sha256},
+        xtick = data,
+        scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
+        legend style={at={(0.5,-0.25)}, anchor=north,legend columns=2},
+        enlarge x limits=0.1,
+    ]
+
+\addplot[style={black,fill=black,mark=none}]
+    coordinates {
+        (oot, 800)
+        (none:none, 0)
+        (aes256cbc:none, 0)
+        (aes256cbc:sha256, 0)
+    };
+    \label{oot}
+
+\addplot[style={ForestGreen,fill=ForestGreen,mark=none}]
+    coordinates {
+        (oot, 0)
+        (none:none, 500)
+        (aes256cbc:none, 400)
+        (aes256cbc:sha256, 300)
+    };
+    \label{}
+
+\addplot[style={BrickRed,fill=BrickRed,mark=none}]
+    coordinates {
+        (oot, 0)
+        (none:none, 500)
+        (aes256cbc:none, 400)
+        (aes256cbc:sha256, 300)
+    };
+    \label{}
+\legend{}
+\end{axis}
+
+\end{tikzpicture}
+\caption{}
+\label{}
+\end{figure}
 
 
 \begin{figure}[ht]
@@ -116,8 +218,8 @@
 \legend{raw, ipsec-soft-gcm128, ipsec-ba411e-gcm128, ipsec-soft-cbc256-sha1, ipsec-ba411e-cbc256-sha1}
 \end{axis}
 \end{tikzpicture}
-\label{fig:ping-benchmark-ipsec}
 % Here, I could show the gcm128, which show better performances with the BA411e, but I would be weird to compare it with aes256cbc.
 % I need another graph with a CPu usage comparison to show that even if the perf are the same for soft/hard with aes256gcm, the hard loads less the CPU (I hope so, at least).
 \caption{Ping min/avg/max response time for different packet sizes using IPsec. For each packet size, 1000 requests were flooded to the board, that is \textit{"outputs packets as fast as they come back or one hundred times per second, whichever is more"}, according to the \texttt{ping} command manual.}
+\label{fig:ping-benchmark-ipsec}
 \end{figure}
