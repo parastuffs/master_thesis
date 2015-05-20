@@ -125,3 +125,21 @@ The later was developped by a vendor consortium and proposed in the RFC 2637 and
 
 \subsection{IPSec}
 % IPSec as a protocol, strongswan come in the 'implementation' chapter.
+
+\begin{figure}[ht]
+\center
+\subfloat[\label{fig:ipsec-transport}Transport]{%
+	\large
+	\resizebox{.465\linewidth}{!}{%
+	\input{ipsec-transport}
+	}
+}
+\subfloat[\label{fig:ipsec-tunnel}Tunnel]{%
+	\large
+	\resizebox{.535\linewidth}{!}{%
+	\input{ipsec-tunnel}
+	}
+}
+\caption{IPSec transport (a) and tunnel (b) overheads}{Tunnel mode adds a custom IP header and moves the AH/ESP header in front of the original IP header. Note: ``trl" stands for ``trailer", ``hdr" for ``header"}
+\label{fig:ipsec-transport-tunnel}
+\end{figure}
