@@ -64,8 +64,19 @@ The encryption and decryption of a given message $m \in \mathds{Z}_n$ are define
 \subsubsection{Diffie-Hellman}
 Diffie-Hellman is a secret key exchange protocol: two parties compute a shared secret $ZZ$ that can be used as a symetric key during the following exchanges.
 It uses the same kind of operation as RSA, that is modular exponentiation.
-The RFC 2631~\cite{rfc2631} decribes the protocol:
+The protocol can be one of two type (\cite{rfc2631}, ...):
+\begin{itemize}
+	\item Static: the actors use their authenticated certificate to compute the shared secret.
+	\item Ephemeral: the actors create a new pair of public/private keys from which the secret key is derived.
+\end{itemize}
+A static scheme is easier to implement and requires much less operations, but using ephemeral keys is essential to ensure perfect forward secrecy.
+Imagine that somehow, an opponent lays his hand on the shared secret.
+If that secret has already been used, he can decipher all data transfered during past connections.
+However, if the secret is new for every new connection, the compromission of the shared secret des not jeopardize past communications.
+This is perfect forward secrecy: using a new key to protect the past.
 
+Hereunder is the generation of an ephemeral shared secret.
+For a static secret, Alice and Bob will simply use their static certificate, sparing one modular exponentiation.
 \begin{enumerate}
 	\item Alice generates once $p$ and $g$ (using precomputed parameters):
 	\begin{description}[nosep]

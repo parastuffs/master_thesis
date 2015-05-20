@@ -5,8 +5,53 @@
 \section{TLS connections}
 % Begin with the benchmark done by Bastien on the raw number of verif/s with openssl.
 
+This benchmark is done only with OpenVPN.
+Since there is no standard support for those operation in the kernel yet, it would not have made sense to use IPSec, since it would have had to fallback to OpenSSL, then following the same path as OpenVPN do.
+As soon as the public key operations can be plugged into the crypto API, this use case should however be tested immediatly.
+
 \section{File transfer}
 %FTP over openvpn and IPSec
 
 %OpenSSH: 	- normal transfer: shows perf difference
 %			- capped to software max: show CPU offload
+
+\subsection{openSSH}
+
+\begin{figure}[ht]
+\input{graphs/openssh-bench}
+\caption{file transfer over an SSH tunnel. The background stripped bars are the CPU usage.}
+\label{fig:openssh-bench}
+\end{figure}
+
+\subsection{OpenVPN}
+
+\begin{figure}[ht]
+\input{graphs/openvpn-ftp-bench}
+\caption{FTP file transfer over an OpenVPN tunnel. The background stripped bars are the CPU usage.}
+\label{fig:openvpn-ftp-bench}
+\end{figure}
+
+We can see that adding a MAC computation aside the encryption merely lowers the performance when using the hardware.
+Even though OpenSSL uses here an hihgly ARM-optimzed assembly implementation of SHA-256, it shows that the bottleneck is on the hardware side.
+
+Indeed, 
+
+\subsection{IPSec}
+
+\begin{figure}[ht]
+\input{graphs/ipsec-ftp-bench}
+\caption{FTP file transfer over an IPSec tunnel. The background stripped bars are the CPU usage.}
+\label{fig:ipsec-ftp-bench}
+\end{figure}
+
+Some results have to be put into perspective with the fact that the implementation of SHA-256 is entirely C-based.
+A more recent one using assembly instructions optimized for the NEON SIMD instruction set of the ARMv7 core could be used and would most probably yield better results.
+The CPU usage of the software implementation would drop -- even if not significantly -- as for the hardware, it would be less limited by the software MAC counter part, and if the CPU usage could stay at the same level, we could expect a better throughput.
+
+\subsection{Comparison}
+
+\begin{figure}[ht]
+\input{graphs/ftp-bench-comparison}
+\caption{Comparison of file transfer methods. The background stripped bars are the CPU usage.}
+\label{fig:ftp-bench-comparison}
+\end{figure}

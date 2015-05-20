@@ -1,3 +1,9 @@
 \chapter{Test protocol and Prediction}
 
 % Streamline
+
+\section{File transfer}
+The file transfered is an un compressed block of 128MB of random data generated using the following command:
+\begin{lstlisting}[language=bash]
+  $ head -c $((1024*1024*128)) /dev/urandom > heavy.file
+\end{lstlisting}

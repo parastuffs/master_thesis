@@ -1,0 +1,98 @@
+\begin{tikzpicture}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% CPU in the background
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{axis}[
+        width  = 0.95*\textwidth,
+        height = 8cm,
+        major x tick style = transparent,
+        ybar=2pt,%space between the bars
+        bar width=16pt,
+        enlarge x limits={abs=1},
+        ylabel = {CPU\#0 usage},
+        hide x axis,
+        axis y line*=right,
+        ymin=0, ymax=100,
+        symbolic x coords={none:none, aes256cbc:none, aes256cbc:sha256},
+        xtick = data,
+        scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
+        legend style={at={(0.5,-0.15)}, anchor=north,legend columns=4},
+        enlarge x limits=0.1,
+    ]
+
+\addplot[style={black,fill=LimeGreen,postaction={pattern=north east lines},mark=none}]
+    coordinates {
+        (none:none, 0)
+        (aes256cbc:none, 96.26)
+        (aes256cbc:sha256, 89.29)
+    };
+    \label{software}
+
+\addplot[style={black,fill=RedOrange,postaction={pattern=north east lines},mark=none}]
+    coordinates {
+        (none:none, 0)
+        (aes256cbc:none, 46.01)
+        (aes256cbc:sha256, 68.19)
+    };
+    \label{ba411e}
+
+\addplot[style={black,fill=gray,postaction={pattern=north east lines},mark=none}]
+    coordinates {
+        (none:none, 7.16)
+        (aes256cbc:none, 0)
+        (aes256cbc:sha256, 0)
+    };
+    \label{out-of-tunnel}%"oot" for "out of tunnel"
+\legend{software, ba411e, out-of-tunnel}
+\end{axis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% throughput
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{axis}[
+        title = {file transfer over SSH tunnel},
+        width  = 0.95*\textwidth,
+        height = 8cm,
+        major x tick style = transparent,
+        ybar=10pt,
+        bar width=8pt,
+        enlarge x limits={abs=1},
+        ymajorgrids = true,
+        ylabel = {Throughtput [MB/s]},
+        xlabel = {},
+        ymin=0, ymax=12,
+        symbolic x coords={oot, none:none, aes256cbc:none, aes256cbc:sha256},
+        xtick = data,
+        scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
+        legend style={at={(0.5,-0.25)}, anchor=north,legend columns=2},
+        enlarge x limits=0.1,
+    ]
+
+\addplot[style={black,fill=ForestGreen,mark=none}]
+    coordinates {
+        (none:none, 0)
+        (aes256cbc:none, 10.89)
+        (aes256cbc:sha256, 8.19)
+    };
+    \label{soft-tp}
+
+\addplot[style={black,fill=BrickRed,mark=none}]
+    coordinates {
+        (none:none, 0)
+        (aes256cbc:none, 10.67)
+        (aes256cbc:sha256, 10.39)
+    };
+    \label{ba411e-tp}
+
+\addplot[style={black,fill=black,mark=none}]
+    coordinates {
+        (none:none, 11.39)
+        (aes256cbc:none, 0)
+        (aes256cbc:sha256, 0)
+    };
+    \label{oot-tp}%"tp" for "throughput"
+\legend{}
+\end{axis}
+
+\end{tikzpicture}
