@@ -1,6 +1,9 @@
 \chapter{Technical background}
 
-This chapter will address the technical ground inherent to this work: first the operating system, followed by the cryptography and networking.
+This chapter will address the technical ground inherent to this work.
+First comes an overview of Linux operating systems, the distinction between user and kernel mode, and the design of device drivers.
+
+Follow a quick presentation of FPGAs and how they can be driven from the operating system.
 
 \section{Operating system}
 
@@ -20,6 +23,13 @@ Hopefully, modern monolithic kernels such as the Linux kernel from 2.6 provide p
 Hence, systems with a lot of processes in need for CPU ressources would not be stalled, but it would not change anything if the only process heavily requesting processor time is the one using the driver.
 
 \section{FPGA}
+
+Driving from the OS: basically, they will need to share some memory.
+That memory can be directly mapped and accessed from the user-space using \texttt{/dev/mem}, or can use a direct memory access module (DMA).
+From the operation system, we build a bunch of scatterlist in ther kernel-space memory, then map those pages to memory descriptor that have a physical address on the DMA.
+They can be mapped three different ways: \texttt{DMA\_BIDIRECTIONAL}, \texttt{DMA\_TO\_DEVICE} or \texttt{DMA\_FROM\_DEVICE}.
+When the CPU write something in those descriptor and synchronize them with the DMA, it does not have to care about them anymore, the DMA in now in charge to send them to the device where registers are ready to read the incomming data.
+The same goes from the device to the CPU: when the device wants to communicate data to the OS, it writes it on the DMA that will transfer them to the CPU, triggering a flag on the way to notify it.
 
 \section{Cryptography}
 
@@ -64,10 +74,11 @@ The encryption and decryption of a given message $m \in \mathds{Z}_n$ are define
 \subsubsection{Diffie-Hellman}
 Diffie-Hellman is a secret key exchange protocol: two parties compute a shared secret $ZZ$ that can be used as a symetric key during the following exchanges.
 It uses the same kind of operation as RSA, that is modular exponentiation.
-The protocol can be one of two type (\cite{rfc2631}, ...):
+The protocol can be one of two type (\cite{rfc2631}, \cite{Frankel:2005:SGI:2206289}):
 \begin{itemize}
 	\item Static: the actors use their authenticated certificate to compute the shared secret.
 	\item Ephemeral: the actors create a new pair of public/private keys from which the secret key is derived.
+	\item Anonymous: same as ephemeral, but without signing anything, hence not identifying neither of the actors. This mode is not advisable since it's vulnerable to main-in-the-middle attack.
 \end{itemize}
 A static scheme is easier to implement and requires much less operations, but using ephemeral keys is essential to ensure perfect forward secrecy.
 Imagine that somehow, an opponent lays his hand on the shared secret.
@@ -76,7 +87,7 @@ However, if the secret is new for every new connection, the compromission of the
 This is perfect forward secrecy: using a new key to protect the past.
 
 Hereunder is the generation of an ephemeral shared secret.
-For a static secret, Alice and Bob will simply use their static certificate, sparing one modular exponentiation.
+For a static secret, Alice and Bob will simply use their static certificate, sparing the modular exponentiation of the ephemeral public key generation.
 \begin{enumerate}
 	\item Alice generates once $p$ and $g$ (using precomputed parameters):
 	\begin{description}[nosep]

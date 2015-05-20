@@ -43,6 +43,22 @@
 \maxsecnumdepth{subsubsection}% 'secnumdepth' is reset by \mainmatter. You should use 'maxsecnumdepth'.
 % \seccounter{tocdepth}{3}% Add subsubsection to the table of content.
 
+%%%%%%%%% vvvvvvv
+% Anthony Debruyn 
+\let\oldCaption\caption
+\renewcommand{\caption}[2]{
+\oldCaption[#1]{{\small\bfseries #1:} #2}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NEW STYLES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\captiondelim{ -- }
+\captionnamefont{\small\bfseries}
+\captiontitlefont{\small}
+\precaption{\rule{\linewidth}{0.4pt}\\}
+% Anthony Debruyn
+%%%%%%%%% ^^^^^^^
+
 % ----------------------
 % lists
 % ----------------------
