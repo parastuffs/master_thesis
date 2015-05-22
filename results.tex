@@ -2,6 +2,14 @@
 
 \section{Response time -- latency}
 
+\subsection{IPSec}
+
+\begin{figure}[ht]
+\input{graphs/ipsec-ping-benchmark}
+\caption{Ping min/avg/max response time}{for different packet sizes using IPsec. For each packet size, 1000 requests were flooded to the board, that is \textit{"outputs packets as fast as they come back or one hundred times per second, whichever is more"}, according to the \texttt{ping} command manual.}
+\label{fig:ping-benchmark-ipsec}
+\end{figure}
+
 \section{TLS connections}
 % Begin with the benchmark done by Bastien on the raw number of verif/s with openssl.
 
@@ -47,6 +55,13 @@ Indeed,
 Some results have to be put into perspective with the fact that the implementation of SHA-256 is entirely C-based.
 A more recent one using assembly instructions optimized for the NEON SIMD instruction set of the ARMv7 core could be used and would most probably yield better results.
 The CPU usage of the software implementation would drop -- even if not significantly -- as for the hardware, it would be less limited by the software MAC counter part, and if the CPU usage could stay at the same level, we could expect a better throughput.
+
+The GCM performance presented clearly shows a drop of throughput and an increase of CPU usage, illustrating the fact that those operations are hard on the software.
+With an hardware offload, we could expect not only a drastic drop of the CPU usage, but an increase of throughput as well, since it's CPU-limited in those results.
+Note that they are achieved usinf a C-based implementation of galois-field multiplications.
+As we saw in chapter~\ref{chap:theory}, modern processor designers tend to add specialized instruction set aimed at AES-GCM enhancement.
+Should further tests be conducted concerning IPSec paired with GCM, it would be wise to compare with an assembly implementation exploiting ARM NEON instruction set.
+Some are being developed~\cite{Conrado2013,Danilo2013}, but none have been committed to the Linux kernel repository yet.
 
 \subsection{Comparison}
 
