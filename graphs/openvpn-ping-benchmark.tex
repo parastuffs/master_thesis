@@ -13,7 +13,7 @@
         ylabel = {Response time [ms]},
         xlabel = {ICMP packet size [B]},
         ymin=0,
-        symbolic x coords={56, 500, 1000, 4000, 8000, 16000},
+        symbolic x coords={56, 1000, 4000, 8000, 16000},
         xtick = data,
         scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
         legend style={at={(0.5,-0.25)}, anchor=north,legend columns=2},
@@ -24,7 +24,6 @@
 \addplot[style={black, fill=black}]
     coordinates {
         (56, 1.444)
-        (500, 1.728)
         (1000, 1.929)
         (4000, 2.376)
         (8000, 2.811)
@@ -35,7 +34,6 @@
 \addplot[style={brown, fill=brown}]
     coordinates {
         (56, 2.066)
-        (500, 2.357)
         (1000, 2.561)
         (4000, 3.373)
         (8000, 4.293)
@@ -46,7 +44,6 @@
 \addplot[style={green, fill=green}]
     coordinates {
         (56, 2.415)
-        (500, 2.825)
         (1000, 3.061)
         (4000, 4.376)
         (8000, 5.997)
@@ -57,7 +54,6 @@
 \addplot[style={orange, fill=orange}]
     coordinates {
         (56, 2.416)
-        (500, 2.778)
         (1000, 3.052)
         (4000, 4.140)
         (8000, 5.963)

@@ -11,28 +11,16 @@
         ylabel = {Response time [ms]},
         xlabel = {ICMP packet size [B]},
         ymin=0,
-        symbolic x coords={56, 500, 1000, 4000, 8000, 16000},
+        symbolic x coords={56, 1000, 4000, 8000, 16000},
         xtick = data,
         scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
         legend style={at={(0.5,-0.25)}, anchor=north,legend columns=2},
-        enlarge x limits=0.1,
+        % enlarge x limits=0.1,
     ]
-
-\addplot[style={black, fill=black}]
-    coordinates {
-        (56, 1.444)
-        (500, 1.728)
-        (1000, 1.929)
-        (4000, 2.376)
-        (8000, 2.811)
-        (16000, 4.322)
-    };
-    \label{raw}
 
 \addplot[style={brown, fill=brown, postaction={pattern=north east lines}}]
     coordinates {
         (56, 1.545)
-        (500, 1.785)
         (1000, 2.045)
         (4000, 2.521)
         (8000, 2.997)
@@ -43,7 +31,6 @@
 \addplot[style={brown, fill=brown, postaction={pattern=north west lines}}]
     coordinates {
         (56, 2.066)
-        (500, 2.357)
         (1000, 2.561)
         (4000, 3.373)
         (8000, 4.293)
@@ -54,7 +41,6 @@
 \addplot[style={green, fill=green, postaction={pattern=north east lines}}]
     coordinates {
         (56, 1.645)
-        (500, 1.960)
         (1000, 2.322)
         (4000, 3.420)
         (8000, 4.762)
@@ -66,7 +52,6 @@
 \addplot[style={green, fill=green, postaction={pattern=north west lines}}]
     coordinates {
         (56, 2.415)
-        (500, 2.825)
         (1000, 3.061)
         (4000, 4.376)
         (8000, 5.997)
@@ -77,7 +62,6 @@
 \addplot[style={orange, fill=orange, postaction={pattern=north east lines}}]
     coordinates {
         (56, 1.635)
-        (500, 1.935)
         (1000, 2.246)
         (4000, 3.172)
         (8000, 4.170)
@@ -88,7 +72,6 @@
 \addplot[style={orange, fill=orange, postaction={pattern=north west lines}}]
     coordinates {
         (56, 2.416)
-        (500, 2.778)
         (1000, 3.052)
         (4000, 4.140)
         (8000, 5.963)
@@ -96,7 +79,7 @@
     };
     \label{openvpn-ba411e-cbc256-sha256}
 
-\legend{raw, none-none, soft-cbc256-sha256, ba411e-cbc256-sha256, soft-gcm256, ba411e-gcm256}
+\legend{ipsec-none-none, openvpn-none-none, ipsec-soft-cbc256-sha256, openvpn-soft-cbc256-sha256, ipsec-ba411e-cbc256-sha256, openvpn-ba411e-cbc256-sha256}
 \end{axis}
 \end{tikzpicture}
 % Here, I could show the gcm256, which show better performances with the BA411e, but I would be weird to compare it with aes256cbc.
