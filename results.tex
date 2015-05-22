@@ -1,21 +1,24 @@
 \chapter{Results and Analysis}\label{chap:results}
 
-\section{Response time -- latency}
-
-\subsection{IPSec}
-
-\begin{figure}[ht]
-\input{graphs/ipsec-ping-benchmark}
-\caption{Ping min/avg/max response time}{for different packet sizes using IPsec. For each packet size, 1000 requests were flooded to the board, that is \textit{"outputs packets as fast as they come back or one hundred times per second, whichever is more"}, according to the \texttt{ping} command manual.}
-\label{fig:ping-benchmark-ipsec}
-\end{figure}
-
 \section{TLS connections}
 % Begin with the benchmark done by Bastien on the raw number of verif/s with openssl.
 
 This benchmark is done only with OpenVPN.
 Since there is no standard support for those operation in the kernel yet, it would not have made sense to use IPSec, since it would have had to fallback to OpenSSL, then following the same path as OpenVPN do.
 As soon as the public key operations can be plugged into the crypto API, this use case should however be tested immediatly.
+
+
+\section{Response time -- latency}
+After the establishement of a connection.
+
+\subsection{IPSec}
+
+\begin{figure}[ht]
+\input{graphs/ipsec-ping-benchmark}
+\caption{Ping min/avg/max response time}{for different packet sizes using IPsec. For each packet size, 1000 requests were flooded to the board, that is \textit{"outputs packets as fast as they come back or one hundred times per second, whichever is more"}, according to the \texttt{ping} command manual.} %TODO move the end of the caption to the "test protocol" chapter.
+\label{fig:ping-benchmark-ipsec}
+\end{figure}
+
 
 \section{File transfer}
 %FTP over openvpn and IPSec
