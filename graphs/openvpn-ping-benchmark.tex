@@ -3,8 +3,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{tikzpicture}
 \begin{axis}[
-        title = {Ping benchmark},
-        width  = \textwidth,
+        title = {Ping benchmark -- OpenVPN},
+        width  = 0.95*\textwidth,
         height = 8cm,
         major x tick style = transparent,
         ybar,
@@ -34,62 +34,39 @@
 
 \addplot[style={brown, fill=brown}]
     coordinates {
-        (56, 1.545)
-        (500, 1.785)
-        (1000, 2.045)
-        (4000, 2.521)
-        (8000, 2.997)
-        (16000, 4.703)
+        (56, 2.066)
+        (500, 2.357)
+        (1000, 2.561)
+        (4000, 3.373)
+        (8000, 4.293)
+        (16000, 6.117)
     };
     \label{none-none}
 
 \addplot[style={green, fill=green}]
     coordinates {
-        (56, 1.645)
-        (500, 1.960)
-        (1000, 2.322)
-        (4000, 3.420)
-        (8000, 4.762)
-        (16000, 7.975)
-
+        (56, 2.415)
+        (500, 2.825)
+        (1000, 3.061)
+        (4000, 4.376)
+        (8000, 5.997)
+        (16000, 9.135)
     };
     \label{soft-cbc256-sha256}
 
 \addplot[style={orange, fill=orange}]
     coordinates {
-        (56, 1.635)
-        (500, 1.935)
-        (1000, 2.246)
-        (4000, 3.172)
-        (8000, 4.170)
-        (16000, 6.929)
+        (56, 2.416)
+        (500, 2.778)
+        (1000, 3.052)
+        (4000, 4.140)
+        (8000, 5.963)
+        (16000, 9.207)
     };
     \label{ba411e-cbc256-sha256}
 
-\addplot[style={blue, fill=blue}]
-    coordinates {
-        (56, 1.651)
-        (500, 2.021)
-        (1000, 2.388)
-        (4000, 3.765)
-        (8000, 5.383)
-        (16000, 9.241)
-    };
-    \label{soft-gcm256}
-
-\addplot[style={red, fill=red}]
-    coordinates {
-        (56, 1.764)
-        (500, 0)
-        (1000, 2.286)
-        (4000, 0)
-        (8000, 0)
-        (16000, 0)
-    };
-    \label{ba411e-gcm256}
-
-\legend{raw, none-none, soft-cbc256-sha256, ba411e-cbc256-sha256, soft-gcm256, ba411e-gcm256}
+\legend{raw, soft-cbc256-sha256, ba411e-cbc256-sha256}
 \end{axis}
 \end{tikzpicture}
-% Here, I could show the gcm256, which show better performances with the BA411e, but I would be weird to compare it with aes256cbc.
+% Here, I could show the gcm128, which show better performances with the BA411e, but I would be weird to compare it with aes256cbc.
 % I need another graph with a CPu usage comparison to show that even if the perf are the same for soft/hard with aes256gcm, the hard loads less the CPU (I hope so, at least).
