@@ -1,4 +1,12 @@
 \chapter{Implementation}
+This chapter will present how we implemented the protocols of chapter~\ref{chap:theory} on the board.
+The figure~\ref{fig:os-path-generic} show the generic data flow in the operating system through the user and kernel spaces.
+We will first detail the software part, with the OpenVPN and openSSH as the application, and OpenSSL as a cryptographic library on which both applications rely.
+Then will come strongswan, a user-space abstraction layer giving access to IPSec and we will see how different it is from an OpenVPN implementation.
+Lastly, the standard Linux cryptographic kernel modules and network drivers will be listed and briefly discussed.
+
+Before closing the chapter, we will present the two main IPs to which the cryptographic operations will be offloaded and the associated drivers.
+
 
 \begin{figure}[ht]
 \center
@@ -14,7 +22,7 @@
 	\input{os-path-specific}
 	}
 }
-\caption{OS path generic}{}
+\caption{OS data paths}{(a) as a generic abstraction and (b) with some specific blocks replaced with custom implementations.}
 \label{fig:os-path-generic}
 \end{figure}
 
@@ -67,6 +75,14 @@ void encrypt_sign (struct context *c, bool comp_frag)
 \label{fig:openvpn-packet-flow}
 \end{figure}
 
+
+\subsection{OpenSSH}
+% Talk about the MAC=none patch
+% connection using SSL/TLS, then AES, but without fragmentation (unlike openvpn)
+
+
+
+
 \subsection{OpenSSL}
 
 
@@ -118,10 +134,6 @@ When OpenSSL will have to share the CPU with other applications, the loss will b
 
 % Talk about the assembly implementation, maybe show the difference in an appendice with the C implementation. Not /that/ interresting.
 
-\subsection{OpenSSH}
-% Talk about the MAC=none patch
-% connection using SSL/TLS, then AES, but without fragmentation (unlike openvpn)
-
 
 \subsection{Strongswan}
 % TODO talk about IKE and SA management
@@ -132,7 +144,7 @@ Strongswan as two advantages: it has a tremendous and exhaustive documentation, 
 Once configured, a simple \texttt{ipsec start \&\& ipsec up <connection>} on both sides is enough to create a ready to use VPN.
 
 The figure~\ref{fig:ipsec-workflow} illustrates the workflow of Alice communicating with Bob via an IPSec ESP tunnel.
-The XFRM, read "transform", framework is implementing IPSec and handles the incomming and outgoing packets for established VPNs~\cite{rosen2014}.
+The XFRM, read ``transform", framework is implementing IPSec and handles the incomming and outgoing packets for established VPNs~\cite{rosen2014}.
 Its name comes from the fact that the kernel transforms packet frames to incorporate IPSec security.
 Depending on the configuration, XFRM uses the AH or ESP kernel module, which in turn calls the crypto API to encrypt and/or sign the IP packet.
 
