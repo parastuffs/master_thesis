@@ -1,0 +1,83 @@
+\begin{tikzpicture}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% CPU in the background
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{axis}[
+        width  = 0.7*\textwidth,
+        height = 8cm,
+        major x tick style = transparent,
+        ybar=2pt,%space between the bars
+        bar width=16pt,
+        enlarge x limits={abs=1},
+        ylabel = {CPU\#0 usage},
+        hide x axis,
+        axis y line*=right,
+        ymin=0, ymax=100,
+        symbolic x coords={RSA-1024, RSA-2048, RSA-4096},
+        xtick = data,
+        scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
+        legend style={at={(0.5,-0.15)}, anchor=north,legend columns=2},
+        enlarge x limits=0.1,
+    ]
+
+\addplot[style={black,fill=LimeGreen,postaction={pattern=north east lines},mark=none}]
+    coordinates {
+        (RSA-1024, 40.32)
+        (RSA-2048, 92.14)
+        (RSA-4096, 81.97)
+    };
+    \label{software}
+
+\addplot[style={black,fill=RedOrange,postaction={pattern=north east lines},mark=none}]
+    coordinates {
+        (RSA-1024, 13.29)
+        (RSA-2048, 4.82)
+        (RSA-4096, 4.78)
+    };
+    \label{ba414e}
+\legend{software, ba414e}
+\end{axis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% throughput
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{axis}[
+        title = {TLS connections through OpenVPN},
+        width  = 0.7*\textwidth,
+        height = 8cm,
+        major x tick style = transparent,
+        ybar=10pt,
+        bar width=8pt,
+        enlarge x limits={abs=1},
+        ymajorgrids = true,
+        ylabel = {Throughtput [MB/s]},
+        xlabel = {},
+        ymin=0,
+        symbolic x coords={RSA-1024, RSA-2048, RSA-4096},
+        xtick = data,
+        scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
+        legend style={at={(0.5,-0.25)}, anchor=north,legend columns=2},
+        enlarge x limits=0.1,
+    ]
+
+\addplot[style={black,fill=ForestGreen,mark=none}]
+    coordinates {
+        (RSA-1024, 445.4)
+        (RSA-2048, 155.6)
+        (RSA-4096, 19.6)
+    };
+    \label{soft-tp}
+
+\addplot[style={black,fill=BrickRed,mark=none}]
+    coordinates {
+        (RSA-1024, 509.3)
+        (RSA-2048, 420.9)
+        (RSA-4096, 115.5)
+    };
+    \label{ba411e-tp}
+\legend{}
+\end{axis}
+
+\end{tikzpicture}
+

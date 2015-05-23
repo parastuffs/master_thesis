@@ -12,11 +12,11 @@
         ymajorgrids = true,
         ylabel = {Response time [ms]},
         xlabel = {ICMP packet size [B]},
-        ymin=0,
+        ymin=0, ymax=10,
         symbolic x coords={56, 1000, 4000, 8000, 16000},
         xtick = data,
         scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
-        legend style={at={(0.5,-0.25)}, anchor=north,legend columns=2},
+        legend style={at={(0.5,-0.25)}, anchor=north,legend columns=3},
         enlarge x limits=0.1,
     ]
 % I would have prefered to have "\addplot[marks only]", but they overlap if they have the same x coordinate,

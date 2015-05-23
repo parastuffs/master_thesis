@@ -7,6 +7,13 @@ This benchmark is done only with OpenVPN.
 Since there is no standard support for those operation in the kernel yet, it would not have made sense to use IPSec, since it would have had to fallback to OpenSSL, then following the same path as OpenVPN do.
 As soon as the public key operations can be plugged into the crypto API, this use case should however be tested immediatly.
 
+\begin{figure}[ht]
+\center
+\input{graphs/openvpn-tls-bench}
+\caption{TLS connections per second}{The background stripped bars are the CPU usage. Raw data in table~\ref{tab:tls-con}.}
+\label{fig:openvpn-tls-bench}
+\end{figure}
+
 
 \section{Response time -- latency}
 After the establishement of a connection.
@@ -33,7 +40,7 @@ After the establishement of a connection.
 
 \begin{figure}[ht]
 \input{graphs/ping-bench-comparison}
-\caption{Ping min/avg/max response time}{comparison.} %TODO move the end of the caption to the "test protocol" chapter.
+\caption{Ping average comparison}{All values are for aes-256-cbc with sha-256}
 \label{fig:ping-benchmark-comparison}
 \end{figure}
 
@@ -88,6 +95,6 @@ Some are being developed~\cite{Conrado2013,Danilo2013}, but none have been commi
 
 \begin{figure}[ht]
 \input{graphs/ftp-bench-comparison}
-\caption{Comparison of file transfer methods. The background stripped bars are the CPU usage.}{}
+\caption{Comparison of file transfer methods}{The background stripped bars are the CPU usage.}
 \label{fig:ftp-bench-comparison}
 \end{figure}
