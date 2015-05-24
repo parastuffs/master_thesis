@@ -32,22 +32,6 @@ Before closing the chapter, we will present the two main IPs to which the crypto
 % By default, point-to-point, but since the version 2.0 can be configured in server mode, hence being able to manage hundreds of clients.
 
 \lstset{language=c}
-\lstset{commentstyle=\color{colComments}\textit,
-float=hbp,%
-basicstyle=\ttfamily\footnotesize, %
-identifierstyle=\color{colIdentifier}, %
-keywordstyle=\color{colKeys}, %
-stringstyle=\color{colString}, %
-columns=flexible, %
-tabsize=2, %
-extendedchars=true, %
-showspaces=false, %
-showstringspaces=false, %
-numbers=left, %
-numberstyle=\tiny, %
-breaklines=true, %
-breakautoindent=true, %
-captionpos=b}
 \begin{lstlisting}[caption=openvpn compress then encrypt -- sample from \texttt{forward.c}, label=list:openvpn-workflow]
 /* Compress, fragment, encrypt and HMAC-sign an outgoing packet. */
 void encrypt_sign (struct context *c, bool comp_frag)
@@ -79,6 +63,19 @@ void encrypt_sign (struct context *c, bool comp_frag)
 \subsection{OpenSSH}
 % Talk about the MAC=none patch
 % connection using SSL/TLS, then AES, but without fragmentation (unlike openvpn)
+OpenSSH relies on an external cryptographic library for all its security operations.
+Up until the version 6.7 published in october 2014, it had to be compiled against OpenSSL.
+However, after the infamous security vulnerability heartbleed in april 2014, the developpers took a step to move towards LibreSSL, a fork of OpenSSL managed by OpenBSD  developers.
+Still, there is no official support for any other cryptographic library.
+
+If OpenSSH does support most of OpenSSL ciphers by default, it takes some liberties such as disabling the CBC encryption mode and removing the support of no MAC during a transmission.
+
+\noindent The first liberty is a laste\footnote{A vulnerability note as been issued by Carnegie Mellon University Computer Emergency Response Team in early 2009 (last revision)~\cite{CERT2009}, in response to a research of University of London~\cite{Albrecht:2009} presenting a plaintext-recovering attack against SSH when CBC mode is used, but the OpenSSH update took only place in october 2014.}.
+Even if it is not recommended, the user can still enable this mode by explicitly configuring it in the \texttt{sshd\_config} options.
+
+\noindent The second liberty has been taken to prevent the user to strip himself from data authenticity and integrity.
+However, in the case of testing and benchmarking, leaving the MAC behind can be interresting, especially if it is not offloaded in hardware such as the encryption in our case.
+In order to add this feature to OpenSSH, we wrote a patch to apply on OpenSSH 6.7, available in appendix~\cite{chap:openssh-patch}.
 
 
 
@@ -87,7 +84,7 @@ void encrypt_sign (struct context *c, bool comp_frag)
 
 
 It is to be noted that the present work uses an implementation with all the debug flags activated.
-If it does have an impact on the performance, it is minimal: in the worst case of the benchmark, the throughput drops only by 2.4\%.
+Figure~\ref{fig:openssl-speed-dbg-on-off} shows that if it does have an impact on the performance, it is minimal: in the worst case of the benchmark, the throughput drops only by 2.4\%.
 Moreover, the benchmark maximizes this difference by doing only OpenSSL operations.
 When OpenSSL will have to share the CPU with other applications, the loss will be even less noticeable.
 \begin{figure}[ht]
@@ -128,8 +125,8 @@ When OpenSSL will have to share the CPU with other applications, the loss will b
 \legend{AES-256-CBC debug [off], AES-256-CBC debug [on], AES-128-CBC debug [off], AES-128-CBC debug [on]}
 \end{axis}
 \end{tikzpicture}
+\caption{OpenSSL debugging benchmark}{Software benchmark of Openssl speed for AES mode CBC, with 128- and 256-bit keys, debugging flags (de)activated at compilation (\texttt{-fno-inline -g -marm}). The throughput difference ranges from 0.2\% and 2.4\% , and is more marked for larger keysize, as more debugging data needs to be generated.}
 \label{fig:openssl-speed-dbg-on-off}
-\caption{Software benchmark of Openssl speed for AES mode CBC, with 128- and 256-bit keys, debugging flags (de)activated at compilation (\texttt{-fno-inline -g -marm}).}{}
 \end{figure}
 
 % Talk about the assembly implementation, maybe show the difference in an appendice with the C implementation. Not /that/ interresting.
@@ -163,8 +160,32 @@ Since it does not require a virtual network interface like OpenVPN, the only tra
 
 \subsection{Linux drivers}
 % Mention the fact that we use the assembly implementation of AES, not the generic C one.
+% Need an lsmod here.
+Several kernel modules are needed to implement the various cryptographic algorithm in software.
+The GCM alone needs five different modules, and IPSec three others.
+The following description addresses all the kernel modules required to run all the use cases presented in this work.
+
+
+\begin{description}
+	\item[\texttt{aes\_arm}] Assembly implementation of AES. This version is optimized to use the ARMv7 instruction set.
+	\item[\texttt{sha256-generic}] C implementation of SHA-256.
+	\item[\texttt{gfmult128}] Multiplication in $GF(2^128)$, needed by the GCM mode.
+	\item[\texttt{ghash}] GHASH function needed by the authentication of the GCM mode.
+	\item[\texttt{seqiv}] Sequence IV number generator, needed by the CTR and GCM modes.
+	\item[\texttt{cbc}] C based CBC mode.
+	\item[\texttt{gcm}] C base GCM mode.
+	\item[\texttt{crypto\_null}] Null cipher. This basically does nothing on the plaintext, but it is still needed to propose the interface in the kernel.
+	\item[\texttt{tun}] TUN/TAP network device, needed by OpenVPN.
+	\item[\texttt{xfrm\_user}] XFRM operations.
+	\item[\texttt{esp4}] IPv4 ESP implementation. The AH counterparty is also available in the \texttt{ah4} module.
+	\item[\texttt{ipcomp}] IP compression module. Needed by IPSec if the option is activated in the configuration.
+	\item[\texttt{cryptodev}] Creates \texttt{/dev/crypto}, giving access to the crypto API in the user space.
+	\item[\texttt{uio}] User-space I/O driver, allowing to access the hardware memory from the user space, needed by our implementation of the BA414E driver.
+\end{description}
 
 \section{Offload}
+
+The table~\ref{tab:ip-ciphers} summarizes the ciphers supported by the two Barco Silex' IPs used in this work.
 
 \begin{table}[ht]
 \begin{tabular}{|l|c|}\hline
@@ -189,6 +210,6 @@ Be it IRQ or polling, the inner workings are the same and follow the exact same 
 
 
 \subsection{BA414E Driver and Silex engine}
-At the moment of development, there is no asymetric cryptography interface in the crypto API.
+At the moment of development, there is no asymetric cryptography interface in the crypto API\footnote{A request for comment patch as been submitted to the Linux kernel mailing list~\cite{crypto-api-pk-encryption} in late April 2015, proposing a standard interface for public key encryption in the crypto API.}.
 The BA414E can thus not be accessed using the same path as the BA411E and a user-space driver will be needed, that is the leftern path of figure~\ref{fig:os-path-generic-b}.
 As presented in section~\ref{sec:theory-driver}, we will need to rely on an UIO driver to access the device from the user space.

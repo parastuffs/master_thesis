@@ -1,0 +1,55 @@
+diff -rupN openssh-6.7p1_vanilla/digest.h openssh-6.7p1/digest.h
+--- openssh-6.7p1_vanilla/digest.h	2014-07-03 13:25:04.000000000 +0200
++++ openssh-6.7p1/digest.h	2015-02-27 11:59:53.508495697 +0100
+@@ -28,7 +28,8 @@
+ #define SSH_DIGEST_SHA256	3
+ #define SSH_DIGEST_SHA384	4
+ #define SSH_DIGEST_SHA512	5
+-#define SSH_DIGEST_MAX		6
++#define SSH_DIGEST_NONE		6
++#define SSH_DIGEST_MAX		7
+ 
+ struct sshbuf;
+ struct ssh_digest_ctx;
+diff -rupN openssh-6.7p1_vanilla/digest-libc.c openssh-6.7p1/digest-libc.c
+--- openssh-6.7p1_vanilla/digest-libc.c	2014-07-02 07:28:03.000000000 +0200
++++ openssh-6.7p1/digest-libc.c	2015-02-27 12:01:48.420494935 +0100
+@@ -113,6 +113,16 @@ const struct ssh_digest digests[SSH_DIGE
+ 		(md_init_fn *) SHA512Init,
+ 		(md_update_fn *) SHA512Update,
+ 		(md_final_fn *) SHA512Final
++	},
++	{
++		SSH_DIGEST_NONE,
++		"none@barco.com",
++		0,
++		0,
++		0,
++		NULL,
++		NULL,
++		NULL
+ 	}
+ };
+ 
+diff -rupN openssh-6.7p1_vanilla/digest-openssl.c openssh-6.7p1/digest-openssl.c
+--- openssh-6.7p1_vanilla/digest-openssl.c	2014-07-17 01:01:26.000000000 +0200
++++ openssh-6.7p1/digest-openssl.c	2015-02-27 12:00:24.812495489 +0100
+@@ -59,6 +59,7 @@ const struct ssh_digest digests[] = {
+ 	{ SSH_DIGEST_SHA256,	"SHA256", 	32,	EVP_sha256 },
+ 	{ SSH_DIGEST_SHA384,	"SHA384",	48,	EVP_sha384 },
+ 	{ SSH_DIGEST_SHA512,	"SHA512", 	64,	EVP_sha512 },
++	{ SSH_DIGEST_NONE,		"none@barco.com", 0, EVP_md_null },
+ 	{ -1,			NULL,		0,	NULL },
+ };
+ 
+diff -rupN openssh-6.7p1_vanilla/mac.c openssh-6.7p1/mac.c
+--- openssh-6.7p1_vanilla/mac.c	2014-05-15 06:35:04.000000000 +0200
++++ openssh-6.7p1/mac.c	2015-02-27 12:01:00.204495255 +0100
+@@ -87,6 +87,7 @@ static const struct macalg macs[] = {
+ 	{ "hmac-ripemd160-etm@openssh.com",	SSH_DIGEST, SSH_DIGEST_RIPEMD160, 0, 0, 0, 1 },
+ 	{ "umac-64-etm@openssh.com",		SSH_UMAC, 0, 0, 128, 64, 1 },
+ 	{ "umac-128-etm@openssh.com",		SSH_UMAC128, 0, 0, 128, 128, 1 },
++	{ "none@barco.com",					SSH_DIGEST, SSH_DIGEST_NONE, 0, 0, 0, 0 },
+ 
+ 	{ NULL,					0, 0, 0, 0, 0, 0 }
+ };

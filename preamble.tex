@@ -39,9 +39,41 @@
 \definecolor{colComments}{rgb}{0,0.6,0}  % couleurs des commentaires
 \definecolor{colString}{rgb}{0.6,0.1,0.1}
 
+\lstset{commentstyle=\color{colComments}\textit,
+float=hbp,%
+basicstyle=\ttfamily\footnotesize, %
+identifierstyle=\color{colIdentifier}, %
+keywordstyle=\color{colKeys}, %
+stringstyle=\color{colString}, %
+columns=flexible, %
+tabsize=2, %
+extendedchars=true, %
+showspaces=false, %
+showstringspaces=false, %
+numbers=left, %
+numberstyle=\tiny, %
+breaklines=true, %
+breakautoindent=true, %
+captionpos=b,
+frame=lines}
+
+\lstdefinelanguage{diff}{
+  morecomment=[f][\color{NavyBlue}]{@@},     % group identifier
+  morecomment=[f][\color{BrickRed}]-,         % deleted lines 
+  morecomment=[f][\color{ForestGreen}]+,       % added lines
+  morecomment=[f][\color{magenta}]{---}, % Diff header lines (must appear after +,-)
+  morecomment=[f][\color{magenta}]{+++},
+}
+
+
+
+
 \setcounter{secnumdepth}{3}% Number up to subsubsection
 \maxsecnumdepth{subsubsection}% 'secnumdepth' is reset by \mainmatter. You should use 'maxsecnumdepth'.
 % \seccounter{tocdepth}{3}% Add subsubsection to the table of content.
+
+
+
 
 %%%%%%%%% vvvvvvv
 % Anthony Debruyn 
@@ -58,6 +90,9 @@
 \precaption{\rule{\linewidth}{0.4pt}\\}
 % Anthony Debruyn
 %%%%%%%%% ^^^^^^^
+
+
+
 
 % ----------------------
 % lists
