@@ -2,36 +2,3 @@
 Here we talk about the protocols, the platform.
 Show The OS stack (kernel/user)
 
-\section{Experimental setup}
-The experimental environment is built around a standard x86 host and an ARM Cortex-A9 alongside an Altera Cyclone V FPGA as the target.
-Both are linked toghether through a network capped by 100Mbps switches.
-Both stations have gigabits ethernet interface and could hence be diretly connected to each other, but in that case the communication would be limited by the I/O transfers of the storage units -- a hard drive disk in one case, an micro-SD card in the second -- on which we can not depend to set a constant throughput limitation, as it is highly influenced by the data block size and general health of the support.
-
-
-\subsection{x86 host}
-The desktop host runs on Windows 7 Professional 64-bit, but a virtual machine using a Linux distribution is used for the developpement and testings.
-
-\begin{framed}
-\begin{description}
-	\item[OS] Ubuntu 12.04 LTS, kernel 3.16
-	\item[CPU] Intel Core-i3 ... (two logical core out of four)
-	\item[RAM] 1GB DDR3
-\end{description}
-\end{framed}
-
-\subsection{Altera Socrates SoCFPGA}
-
-\begin{framed}
-\begin{description}
-	\item[OS] Yocto project, kernel 3.14
-	\item[CPU] Dual core ARM Cortex-A9, 800MHz
-	\item[RAM] ...GB DDR3
-	\item[FPGA] Altera Cyclone V
-\end{description}
-\end{framed}
-
-\subsection{ARM DS-5 Streamline}
-% Use a daemon and a driver to get system info and send them to another machine. Has almost no impact on the performance and the load of the system.
-
-\subsection{Barco Silex' IPs}
-% table with the BA411E and BA414E showing the respective operations and crypto alg
