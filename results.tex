@@ -5,7 +5,9 @@
 
 This benchmark is done only with OpenVPN.
 Since there is no standard support for those operation in the kernel yet, it would not have made sense to use IPSec, since it would have had to fallback to OpenSSL, then following the same path as OpenVPN do.
-As soon as the public key operations can be plugged into the crypto API, this use case should however be tested immediatly.
+As soon as the public key operations can be plugged into the crypto API, this use case should however be tested.
+
+The figure~\ref{fig:openvpn-tls-bench} shows
 
 \begin{figure}[ht]
 \center

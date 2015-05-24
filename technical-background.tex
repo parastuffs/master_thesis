@@ -112,10 +112,31 @@ Moreover, 1024-bit parameter size, both RSA and Diffie-Hellman, are disallowed b
 \section{Network and VPN implementation}
 
 % Present the TCP/IP layering
+The RFC 1122~\cite{rfc1122} defines the TCP/IP and OSI stack as in the table~\ref{tab:tcp-ip-stack}.
+The main difference between the two is the application layer of the TCP/IP stack which corresponds to the three upper layers of the OSI model.
+Some references, such as~\citet{tanenbaum2011}, conceptually split the TCP/IP link layer into an additional physical layer.
+
+\begin{table}[ht]
+\center
+\begin{tabularx}{\textwidth}{|l|l|l|X|} \hline
+\multicolumn{2}{|c|}{TCP/IP layering} & \multicolumn{2}{c|}{OSI model} \\ \hline
+Layer & Protocols & Layer & Protocols \\ \hline
+\multirow{3}{*}{Application} & \multirow{3}{*}{FTP, SSH} & Application & FTP \\ \cline{3-4}
+ & & Presentation & ASCII, JPEG \\ \cline{3-4}
+ & & Session & RPC, PAP \\ \hline
+Transport & TCP, UDP & Transport & TCP, UDP \\ \hline
+Internet & IP, ICMP, IPSec & Network & IP, ICMP, IPSec \\ \hline
+\multirow{2}{*}{Data Link} & \multirow{2}{*}{PPP, MAC, Ethernet, L2TP} & Data link & PPP, MAC, Ethernet, L2TP \\ \cline{3-4}
+ & & Physical & USB, DSL, IEEE 802.11 \\ \hline
+\end{tabularx}
+\caption{TCP/IP and OSI model comparison}{They are globaly the same, except for the application layer of the TCP/IP stack which merge togheter the three upper layers of the OSI model. Between parenthsis are examples of protocols resting on each layer.}
+\label{tab:tcp-ip-stack}
+\end{table}
+
 
 % First explain what a VPN is.
 
-There exist several major implementations of VPN: SSL, IPSec and PPTP.
+There exist several major implementations of VPN: SSL, IPSec, L2TP and PPTP.
 The later was developped by a vendor consortium and proposed in the RFC 2637 and will not be discussed further.
 
 \subsection{SSL/TLS}
@@ -125,6 +146,8 @@ The later was developped by a vendor consortium and proposed in the RFC 2637 and
 
 \subsection{IPSec}
 % IPSec as a protocol, strongswan come in the 'implementation' chapter.
+
+%TODO Figure IPSec frame structure.
 
 \begin{figure}[ht]
 \center

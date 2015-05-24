@@ -30,6 +30,22 @@ Before closing the chapter, we will present the two main IPs to which the crypto
 
 \subsection{OpenVPN}
 % By default, point-to-point, but since the version 2.0 can be configured in server mode, hence being able to manage hundreds of clients.
+% TODO talk about the cipher none patch for version < ...
+
+OpenVPN is widely used, and is can even integraed in some routers using packages such as DD-WRT and OpenWRT.
+OpenVPN is also used by the Dutch government to secure all its communications~\cite{openvpn-nl}.
+
+OpenVPN offers two different TUN/TAP virtual interfaces:
+\begin{description}
+	\item[TUN] Layer 3 IP tunnel
+	\item[TAP] Layer 2 ethernet tunnel.
+\end{description}
+
+
+Uses regular TCP/UDP network protocols, which can be an advantage over IPSec if the ISP decides to block the latter.
+
+Note that if one wants to use the \texttt{none} cipher with a version of OpenVPN ealier than 2.6.7, he would have to update it using a community patch~\cite{openvpn-patch-none}.
+
 
 \lstset{language=c}
 \begin{lstlisting}[caption=openvpn compress then encrypt -- sample from \texttt{forward.c}, label=list:openvpn-workflow]
@@ -81,6 +97,8 @@ In order to add this feature to OpenSSH, we wrote a patch to apply on OpenSSH 6.
 
 
 \subsection{OpenSSL}
+
+Offers an high-level interface called EVP to be used by other applications.
 
 
 It is to be noted that the present work uses an implementation with all the debug flags activated.
