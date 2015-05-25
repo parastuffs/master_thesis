@@ -12,7 +12,7 @@ The desktop host runs on Windows 7 Professional 64-bit, but a virtual machine us
 \begin{framed}
 \begin{description}
 	\item[OS] Ubuntu 12.04 LTS, kernel 3.16
-	\item[CPU] Intel Core-i3 ... (two logical core out of four)
+	\item[CPU] Intel Core-i5 (two logical core out of four)
 	\item[RAM] 1GB DDR3
 \end{description}
 \end{framed}
@@ -23,7 +23,7 @@ The desktop host runs on Windows 7 Professional 64-bit, but a virtual machine us
 \begin{description}
 	\item[OS] Yocto project, kernel 3.14
 	\item[CPU] Dual core ARM Cortex-A9, 800MHz
-	\item[RAM] ...GB DDR3
+	\item[RAM] 1GB DDR3
 	\item[FPGA] Altera Cyclone V
 \end{description}
 \end{framed}
@@ -42,7 +42,7 @@ The only option differentiating the clients is their IP address and port number.
 Otherwise, all the clients share the same basic configuration file (see listing~\ref{list:openvpn-config-client}), which tell them to renogociate a new connection every second.
 Hence, if a connection could be made with no delay and if the processes scheduling were ideal, the server would have to address 600 connections per minute.
 
-\lstinputlisting[language=bash]{stress-openvpn.sh}
+\lstinputlisting[language=bash, label=list:openvpn-client-script, caption={Script starting ten clients in parallel who will stress the server.}]{stress-openvpn.sh}
 
 \section{File transfer}
 The file transfered is an un compressed block of 128MB of random data generated using the following command:

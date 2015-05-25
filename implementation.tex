@@ -30,25 +30,42 @@ Before closing the chapter, we will present the two main IPs to which the crypto
 
 \subsection{OpenVPN}
 % By default, point-to-point, but since the version 2.0 can be configured in server mode, hence being able to manage hundreds of clients.
-% TODO talk about the cipher none patch for version < ...
+% https://openvpn.net/index.php/open-source/339-why-ssl-vpn.html
+% https://openvpn.net/index.php/open-source/335-why-openvpn.html
+% https://openvpn.net/papers/BLUG-talk/index.html
 
-OpenVPN is widely used, and is can even integraed in some routers using packages such as DD-WRT and OpenWRT.
 OpenVPN is also used by the Dutch government to secure all its communications~\cite{openvpn-nl}.
-
-OpenVPN offers two different TUN/TAP virtual interfaces:
-\begin{description}
-	\item[TUN] Layer 3 IP tunnel
-	\item[TAP] Layer 2 ethernet tunnel.
-\end{description}
-
 
 Uses regular TCP/UDP network protocols, which can be an advantage over IPSec if the ISP decides to block the latter.
 
-Note that if one wants to use the \texttt{none} cipher with a version of OpenVPN ealier than 2.6.7, he would have to update it using a community patch~\cite{openvpn-patch-none}.
+OpenVPN offers two different TUN/TAP virtual interfaces:
+\begin{description}
+	\item[TUN] Virtual layer 3 IP tunnel, seen as a point-to-point interface from the kernel point of view.
+	\item[TAP] Virtual layer 2 ethernet tunnel.
+\end{description}
+
+Since OpenVPN aims at network security at the application level, it needs virtual network interface to which to push and from which to read the secured data.
+The \texttt{tun} adapter will be used when OpenVPN wants to establish a point-to-point connection between two client, while the \texttt{tap} device is used when there is one server acting as a bridge, hence managing lots of clients at the same time.
+
+OpenVPN as two choices when it wants to sends its data over the internet: either encapsulating its IP packet into TCP or UDP packets.
+The problem of encapsulating IP into TCP is that inside IP packets are already TCP frames.
+The reason is that IP has been designed to work on unreliable networks, and TCP includes in its standard protocols to retry and drop packets.
+Hence, encapsulating an IP packet into a TCP packet produces a redundancy by nesting reliability layers.
+UDP is the unreliable counterparty of TCP, offering a better alternative for encapsulation.
+If we refer to the figure~\ref{fig:openvpn-packet-flow}, \texttt{iperf} would send its regular \texttt{IP(TCP)} packet over the virtual \texttt{tun} device, which will then compress, fragment and encrypt the frame before encaspulating it into a new UDP packet that will finally be sent through the physical \texttt{eth0} interface.
+
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{OpenVPN-packetflow}
+\caption{OpenVPN packet flow}{it shows two hosts using \texttt{iperf} inside an OpenVPN tunnel. This figure comes from the OpenVPN documentation~\cite{openvpn-doc-workflow} and has inverted the encryption and fragmentation.}
+\label{fig:openvpn-packet-flow}
+\end{figure}
+
+\noindent At this point, it is important to note that if the figure~\ref{fig:openvpn-packet-flow} shows a workflow in which the encryption taking place before the fragmentation, a quick look at the source code proves the opposite.
+A sample of the said code has been writen down in the listing~\ref{list:openvpn-workflow}.
 
 
 \lstset{language=c}
-\begin{lstlisting}[caption=openvpn compress then encrypt -- sample from \texttt{forward.c}, label=list:openvpn-workflow]
+\begin{lstlisting}[caption={openvpn compress then encrypt -- sample from \texttt{forward.c}. It clearly shows that the order of operations in the packet workflow is compression, then fragmentation and finally encryption.}, label=list:openvpn-workflow, float]% The 'float' option makes the listing unbreakable.
 /* Compress, fragment, encrypt and HMAC-sign an outgoing packet. */
 void encrypt_sign (struct context *c, bool comp_frag)
 {
@@ -69,12 +86,16 @@ void encrypt_sign (struct context *c, bool comp_frag)
 }
 \end{lstlisting}
 
-\begin{figure}[ht]
-\includegraphics[width=\textwidth]{OpenVPN-packetflow}
-\caption{OpenVPN packet flow as advertized on the openVPN wiki.}{}
-\label{fig:openvpn-packet-flow}
-\end{figure}
+An other way to look at this workflow is to completely isolate the OpenVPN part from both hosts, and exporting it to an independent device such as a router.
+The hosts would be stripped off the virtual interface -- \texttt{tun0} would become physical, and would communicate normally over the internet, at least from their point of view.
+All their communications would be routed by the router of their local area network, incomming on a physical \texttt{tun0} interface and outputed to the internet on the \texttt{eth0} interface.
+Such implementation are used when an adminstrator wishes to secure a whole local area network without bloating each client with a VPN application.
+In this case, there exist router firmware packages running OpenVPN, such as DD-WRT and OpenWRT.
+Whatever the method used, the crucial point is that the VPN tunnel usage is transparent to the application.\newline{}
 
+OpenVPN relies on a cryptographic library, OpenSSL in our case, for all the security operations: encryption, signature, certificate management, etc.
+
+\noindent Note that if one wants to use the \texttt{none} cipher with a version of OpenVPN ealier than 2.3.7, he would have to update it using a community patch~\cite{openvpn-patch-none}.
 
 \subsection{OpenSSH}
 % Talk about the MAC=none patch
@@ -91,7 +112,7 @@ Even if it is not recommended, the user can still enable this mode by explicitly
 
 \noindent The second liberty has been taken to prevent the user to strip himself from data authenticity and integrity.
 However, in the case of testing and benchmarking, leaving the MAC behind can be interresting, especially if it is not offloaded in hardware such as the encryption in our case.
-In order to add this feature to OpenSSH, we wrote a patch to apply on OpenSSH 6.7, available in appendix~\cite{chap:openssh-patch}.
+In order to add this feature to OpenSSH, we wrote a patch to apply on OpenSSH 6.7, available in appendix~\ref{chap:openssh-patch}.
 
 
 

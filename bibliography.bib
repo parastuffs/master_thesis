@@ -41,6 +41,14 @@ day={09}
     note = {\url{http://eprint.iacr.org/}},
 }
 
+@incollection{Bellare2000,
+	author = {Mihir Bellare and Chanathip Namprempre},
+	title = {{Authenticated Encryption: Relations among Notions and Analysis of the Generic Composition Paradigm}},
+	booktitle = {{Advances in Cryptology — ASIACRYPT 2000}},
+	year = {2000},
+	publisher = {Springer Berlin Heidelberg},
+}
+
 @techreport{rfc2631,
 	author = "E. Rescorla",
 	title = "{Diffie-Hellman Key Agreement Method}",
@@ -91,13 +99,27 @@ day={09}
 	title = "{The Transport Layer Security (TLS) Protocol Version 1.2}",
 	HOWPUBLISHED = {Internet Requests for Comments},
 	TYPE="{RFC}",
-	NUMBER=45246,
+	NUMBER=5246,
 	ISSN = {2070-1721},
 	PUBLISHER = "{RFC Editor}",
 	INSTITUTION = "{RFC Editor}",
 	URL={https://tools.ietf.org/rfc/rfc5246.txt},
 	year = "2008",
 	month = "August",
+}
+
+@techreport{rfc2104,
+	author = "H. Krawczyk and M. Bellare and R. Canetti",
+	title = "{HMAC: Keyed-Hashing for Message Authentication}",
+	HOWPUBLISHED = {Internet Requests for Comments},
+	TYPE="{RFC}",
+	NUMBER=2104,
+	ISSN = {2070-1721},
+	PUBLISHER = "{RFC Editor}",
+	INSTITUTION = "{RFC Editor}",
+	URL={http://tools.ietf.org/rfc/rfc2104.txt},
+	year = "1997",
+	month = "February",
 }
 
 @misc{crypto-api-pk-encryption,
@@ -148,7 +170,7 @@ author = "Neil Dunbar"
 
 @incollection{intel-ipsec2011,
 	title = {{Using Intel® AES New Instructions and PCLMULQDQ to Significantly Improve IPSec Performance on Linux}},
-	author = {Intel Corp.},
+	author = {Intel~Corp.},
 	publisher = {Intel White Paper},
 	year = {2010},
 	month = {August},
@@ -156,7 +178,7 @@ author = "Neil Dunbar"
 
 @incollection{intel-gcm2011,
 	title = {{Enabling HighPerformance Galois-Counter Mode on Intel® Architecture Processors}},
-	author = {Intel Corp.},
+	author = {Intel~Corp.},
 	publisher = {Intel White Paper},
 	year = {2012},
 	month = {October},
@@ -187,6 +209,14 @@ Algorithms and Key Lengths}},
  publisher = {National Institute of Standards and Technology},
  address = {Gaithersburg, MD, United States},
 }
+
+@techreport{nist-sp800-38A,
+ author = {Morris Dworkin},
+ title = {{SP 800-38A. Recommendation for Block Cipher Modes of Operation}},
+ year = {2001},
+ publisher = {National Institute of Standards and Technology},
+ address = {Gaithersburg, MD, United States},
+} 
 
 @techreport{pkcs1,
 	title = {{PKCS \#1 v2.2: RSA Cryptography Standard}},
@@ -314,4 +344,34 @@ Algorithms and Key Lengths}},
 	URL={http://tools.ietf.org/rfc/rfc1122.txt},
 	year = "1989",
 	month = "October",
+}
+
+@misc{openvpn-doc-workflow,
+	author = {OpenVPN~community},
+	title = {Optimizing performance on gigabit networks},
+	year = {2011},
+	howpublished = {https://community.openvpn.net/openvpn/wiki/Gigabit\_Networks\_Linux},
+	note = {visited May 25, 2015},
+}
+
+@article{mcgrew2005,
+  author = {McGrew, D. A. and Viega, J.},
+  journal = {NIST Modes Operation Symmetric Key Block Ciphers},
+  title = {The Galois/counter mode of operation (GCM)},
+  year = 2005
+}
+
+@book{Menezes1996,
+	author = {Alfred J. Menezes and Paul C. van Oorschot and Scott A. Vanstone},
+	title = {Handbook of Applied Cryptography},
+	year = {1996},
+	publisher = {CRC Press},
+	edition = {first},
+}
+
+@unpublished{infof405,
+	title = {INFOF405 -- Computer Security},
+	author = {Olivier Markowitch},
+	year = {2013},
+	note = {Lecture notes},
 }
