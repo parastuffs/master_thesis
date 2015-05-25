@@ -1,0 +1,105 @@
+\begin{tikzpicture}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% CPU in the background
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{axis}[
+        width  = 0.4*\textwidth,
+        height = 5cm,
+        major x tick style = transparent,
+        ybar=2pt,%space between the bars
+        bar width=10pt,
+        enlarge x limits={abs=1},
+        ylabel = {CPU\#0 usage},
+        hide x axis,
+        axis y line*=right,
+        ymin=0, ymax=100,
+        symbolic x coords={oot, openSSH, OpenVPN, IPSec},
+        xtick = data,
+        scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
+        legend style={at={(0.5,-0.45)}, anchor=north,legend columns=4},
+        enlarge x limits=0.1,
+    ]
+
+\addplot[style={black,fill=LimeGreen,postaction={pattern=north east lines},mark=none}]
+    coordinates {
+        (oot, 0)
+        (openSSH, 89.29)
+        (OpenVPN, 76.03)
+        (IPSec, 74.64)
+    };
+    \label{software}
+
+\addplot[style={black,fill=RedOrange,postaction={pattern=north east lines},mark=none}]
+    coordinates {
+        (oot, 0)
+        (openSSH, 68.29)
+        (OpenVPN, 80.89)
+        (IPSec, 17.25)
+    };
+    \label{hardware}
+
+\addplot[style={black,fill=gray,postaction={pattern=north east lines},mark=none}]
+    coordinates {
+        (oot, 7.16)
+        (openSSH, 0)
+        (OpenVPN, 0)
+        (IPSec, 0)
+    };
+    \label{oot}%"oot" for "out of tunnel"
+\legend{software, hardware, oot}
+\end{axis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% throughput
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{axis}[
+        % title = {Comparison over file transfer methods},
+        width  = 0.4*\textwidth,
+        height = 5cm,
+        major x tick style = transparent,
+        ybar=6pt,
+        bar width=6pt,
+        enlarge x limits={abs=1},
+        ymajorgrids = true,
+        ylabel = {Throughtput [MB/s]},
+        xlabel = {},
+        ymin=0, ymax=12,
+        symbolic x coords={oot, openSSH, OpenVPN, IPSec},
+        xtick = data,
+        x tick label style={rotate=45,anchor=east},
+        scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
+        % legend style={at={(0.5,-0.25)}, anchor=north,legend columns=2},
+        enlarge x limits=0.1,
+    ]
+
+\addplot[style={black,fill=ForestGreen,mark=none}]
+    coordinates {
+        (oot, 0)
+        (openSSH, 8.19)
+        (OpenVPN, 3.87)
+        (IPSec, 6.47)
+    };
+    \label{soft-tp}
+
+\addplot[style={black,fill=BrickRed,mark=none}]
+    coordinates {
+        (oot, 0)
+        (openSSH, 10.39)
+        (OpenVPN, 2.84)
+        (IPSec, 5.80)
+    };
+    \label{hardware-tp}
+
+\addplot[style={black,fill=black,mark=none}]
+    coordinates {
+        (oot, 11.39)
+        (openSSH, 0)
+        (OpenVPN, 0)
+        (IPSec, 0)
+    };
+    \label{oot-tp}%"tp" for "throughput"
+\legend{}
+\end{axis}
+
+\end{tikzpicture}
