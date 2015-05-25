@@ -3,18 +3,70 @@
 \section{TLS connections}
 % Begin with the benchmark done by Bastien on the raw number of verif/s with openssl.
 
-This benchmark is done only with OpenVPN.
-Since there is no standard support for those operation in the kernel yet, it would not have made sense to use IPSec, since it would have had to fallback to OpenSSL, then following the same path as OpenVPN do.
-As soon as the public key operations can be plugged into the crypto API, this use case should however be tested.
+If the ten clients could connect instantaneously to the server every second, the maximum number of connections would be 600 per minute.
+However, a certain connection time has to be taken into account.
+Those are summarized in table~\ref{tab:openvpn-con-time}.
 
-The figure~\ref{fig:openvpn-tls-bench} shows
+\begin{table}[ht]
+\center
+\small
+\begin{tabular}{ll|l|} \cline{3-3}
+ & & Connection time [s] \\ \hline
+\multicolumn{1}{|l|}{\multirow{2}{*}{RSA-1024}} & soft & 0.041921 \\ \cline{2-3}
+\multicolumn{1}{|l|}{} & BA411E & 0.020312 \\ \hline
+\multicolumn{1}{|l|}{\multirow{2}{*}{RSA-2048}} & soft & 0.202945 \\ \cline{2-3}
+\multicolumn{1}{|l|}{} & BA411E & 0.039965 \\ \hline
+\multicolumn{1}{|l|}{\multirow{2}{*}{RSA-4096}} & soft & 1.436743 \\ \cline{2-3}
+\multicolumn{1}{|l|}{} & BA411E & 0.183533 \\ \hline
+\end{tabular}
+\caption{OpenVPN connection time}{time necessary to establish an aes-256-cbc connection with DHE.}
+\label{tab:openvpn-con-time}
+\end{table}
+
+It already shows that the connection latency is divided by 2 for low security RSA, and up to by 7.8 for higher security parameters.
+The figure~\ref{fig:openvpn-tls-bench} shows the number of TLS connections per minute for three RSA exponent sizes: 1024-, 2048- and 4096-bit.
+The higher the exponent size, the higher the performance boost.
+
+
+\begin{table}[ht]
+\center
+\small
+\begin{tabular}{l|c|c|c|c|c|c|c|c|c|} \cline{2-10}
+ & \multicolumn{3}{c|}{RSA-1024} & \multicolumn{3}{c|}{RSA-2048} & \multicolumn{3}{c|}{RSA-4096} \\ \cline{2-10}
+ & \multicolumn{2}{c|}{Con.} & CPU & \multicolumn{2}{c|}{Con.} & CPU & \multicolumn{2}{|c|}{Con.} & CPU \\ \hline
+\multicolumn{1}{|c|}{Soft} & 445.4 & \multirow{2}{*}{x1.14} & 40.32 & 155.6& \multirow{2}{*}{x2.70}  & 92.14 & 19.6& \multirow{2}{*}{x5.89}  & 81.97 \\ \cline{1-2}\cline{4-5}\cline{7-8}\cline{10-10}
+\multicolumn{1}{|c|}{BA414E} & 509.3 & & 13.29 & 420.9 & & 4.82 & 115.5 & & 4.34 \\ \hline
+\end{tabular}
+\caption{TLS connections per minute}{measures obtained with ten clients concurently connecting to an OpenVPN server.}
+\label{tab:tls-con}
+\end{table}
 
 \begin{figure}[ht]
 \center
 \input{graphs/openvpn-tls-bench}
-\caption{TLS connections per second}{The background stripped bars are the CPU usage. Raw data in table~\ref{tab:tls-con}.}
+\caption{TLS connections per minute}{The background stripped bars are the CPU usage. Raw data in table~\ref{tab:tls-con}.}
 \label{fig:openvpn-tls-bench}
 \end{figure}
+
+
+\noindent For RSA-1024, the results are mitigated: a poor performance increase, but already less than half the CPU usage.
+It should be noted that at this point, the number of clients is probably too low to push the configuration to its limits.
+It is however an interesting comparison case with the next level of security: RSA-2048.
+
+\noindent RSA-2048 is a much more common configuration, espacially since the NIST deprecated RSA-1024 in 2013.
+The full software implementation is visibly affected by the increase of the exponent size: the CPU usage doubles and the server processes three time less connections.
+At the same time, the hardware loses less than 20\% connections for a third of the CPU usage.
+%TODO check if it is hardware limited or limited by the performances of the VM. It is not to be forgotten that it has to keep up with the server, even when the latter is helped by the high-performance hardware. My guess is that the VM is capping the perf, hence the exact same CPU usage for RSA-2048 and RSA-4096.
+
+\noindent The results obtained for RSA-4096 can be interpreted similarly to those of RSA-2048, except that the CPU usage is exactly the same for th hardware configuration.
+One way too look at those results is to directly compare the raw performance, and the hardware can then process almost six times more connections per minute than the software.
+However, this is only half of it, since it leaves the CPU usage drop aside.
+If we look at the efficiency, the software can process 0.24 connection per percentage of CPU usage, whilst the hardware can process 24 of them.
+The efficiency is thus multipled by a factor 1000.
+
+Such interesting results, particularly regarding the CPU usage, are possible because at least 87\% of the operations are RSA and Diffie-Hellman operations, which are entirely offloaded in hardware.
+Nevertheless, OpenVPN still needs to proceed to some extra computations (such as SHA-1 integrity), and the hardware operations are not instantaneous, so the performance gain can only be that high.
+
 
 
 \section{Response time -- latency}

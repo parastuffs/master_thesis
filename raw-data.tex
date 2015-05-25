@@ -2,14 +2,15 @@
 
 \section{TLS connections}
 
-\begin{table}[ht]
-\center
-\begin{tabular}{l|c|c|c|c|c|c|} \cline{2-7}
- & \multicolumn{2}{c|}{RSA-1024} & \multicolumn{2}{c|}{RSA-2048} & \multicolumn{2}{c|}{RSA-4096} \\ \cline{2-7}
- & Con. & CPU & Con. & CPU & Con. & CPU \\ \hline
-\multicolumn{1}{|c|}{Soft} & 445.4 & 40.32 & 155.6 & 92.14 & 19.6 & 81.97 \\ \hline
-\multicolumn{1}{|c|}{BA414E} & 509.3 & 13.29 & 420.9 & 4.82 & 115.5 & 4.34 \\ \hline
-\end{tabular}
-\caption{TLS connections per minute}{measures obtained with ten clients concurently connecting to an OpenVPN server.}
-\label{tab:tls-con}
-\end{table}
+% \begin{table}[ht]
+% \center
+% \small
+% \begin{tabular}{l|c|c|c|c|c|c|c|c|c|} \cline{2-10}
+%  & \multicolumn{3}{c|}{RSA-1024} & \multicolumn{3}{c|}{RSA-2048} & \multicolumn{3}{c|}{RSA-4096} \\ \cline{2-10}
+%  & \multicolumn{2}{c|}{Con.} & CPU & \multicolumn{2}{c|}{Con.} & CPU & \multicolumn{2}{|c|}{Con.} & CPU \\ \hline
+% \multicolumn{1}{|c|}{Soft} & 445.4 & \multirow{2}{*}{x1.14} & 40.32 & 155.6& \multirow{2}{*}{x2.70}  & 92.14 & 19.6& \multirow{2}{*}{x5.89}  & 81.97 \\ \cline{1-2}\cline{4-5}\cline{7-8}\cline{10-10}
+% \multicolumn{1}{|c|}{BA414E} & 509.3 & & 13.29 & 420.9 & & 4.82 & 115.5 & & 4.34 \\ \hline
+% \end{tabular}
+% \caption{TLS connections per minute}{measures obtained with ten clients concurently connecting to an OpenVPN server.}
+% \label{tab:tls-con}
+% \end{table}
