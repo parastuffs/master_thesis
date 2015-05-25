@@ -10,7 +10,7 @@ The driver of the BA411E can be made less ressources hungry by improving the ini
 A better alternative would be to avoid descriptors altogether by modifiying the interface with the IP so that it can use the scatterlist directly.
 We would then spare a lot of DMA mapping instruction and thus some precious cycles on the software side.
 
-As we already remarked in \ref{sec:section-where-we-see-the-CPU-usage-of-ba411e-usage-with-active-polling}, the use cases involving IPSec were conducted using a previous revision of the driver still activelly polling the IP for its results.
+As we already remarked in \ref{sec:section-where-we-see-the-CPU-usage-of-ba411e-usage-with-active-polling}, the use cases involving IPsec were conducted using a previous revision of the driver still activelly polling the IP for its results.
 A better and cleaner way to proceed is to use interruption routines, as shown in \ref{sec:section-ba411e-with-irq}.
 However, the kernel does not support their current implementation and panics upon usage.
 If one were to be willing to spend the time replacing the active polling by clean asynchronous interruptions, he should be aware of the overhead imposed by an interruption.

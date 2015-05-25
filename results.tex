@@ -80,7 +80,7 @@ After the establishement of a connection.
 \label{fig:ping-benchmark-openvpn}
 \end{figure}
 
-\subsection{IPSec}
+\subsection{IPsec}
 
 \begin{figure}[ht]
 \input{graphs/ipsec-ping-benchmark}
@@ -100,7 +100,7 @@ After the establishement of a connection.
 
 
 \section{File transfer}
-%FTP over openvpn and IPSec
+%FTP over openvpn and IPsec
 
 %OpenSSH: 	- normal transfer: shows perf difference
 %			- capped to software max: show CPU offload
@@ -126,11 +126,11 @@ Even though OpenSSL uses here an hihgly ARM-optimzed assembly implementation of 
 
 Indeed, 
 
-\subsection{IPSec}
+\subsection{IPsec}
 
 \begin{figure}[ht]
 \input{graphs/ipsec-ftp-bench}
-\caption{FTP file transfer over an IPSec tunnel. The background stripped bars are the CPU usage.}{}
+\caption{FTP file transfer over an IPsec tunnel. The background stripped bars are the CPU usage.}{}
 \label{fig:ipsec-ftp-bench}
 \end{figure}
 
@@ -142,7 +142,7 @@ The GCM performance presented clearly shows a drop of throughput and an increase
 With an hardware offload, we could expect not only a drastic drop of the CPU usage, but an increase of throughput as well, since it's CPU-limited in those results.
 Note that they are achieved usinf a C-based implementation of galois-field multiplications.
 As we saw in chapter~\ref{chap:theory}, modern processor designers tend to add specialized instruction set aimed at AES-GCM enhancement.
-Should further tests be conducted concerning IPSec paired with GCM, it would be wise to compare with an assembly implementation exploiting ARM NEON instruction set.
+Should further tests be conducted concerning IPsec paired with GCM, it would be wise to compare with an assembly implementation exploiting ARM NEON instruction set.
 Some are being developed~\cite{Conrado2013,Danilo2013}, but none have been committed to the Linux kernel repository yet.
 
 \subsection{Comparison}

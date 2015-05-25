@@ -2,7 +2,7 @@
 This chapter will present how we implemented the protocols of chapter~\ref{chap:theory} on the board.
 The figure~\ref{fig:os-path-generic} show the generic data flow in the operating system through the user and kernel spaces.
 We will first detail the software part, with the OpenVPN and openSSH as the application, and OpenSSL as a cryptographic library on which both applications rely.
-Then will come strongswan, a user-space abstraction layer giving access to IPSec and we will see how different it is from an OpenVPN implementation.
+Then will come strongswan, a user-space abstraction layer giving access to IPsec and we will see how different it is from an OpenVPN implementation.
 Lastly, the standard Linux cryptographic kernel modules and network drivers will be listed and briefly discussed.
 
 Before closing the chapter, we will present the two main IPs to which the cryptographic operations will be offloaded and the associated drivers.
@@ -36,7 +36,7 @@ Before closing the chapter, we will present the two main IPs to which the crypto
 
 OpenVPN is also used by the Dutch government to secure all its communications~\cite{openvpn-nl}.
 
-Uses regular TCP/UDP network protocols, which can be an advantage over IPSec if the ISP decides to block the latter.
+Uses regular TCP/UDP network protocols, which can be an advantage over IPsec if the ISP decides to block the latter.
 
 OpenVPN offers two different TUN/TAP virtual interfaces:
 \begin{description}
@@ -173,18 +173,18 @@ When OpenSSL will have to share the CPU with other applications, the loss will b
 
 \subsection{Strongswan}
 % TODO talk about IKE and SA management
-Strongswan is a full implementation of IPSec relying on the kernel drivers for the networking part, on the crypto API for the cryptographic part, and on user space crypto libraries for the connection negociation.
+Strongswan is a full implementation of IPsec relying on the kernel drivers for the networking part, on the crypto API for the cryptographic part, and on user space crypto libraries for the connection negociation.
 An other popular implementation is ipsec-tools, but its development lags behind modern Linux and is not up-to-date with the 3.14 Linux kernel headers, making its cross-compilation painfull.
 %Use strongswan 5.3.0
 Strongswan as two advantages: it has a tremendous and exhaustive documentation, and its uer interface is straightforward.
 Once configured, a simple \texttt{ipsec start \&\& ipsec up <connection>} on both sides is enough to create a ready to use VPN.
 
-The figure~\ref{fig:ipsec-workflow} illustrates the workflow of Alice communicating with Bob via an IPSec ESP tunnel.
-The XFRM, read ``transform", framework is implementing IPSec and handles the incomming and outgoing packets for established VPNs~\cite{rosen2014}.
-Its name comes from the fact that the kernel transforms packet frames to incorporate IPSec security.
+The figure~\ref{fig:ipsec-workflow} illustrates the workflow of Alice communicating with Bob via an IPsec ESP tunnel.
+The XFRM, read ``transform", framework is implementing IPsec and handles the incomming and outgoing packets for established VPNs~\cite{rosen2014}.
+Its name comes from the fact that the kernel transforms packet frames to incorporate IPsec security.
 Depending on the configuration, XFRM uses the AH or ESP kernel module, which in turn calls the crypto API to encrypt and/or sign the IP packet.
 
-We can also clearly see one of the main advantages of IPSec: it works in the kernel space.
+We can also clearly see one of the main advantages of IPsec: it works in the kernel space.
 Since it does not require a virtual network interface like OpenVPN, the only transfer between the user/kernel space happens when the former wishes to send a packet on the network, passing it to the later -- or \textit{vice versa} for incomming packets.
 
 \begin{figure}[ht]
@@ -192,7 +192,7 @@ Since it does not require a virtual network interface like OpenVPN, the only tra
 \resizebox{\linewidth}{!}{%
 \input{ipsec-transfer}
 }
-\caption{IPSec user/kernel space workflow, using \texttt{ping} as a test case.}{}
+\caption{IPsec user/kernel space workflow, using \texttt{ping} as a test case.}{}
 \label{fig:ipsec-workflow}
 \end{figure}
 
@@ -201,7 +201,7 @@ Since it does not require a virtual network interface like OpenVPN, the only tra
 % Mention the fact that we use the assembly implementation of AES, not the generic C one.
 % Need an lsmod here.
 Several kernel modules are needed to implement the various cryptographic algorithm in software.
-The GCM alone needs five different modules, and IPSec three others.
+The GCM alone needs five different modules, and IPsec three others.
 The following description addresses all the kernel modules required to run all the use cases presented in this work.
 
 
@@ -217,7 +217,7 @@ The following description addresses all the kernel modules required to run all t
 	\item[\texttt{tun}] TUN/TAP network device, needed by OpenVPN.
 	\item[\texttt{xfrm\_user}] XFRM operations.
 	\item[\texttt{esp4}] IPv4 ESP implementation. The AH counterparty is also available in the \texttt{ah4} module.
-	\item[\texttt{ipcomp}] IP compression module. Needed by IPSec if the option is activated in the configuration.
+	\item[\texttt{ipcomp}] IP compression module. Needed by IPsec if the option is activated in the configuration.
 	\item[\texttt{cryptodev}] Creates \texttt{/dev/crypto}, giving access to the crypto API in the user space.
 	\item[\texttt{uio}] User-space I/O driver, allowing to access the hardware memory from the user space, needed by our implementation of the BA414E driver.
 \end{description}

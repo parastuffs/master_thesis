@@ -1,4 +1,4 @@
-\chapter{Test protocol and Prediction}
+\chapter{Test protocol}
 
 \section{Experimental setup}
 The experimental environment is built around a standard x86 host and an ARM Cortex-A9 alongside an Altera Cyclone V FPGA as the target.
@@ -33,7 +33,7 @@ The desktop host runs on Windows 7 Professional 64-bit, but a virtual machine us
 
 \section{TLS Connections}
 This benchmark is done only with OpenVPN.
-Since there is no standard support for those operation in the kernel yet, it would not have made sense to use IPSec, since it would have had to fallback to OpenSSL, then following the same path as OpenVPN do.
+Since there is no standard support for those operation in the kernel yet, it would not have made sense to use IPsec, since it would have had to fallback to OpenSSL, then following the same path as OpenVPN do.
 As soon as the public key operations can be plugged into the crypto API, this use case should however be tested.
 
 For this use case, the board is configured in server mode, so that it can accept connections from any client.
@@ -49,3 +49,8 @@ The file transfered is an un compressed block of 128MB of random data generated 
 \begin{lstlisting}[language=bash]
   $ head -c $((1024*1024*128)) /dev/urandom > heavy.file
 \end{lstlisting}
+
+For the IPsec use case, the cipher/authentication pair null/null will be used to quantify the overhead of the encapsulation.
+It should however not be forgotten that it is not to be used as a production configuration.
+As the RFC 7321~\citep[pg. 7]{rfc7321} sates: ``Note that while authentication and encryption can each
+   be `NULL', they MUST NOT both be `NULL'".
