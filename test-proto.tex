@@ -1,4 +1,4 @@
-\chapter{Test protocol}
+\chapter{Test protocol}\label{chap:test-protocol}
 
 \section{Experimental setup}
 The experimental environment is built around a standard x86 host and an ARM Cortex-A9 alongside an Altera Cyclone V FPGA as the target.
@@ -42,7 +42,25 @@ The only option differentiating the clients is their IP address and port number.
 Otherwise, all the clients share the same basic configuration file (see listing~\ref{list:openvpn-config-client}), which tell them to renogociate a new connection every second.
 Hence, if a connection could be made with no delay and if the processes scheduling were ideal, the server would have to address 600 connections per minute.
 
+As this experiment can be very unstable and vastly depends on the operating system scheduling, each test case has been repeated five times to ensure stable results.
+
 \lstinputlisting[language=bash, label=list:openvpn-client-script, caption={Script starting ten clients in parallel who will stress the server.}]{stress-openvpn.sh}
+
+The security parameter tested is a standard TLS-DHE-RSA, hence forcing the peers the renogociate a new shared secret and ephemeral Diffie-Hellman parameters at each connection attempt.
+
+
+\section{Response time -- latency}
+This use case exchanges ICMP request of various sizes via the \texttt{ping} command.
+The initiating peer sends an ICMP echo request to the remote peer, which then answers with an ICMP echo reply.
+
+\noindent For each packet size, 1000 requests were flooded to the board, that is \textit{"outputs packets as fast as they come back or one hundred times per second, whichever is more"}, according to the \texttt{ping} command manual.
+
+The following loop shows the options used for the test as well as the payload sizes:
+\begin{lstlisting}[language=bash]
+for i in 56 1000 8000 16000; do
+	sudo ping -f -s ${i} -c 1000 150.158.232.241
+done
+\end{lstlisting}
 
 \section{File transfer}
 The file transfered is an un compressed block of 128MB of random data generated using the following command:
@@ -55,4 +73,9 @@ It should however not be forgotten that it is not to be used as a production con
 As the RFC 7321~\citep[pg. 7]{rfc7321} sates: ``Note that while authentication and encryption can each
    be `NULL', they MUST NOT both be `NULL'".
 
+We will also use two types of drivers for the BA411E: an interuption-based for OpenVPN and OpenSSH, and a polling-based for IPsec.
+
 All the tests will be conducted with the ESP protocol in tunnel mode, so that we have the worst case scenario; as AH imposes a smaller overhead, the perfomance could only be better.
+
+For OpenSSH, the commmand \texttt{scp} will be used to transfer the data securely over an SSH tunnel.
+As for OpenVPN and IPsec, a tunnel will be established beforehand, and then the simple \texttt{ftp} command will allow the client to fetch the file on the server.

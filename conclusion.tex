@@ -26,7 +26,7 @@ Indeed, if the signature verification using public key cryptography has been ava
 
 \paragraph{Conditional offloading in cryptodev}
 %Note this is still under heavy criticism. If the hardware lags so far behind, why the relatively good score in openvpn?
-The figure \ref{fig:openssl-benchmark-cbc} clearly shows a threshold on the packet size from which the hardware has a clear advantage, and below which the user mode software implementation is to go for.
+The figure \ref{fig:openssl-speed} clearly shows a threshold on the packet size from which the hardware has a clear advantage, and below which the user mode software implementation is to go for.
 %TODO include a listing to where it could be a good place to branch on the packet size. I already found it.
 %TODO at least add a pseudo-code to illustrate this shit.
 Using this breakeven point, one could patch the cryptodev cryptodev engine of OpenSSL to branch on the packet size, using the hardware if the packet is large enough, or fallback on the default software implementation otherwise. %openssl-1.0.2a/crypto/engine/eng_cryptodev.c

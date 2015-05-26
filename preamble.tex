@@ -70,6 +70,18 @@ frame=lines}
   morecomment=[f][\color{MidnightBlue}]\#,%comment
 }
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%http://tex.stackexchange.com/questions/2393/testing-for-current-page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{ifthen}
+\newcounter{cPage}
+\newcommand\figureref[1]{%
+  figure~\ref{#1}%
+ \refstepcounter{cPage}\label{current\thecPage}%
+ \ifthenelse{\equal{\pageref{#1}}{\pageref{current\thecPage}}}%
+  {}{~(p.~\pageref{#1})}}%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 
