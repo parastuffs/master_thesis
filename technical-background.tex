@@ -7,7 +7,7 @@ First comes an overview of Linux operating systems, the distinction between user
 
 \noindent Next comes An overview of the cryptographic field with the main primitives: message digests, symmetric ciphers and asymmetric ciphers.
 
-\ident Finally, the ground necessary to understand the inner working and challenges of some VPNs implementations will be covered with SSL/TLS and IPsec.
+\noindent Finally, the ground necessary to understand the inner working and challenges of some VPNs implementations will be covered with SSL/TLS and IPsec.
 
 
 
@@ -261,18 +261,53 @@ It is a network/internet level security; it examines incomming IP packets and ch
 
 IPsec consist of three components~\cite{cryptoencyclopedia2011}, each defined in their respective RFC:
 \begin{description}
-	\item[Traffic protols] Encapsulating Security Payload (ESP,~\cite{rfc4303}) and Authentication Header (AH,~\cite{rfc4302}).
+	\item[Traffic protocols] Encapsulating Security Payload (ESP,~\cite{rfc4303}) and Authentication Header (AH,~\cite{rfc4302}).
 	\item[Key management] Internet Key Exchange (IKEv2,~\cite{rfc7296}).
 	\item[Policy]Security Policy Database (SPD,~\cite{rfc4301}) and Security Association (SA~\cite{rfc4301}).
 \end{description}
 
-% ESP: TFC padding: traffic flow confidentiality, padding to hide the true nature of the packet, security mesure.
-% Link to the figure fig:esp-packet-structure
-Arguably, the features of AH can be offered by ESP.
+As~\citet{Paterson200672} present them, the SAs are used as repository for cryptographic parameters, and the SPD defines the policies to apply.
+If the SPD can be populated by hand, typically in a configuration file, the SA management should be left to an automated mechanism: the IKEv2.
+
+\noindent The IKEv2 protocol uses four different types of exchanges to fulfill its role:
+\begin{itemize}
+	\item \texttt{IKE\_SA\_INIT}: The two peers agree on cryptographic parameters to use. Among these is a Diffie-Hellman shared secret from which are derived symmetric keys used for a special IKE SA.
+	\item \texttt{IKE\_AUTH}: Once the peers are protected by the IKE SA, they can authenticate themselves to each other and add a first SA in the SA database (SADB).
+	The protocol supports three types of authentication methods:
+	\begin{itemize}
+		\item Digital signature using a PKI.
+		\item MAC using a pre-established secret key.
+		\item Extensible Authentication Protocol (EAP) defined in~\citet{rfc3748}.
+	\end{itemize}
+	At this point, the connection is fully established and ready to use.
+	\item \texttt{CREATE\_CHILD\_SA}: Used to create new SAs between the two peers. It may involve new generations of DH secrets to ensure perfect forward secrecy.
+	\item \texttt{INFORMATIONAL}: Exchange of management information.
+\end{itemize}\newline{}
+
+The figure~\ref{fig:esp-packet-structure} shows the structure of an ESP packet.
+The ESP header includes two fields: a Security Parameter Index (SPI) and a Sequence Number (SN)
+The SPI is a value on which both actors agreed on during the key exchange protocol, identifying the SA to use for the communication.
+The SN is an anti-replay feature, an integer incrementing with each packet processed by the SA. This way, the SA will reject any packet that does not have a SN in the current windows, avoiding an intruder to resend a previously captured packet on the network.
+As the SN is covered by the integrity, the opponent can not change it without having to change the Integrity Check Value (ICV, \textit{a.k.a.} the message digest).
+This authentication covers the whole packet, whilst the confidentiality excludes the ESP header.
+
+\noindent The ESP trailer includes a padding and two 1-byte fields: the padding length and the next header value, which can specify if the packet is dummy or real.
+The padding is needed when using block ciphers to obtain a payload which length is an integral multiple of the block length.
+
+\noindent The ESP payload includes an optional IV and an optional Traffic Flow Confidentiality (TFC) padding.
+The TFC padding allows to modify the length of the packet with dummy data, somewhat hiding the true nature of the payload.
+It differs from the standard padding because its length is not limited to 255 bytes like the latter.
+
+\noindent AH is the same as ESP, except is does not offer encryption features, only the authentication.
+Since ESP can use a null cipher, it arguably offers the same features as AH.
 The existance of AH is actually historical; when the protocol was developped in the 1990s, there were laws in the United States and other countries preventing the export of product including encryption features.
 Having an authentication only counterparty allowed such product to be exported without encryption capabilities.\newline{}
 
-IPsec can be deployed in two modes: transport for end-to-end service and protecting the payload, and tunnel to typically connect gateways and protect the entire IP packet.
+IPsec can be deployed in two modes: 
+\begin{itemize}
+	\item Transport for end-to-end service and protecting the payload. IPsec examines the incomming payload, checks it has not been tampered with and pass it to the next layer.
+	\item Tunnel protects the entire IP packet by encapsulating it into a new IP packet. As the destination contained in the new IP header can be different from the original, this mode can be used to manage gateways.
+\end{itemize}
 The figure~\ref{fig:ipsec-transport-tunnel} shows the space overhead imposed by AH and ESP in transport and tunnel modes.
 
 Both protocols add 10 bytes of fixed size fields (SPI, SN, pad length and next header).
