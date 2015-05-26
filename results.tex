@@ -97,13 +97,29 @@ Nevertheless, OpenVPN still needs to proceed to some extra computations (such as
 The following tests are conducted after the connection has been established, so as the clients do not need to undergo any new key negociation.
 
 \subsection{OpenVPN}
-The figure~\ref{fig:ping-benchmark-openvpn} shows the results for different payload sizes.
+The figure~\ref{fig:ping-benchmark-openvpn} shows the results for different payload sizes, which raw results are presented in table~\ref{tab:ping-benchmark-openvpn}
 
 \begin{figure}[ht]
 \input{graphs/openvpn-ping-benchmark}
 \caption{OpenVN: ping average response time}{OpenVPN adds up to 53\% extra delay and offloading the encryption does not improve the latency.}
 \label{fig:ping-benchmark-openvpn}
 \end{figure}
+
+\begin{table}[ht]
+\center
+\small
+\begin{tabular}{l|c|c|c|c|} \cline{2-5}
+ & 56B & 1000B & 8000B & 16000B \\ \hline
+\multicolumn{1}{|l|}{raw} & 1.444 & 1.929 & 2.811 & 4.322 \\ \hline
+\multicolumn{1}{|l|}{none-none} & 2.066 & 2.561 & 4.293 & 6.117 \\ \hline
+\multicolumn{1}{|l|}{soft-cbc256-none} &  &  &  & \\ \hline
+\multicolumn{1}{|l|}{ba411e-cbc256-none} &  &  &  & \\ \hline
+\multicolumn{1}{|l|}{soft-cbc256-sha256} & 2.415 & 3.061 & 5.997 & 9.135 \\ \hline
+\multicolumn{1}{|l|}{ba411e-cbc256-sha256} & 2.416 & 3.052 & 5.963 & 9.207 \\ \hline
+\end{tabular}
+\caption{OpenVN: ping average response time}{the latency is given in milliseconds.}
+\label{tab:ping-benchmark-openvpn}
+\end{table}
 
 Firstly, is the impact of OpenVPN's operation on the delay: when no encryption nor authentication is used, the exchange is 33\% to 53\% longer. This is simply because the packet has to go through a virtual interface, hence even without the security time overhead, the latency is much longer.
 
@@ -118,13 +134,31 @@ The CPU usage is not even worth mentioning as the operation is only a few millis
 
 
 \subsection{IPsec}
-The figure~\ref{fig:ping-benchmark-ipsec} studies the same payload size as OpenVPN, but with an extra experimental hardware implementation of AES mode GCM.
+The figure~\ref{fig:ping-benchmark-ipsec} studies the same payload size as OpenVPN, but with an extra experimental hardware implementation of AES mode GCM. The raw results are in table~\ref{tab:ping-benchmark-ipsec}.
 
 \begin{figure}[ht]
 \input{graphs/ipsec-ping-benchmark}
 \caption{IPsec: ping average response time}{for different packet sizes.}
 \label{fig:ping-benchmark-ipsec}
 \end{figure}
+
+\begin{table}[ht]
+\center
+\small
+\begin{tabular}{l|c|c|c|c|} \cline{2-5}
+ & 56B & 1000B & 8000B & 16000B \\ \hline
+\multicolumn{1}{|l|}{raw} & 1.444 & 1.929 & 2.811 & 4.322 \\ \hline
+\multicolumn{1}{|l|}{none-none} & 1.545 & 2.045 & 2.997 & 4.703 \\ \hline
+\multicolumn{1}{|l|}{soft-cbc256-none} &  &  &  &  \\ \hline
+\multicolumn{1}{|l|}{ba411e-cbc256-none} &  &  &  &  \\ \hline
+\multicolumn{1}{|l|}{soft-cbc256-sha256} & 1.645 & 2.322 & 4.762 & 7.975 \\ \hline
+\multicolumn{1}{|l|}{ba411e-cbc256-sha256} & 1.635 & 2.246 & 4.170 & 6.929 \\ \hline
+\multicolumn{1}{|l|}{soft-gcm256} & 1.651 & 2.388 & 5.383 & 9.241 \\ \hline
+\multicolumn{1}{|l|}{ba411e-gcm256} & 1.764 & 2.286 & -- & --  \\ \hline
+\end{tabular}
+\caption{IPsec: ping average response time}{the latency is given in milliseconds. Some results for the GCM mode in hardware are non-existant.}
+\label{tab:ping-benchmark-ipsec}
+\end{table}
 
 In this case, the time overhead imposed by IPsec is not larger than 9\%, corroborating the results of~\citet{Xenakis20063225}.
 
@@ -185,12 +219,27 @@ For each application, three encryption:authentication couples are considered: no
 \subsection{OpenSSH}
 The figure~\ref{fig:openssh-bench} shows the results for a file transfer over an SSH tunnel.
 For this application, there is no none:none couple case inside the tunnel, as it would be the same as a transfer outside the tunnel.
+The raw results are gathered in table~\ref{tab:openssh-bench}.
 
 \begin{figure}[ht]
 \input{graphs/openssh-bench}
-\caption{File transfer over an SSH tunnel.}{The background stripped bars are the CPU usage.}
+\caption{File transfer over an SSH tunnel}{The background stripped bars are the CPU usage.}
 \label{fig:openssh-bench}
 \end{figure}
+
+\begin{table}[ht]
+\center
+\small
+\begin{tabular}{l|c|c|c|c|c|c|} \cline{2-7}
+ & \multicolumn{2}{c|}{none:none} & \multicolumn{2}{c|}{aes256cbc:none} & \multicolumn{2}{c|}{aes256cbc:sha256} \\ \cline{2-7}
+ & Tp.  & CPU & Tp.  & CPU & Tp.  & CPU \\ \hline
+\multicolumn{1}{|c|}{Out-of-tunnel} & 11.39 & 7.16 & -- & -- & -- &  -- \\ \hline
+\multicolumn{1}{|c|}{Software} & -- & -- & 10.89 & 96.26 & 8.19 &  89.29 \\ \hline
+\multicolumn{1}{|c|}{BA414E} & -- & -- & 10.67 & 46.01 & 10.39 & 68.19 \\ \hline
+\end{tabular}
+\caption{File transfer over an SSH tunnel}{The throughput is in MB/s.}
+\label{tab:openssh-bench}
+\end{table}
 
 When only encryption is used, both implementation performs almost as well as outside the tunnel, but the software already saturates the CPU, whilst the hardware only uses half the same ressources.
 About 41\% of the operations using the CPU when accelarating with the hardware involve interuptions and kernel memory management.
@@ -202,12 +251,28 @@ The hardware is also consistent, but as there were some ressources available, th
 
 \subsection{OpenVPN}
 The figure~\ref{fig:openvpn-ftp-bench} shows the performance of the file transfer over an OpenVPN tunnel.
+The data is gathered in table~\ref{tab:openvpn-ftp-bench}.
 
 \begin{figure}[ht]
 \input{graphs/openvpn-ftp-bench}
-\caption{FTP file transfer over an OpenVPN tunnel.}{The results inside the tunnel with no encryption nor authentication highlights the overhead OpenVPN adds to the transfer. From there, the throughput only change by a small extent. The poor hardware results also shows the heaviness of OpenVPN on hardware offloading. The background stripped bars are the CPU usage.}
+\caption{FTP file transfer over an OpenVPN tunnel}{The results inside the tunnel with no encryption nor authentication highlights the overhead OpenVPN adds to the transfer. From there, the throughput only change by a small extent. The poor hardware results also shows the heaviness of OpenVPN on hardware offloading. The background stripped bars are the CPU usage.}
 \label{fig:openvpn-ftp-bench}
 \end{figure}
+
+\begin{table}[ht]
+\center
+\small
+\begin{tabular}{l|c|c|c|c|c|c|} \cline{2-7}
+ & \multicolumn{2}{c|}{none:none} & \multicolumn{2}{c|}{aes256cbc:none} & \multicolumn{2}{c|}{aes256cbc:sha256} \\ \cline{2-7}
+ & Tp.  & CPU & Tp.  & CPU & Tp.  & CPU \\ \hline
+\multicolumn{1}{|c|}{Out-of-tunnel} & 11.39 & 7.16 & -- & -- & -- & -- \\ \hline
+\multicolumn{1}{|c|}{Inside tunnel} & 5.18 & 42.60 & -- & -- & -- & -- \\ \hline
+\multicolumn{1}{|c|}{Software} & -- & -- & 4.78 & 76.60 & 3.87 & 76.03 \\ \hline
+\multicolumn{1}{|c|}{BA414E} & -- & -- & 3.35 & 83.74 & 2.84 & 80.89 \\ \hline
+\end{tabular}
+\caption{FTP file transfer over an OpenVPN tunnel}{The throughput is in MB/s.}
+\label{tab:openvpn-ftp-bench}
+\end{table}
 
 As it was already the case for the ping benchmark, the overhead imposed by the manipulation of OpenVPN is extremely heavy: the CPU usage jumps from 7.16\% to 42.60\%, and the throughput drops by 55\%, from 11.39MB/s to 5.18MB/s.
 
@@ -222,9 +287,24 @@ Adding a MAC computation aside the encryption lowers the performance in software
 The figure~\ref{fig:ipsec-ftp-bench} gathers the results of the file transfer over the IPsec tunnel.
 \begin{figure}[ht]
 \input{graphs/ipsec-ftp-bench}
-\caption{FTP file transfer over an IPsec tunnel.}{The advantage of the hardware is a lower CPU usage, at the cost of a few percents lower throughput. The GCM mode is also tested to discuss its implementation in hardware. The background stripped bars are the CPU usage.}
+\caption{FTP file transfer over an IPsec tunnel}{The advantage of the hardware is a lower CPU usage, at the cost of a few percents lower throughput. The GCM mode is also tested to discuss its implementation in hardware. The background stripped bars are the CPU usage.}
 \label{fig:ipsec-ftp-bench}
 \end{figure}
+
+\begin{table}[ht]
+\center
+\small
+\begin{tabular}{l|c|c|c|c|c|c|c|c|} \cline{2-9}
+ & \multicolumn{2}{c|}{none:none} & \multicolumn{2}{c|}{aes256cbc:none} & \multicolumn{2}{c|}{aes256cbc:sha256} & \multicolumn{2}{c|}{aes256gcm} \\ \cline{2-9}
+ & Tp.  & CPU & Tp.  & CPU & Tp.  & CPU & Tp.  & CPU \\ \hline
+\multicolumn{1}{|c|}{Out-of-tunnel} & 11.39 & 7.16 & -- & -- & -- & -- & -- & -- \\ \hline
+\multicolumn{1}{|c|}{Inside tunnel} & 10.21 & 14.68 & -- & -- & -- & -- & -- & -- \\ \hline
+\multicolumn{1}{|c|}{Software} & -- & -- & 8.83 & 63.74 & 6.47 & 74.64 & 5.09 & 89.66 \\ \hline
+\multicolumn{1}{|c|}{BA414E} & -- & -- & 8.52 & 14.87 & 5.80 & 17.25 & -- & -- \\ \hline
+\end{tabular}
+\caption{FTP file transfer over an IPsec tunnel}{The throughput is in MB/s.}
+\label{tab:ipsec-ftp-bench}
+\end{table}
 
 In this implementation, the IPsec overhead is only of 10\%, close to the 9\% of the ping overhead, and the CPU usage only double to reach 14.68\%.
 

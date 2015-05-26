@@ -97,6 +97,7 @@ OpenVPN relies on a cryptographic library, OpenSSL in our case, for all the secu
 
 \noindent Note that if one wants to use the \texttt{none} cipher with a version of OpenVPN ealier than 2.3.7, he would have to update it using a community patch~\cite{openvpn-patch-none}.
 
+
 \subsection{OpenSSH}
 % Talk about the MAC=none patch
 % connection using SSL/TLS, then AES, but without fragmentation (unlike openvpn)
@@ -107,7 +108,7 @@ Still, there is no official support for any other cryptographic library.
 
 If OpenSSH does support most of OpenSSL ciphers by default, it takes some liberties such as disabling the CBC encryption mode and removing the support of no MAC during a transmission.
 
-\noindent The first liberty is a laste\footnote{A vulnerability note as been issued by Carnegie Mellon University Computer Emergency Response Team in early 2009 (last revision)~\cite{CERT2009}, in response to a research of University of London~\cite{Albrecht:2009} presenting a plaintext-recovering attack against SSH when CBC mode is used, but the OpenSSH update took only place in october 2014.}.
+\noindent The first liberty is a response to an old vulnarability\footnote{A vulnerability note as been issued by Carnegie Mellon University Computer Emergency Response Team in early 2009 (last revision)~\cite{CERT2009}, in response to a research of University of London~\cite{Albrecht:2009} presenting a plaintext-recovering attack against SSH when CBC mode is used, but the OpenSSH update took only place in october 2014.}.
 Even if it is not recommended, the user can still enable this mode by explicitly configuring it in the \texttt{sshd\_config} options.
 
 \noindent The second liberty has been taken to prevent the user to strip himself from data authenticity and integrity.
