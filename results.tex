@@ -92,32 +92,63 @@ The following tests are conducted after the connection has been established, so 
 \subsection{OpenVPN}
 The figure~\ref{fig:ping-benchmark-openvpn} shows the results for different payload sizes.
 
+\noindent Firstly, is the impact of OpenVPN's operation on the delay: when no encryption nor authentication is used, the exchange is 33\% to 53\% longer. This is simply because the packet has to go through a virtual interface, hence even without the security time overhead, the latency is much longer.
+
+When combining encryption and authentication, the software and hardware implementation are neck and neck.
+Eventhough the MAC is not offload, the hardware implementation could have performed better.
+The reason is not only all the packets have to go through a virtual interface in the kernel, the payload also has to be sent to the hardware through the kernel.
+In the end, a packet will undergo two full round trips between the user and the kernel space, that is one more than a regular software implementation, plus a final transfer to the physical interface.
+
+\noindent All those transfer make the offload useless in such a case in term of raw performance.
+The CPU usage is not even worth mentioning as the operation is only a few milliseconds long.
+
 
 \begin{figure}[ht]
 \input{graphs/openvpn-ping-benchmark}
-\caption{OpenVN: ping average response time}{}
+\caption{OpenVN: ping average response time}{OpenVPN adds up to 53\% extra delay and offloading the encryption does not improve the latency.}
 \label{fig:ping-benchmark-openvpn}
 \end{figure}
 
 \subsection{IPsec}
+The figure~\ref{fig:ping-benchmark-ipsec} studies the same payload size as OpenVPN, but with an extra experimental hardware implementation of AES mode GCM.
+
+\noindent In this case, the time overhead imposed by IPsec is not larger than 9\%, corroborating the results of~\citet{Xenakis20063225}.
+
+When combining encryption and authentication, the hardware implementation steadily takes the advantage over the software with the encrease of the payload length.
+If they both have the same latency at default payload size, the hardware is up to 13\% faster for 16000 bytes payloads.
+
+As for the GCM mode, the support in the BA411E driver is highly experimental and takes more of a proof of concept than a real use case.
+The current implementation could not support payload sizes larger than 1000 bytes, and at this size it is 5\% faster than the software.
+It is not much, but when compared to the 3\% improvement the BA411E offers at the same size for AES-256-CBC, we can expect an accelaration exceeding the 20\% for larger payload sizes. %TODO Instead of comparing with sha256, compare with none, no software holding back;
+Aside from the fact that the driver is not fully working yet, it could still be extensively improved.
+As an example, it still relies on the \texttt{seqiv} kernel module, as the software implementation does.
+Managing the generation of the IV directly in the driver would cut it loose from yet another software boulder.
 
 \begin{figure}[ht]
 \input{graphs/ipsec-ping-benchmark}
-\caption{Ping min/avg/max response time}{for different packet sizes using IPsec. For each packet size, 1000 requests were flooded to the board, that is \textit{"outputs packets as fast as they come back or one hundred times per second, whichever is more"}, according to the \texttt{ping} command manual.} %TODO move the end of the caption to the "test protocol" chapter.
+\caption{IPsec: ping average response time}{for different packet sizes using IPsec. For each packet size, 1000 requests were flooded to the board, that is \textit{"outputs packets as fast as they come back or one hundred times per second, whichever is more"}, according to the \texttt{ping} command manual.} %TODO move the end of the caption to the "test protocol" chapter.
 \label{fig:ping-benchmark-ipsec}
 \end{figure}
 
 
 
 \subsection{Comparison}
+The figure~\ref{fig:ping-benchmark-comparison} summarizes the results for OpenVPN and IPsec for the most realistic use case: the combination of encryption and authentication.
+
+\noindent The first main difference is the overhead imposed by each method: 53\% for OpenVPN and only 9\% for IPsec.
+Even if those configurations are not realistic, it puts forward the advantage of directly working in the kernel as does IPsec.
+
+As for the combination of encryption and authentication, IPsec is between 13\% and 32\% faster than OpenVPN.
+IPsec loses its advantage with the increase of the payload size, the time lost when moving around the data between the user and the kernel space being less important compared to the securoty operations.
+
+\noindent In hardware, as OpenVPN could not take advantage of the accelaration of the encryption, IPsec is even faster, ranging from 25\% to 33\% faster than OpenVPN.
+
 
 \begin{figure}[ht]
 \input{graphs/ping-bench-comparison}
-\caption{Ping average comparison}{All values are for aes-256-cbc with sha-256}
+\caption{Ping average comparison}{All values are for AES-256-CBC with SHA-256. Globally, IPsec yields better results and propose the most significant hardware offload. Quick reading: the stripped bars are the IPsec results.}
 \label{fig:ping-benchmark-comparison}
 \end{figure}
-
-
 
 
 
@@ -141,6 +172,8 @@ The figure~\ref{fig:ping-benchmark-openvpn} shows the results for different payl
 
 %OpenSSH: 	- normal transfer: shows perf difference
 %			- capped to software max: show CPU offload
+This use case studies the performance of a simple file transfer over three different secure implementations: OpenSSH, OpenVPN and IPsec.
+For each application, three encryption:authentication couples are considered: none:none, AES-256-CBC:none and AES-256-CBC:SHA-256. 
 
 \subsection{openSSH}
 
