@@ -16,7 +16,7 @@
         symbolic x coords={56, 1000, 4000, 8000, 16000},
         xtick = data,
         scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
-        legend style={at={(0.5,-0.25)}, anchor=north,legend columns=3},
+        legend style={at={(0.5,-0.25)}, anchor=north,legend columns=2},
         enlarge x limits=0.1,
     ]
 % I would have prefered to have "\addplot[marks only]", but they overlap if they have the same x coordinate,
@@ -31,7 +31,7 @@
     };
     \label{raw}
 
-\addplot[style={brown, fill=brown}]
+\addplot[style={NavyBlue, fill=NavyBlue}]
     coordinates {
         (56, 2.066)
         (1000, 2.561)
@@ -41,7 +41,7 @@
     };
     \label{none-none}
 
-\addplot[style={green, fill=green}]
+\addplot[style={OliveGreen, fill=OliveGreen}]
     coordinates {
         (56, 2.415)
         (1000, 3.061)
@@ -51,7 +51,7 @@
     };
     \label{soft-cbc256-sha256}
 
-\addplot[style={orange, fill=orange}]
+\addplot[style={BrickRed, fill=BrickRed}]
     coordinates {
         (56, 2.416)
         (1000, 3.052)
@@ -61,7 +61,7 @@
     };
     \label{ba411e-cbc256-sha256}
 
-\legend{raw, soft-cbc256-sha256, ba411e-cbc256-sha256}
+\legend{raw, none-none, soft-cbc256-sha256, ba411e-cbc256-sha256}
 \end{axis}
 \end{tikzpicture}
 % Here, I could show the gcm128, which show better performances with the BA411e, but I would be weird to compare it with aes256cbc.

@@ -1,6 +1,10 @@
 \chapter{Results and Analysis}\label{chap:results}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{TLS connections}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Begin with the benchmark done by Bastien on the raw number of verif/s with openssl.
 
 If the ten clients could connect instantaneously to the server every second, the maximum number of connections would be 600 per minute.
@@ -69,14 +73,27 @@ Nevertheless, OpenVPN still needs to proceed to some extra computations (such as
 
 
 
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Response time -- latency}
-After the establishement of a connection.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The following tests are conducted after the connection has been established, so as the clients do not need to undergo any new key negociation.
 
 \subsection{OpenVPN}
 
 \begin{figure}[ht]
 \input{graphs/openvpn-ping-benchmark}
-\caption{Ping min/avg/max response time}{for different packet sizes using OpenVPN}
+\caption{OpenVN: ping average response time}{}
 \label{fig:ping-benchmark-openvpn}
 \end{figure}
 
@@ -99,7 +116,25 @@ After the establishement of a connection.
 \end{figure}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{File transfer}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %FTP over openvpn and IPsec
 
 %OpenSSH: 	- normal transfer: shows perf difference

@@ -282,7 +282,8 @@ If the SPD can be populated by hand, typically in a configuration file, the SA m
 	At this point, the connection is fully established and ready to use.
 	\item \texttt{CREATE\_CHILD\_SA}: Used to create new SAs between the two peers. It may involve new generations of DH secrets to ensure perfect forward secrecy.
 	\item \texttt{INFORMATIONAL}: Exchange of management information.
-\end{itemize}\newline{}
+\end{itemize}
+~\newline{}
 
 The figure~\ref{fig:esp-packet-structure} shows the structure of an ESP packet.
 The ESP header includes two fields: a Security Parameter Index (SPI) and a Sequence Number (SN)
