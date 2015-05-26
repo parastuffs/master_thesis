@@ -1,7 +1,7 @@
 \chapter{Implementation}
 This chapter will present how we implemented the protocols of chapter~\ref{chap:theory} on the board.
-The figure~\ref{fig:os-path-generic} show the generic data flow in the operating system through the user and kernel spaces.
-We will first detail the software part, with the OpenVPN and openSSH as the application, and OpenSSL as a cryptographic library on which both applications rely.
+The figure~\ref{fig:os-path-generic} shows the generic data flow in the operating system through the user and kernel spaces.
+We will first detail the software part, with the OpenVPN and openSSH as the applications, and OpenSSL as a cryptographic library on which both applications rely.
 Then will come strongswan, a user-space abstraction layer giving access to IPsec and we will see how different it is from an OpenVPN implementation.
 Lastly, the standard Linux cryptographic kernel modules and network drivers will be listed and briefly discussed.
 
@@ -33,8 +33,8 @@ Before closing the chapter, we will present the two main IPs to which the crypto
 % https://openvpn.net/index.php/open-source/339-why-ssl-vpn.html
 % https://openvpn.net/index.php/open-source/335-why-openvpn.html
 % https://openvpn.net/papers/BLUG-talk/index.html
-
-OpenVPN is also used by the Dutch government to secure all its communications~\cite{openvpn-nl}.
+OpenVPN is a very popular VPN solution relying on the application layer of the TCP/IP stack by using the SSL/TLS protocols.
+% OpenVPN is also used by the Dutch government to secure all its communications~\cite{openvpn-nl}.
 
 Uses regular TCP/UDP network protocols, which can be an advantage over IPsec if the ISP decides to block the latter.
 

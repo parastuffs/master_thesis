@@ -3,7 +3,11 @@
 This chapter will address the technical ground inherent to this work.
 First comes an overview of Linux operating systems, the distinction between user and kernel mode, and the design of device drivers.
 
-Follow a quick presentation of FPGAs and how they can be driven from the operating system.
+\noindent Follow a quick presentation of FPGAs and how they can be driven from the operating system.
+
+\noindent Next comes An overview of the cryptographic field with the main primitives: message digests, symmetric ciphers and asymmetric ciphers.
+
+\ident Finally, the ground necessary to understand the inner working and challenges of some VPNs implementations will be covered with SSL/TLS and IPsec.
 
 
 
@@ -34,9 +38,9 @@ Hence, systems with a lot of processes in need for CPU ressources would not be s
 
 Driving from the OS: basically, they will need to share some memory.
 That memory can be directly mapped and accessed from the user-space using \texttt{/dev/mem}, or can use a direct memory access module (DMA).
-From the operation system, we build a bunch of scatterlist in ther kernel-space memory, then map those pages to memory descriptor that have a physical address on the DMA.
+From the operating system, we build a bunch of scatterlist in the kernel-space memory, then map those pages to memory descriptor that have a physical address on the DMA.
 They can be mapped three different ways: \texttt{DMA\_BIDIRECTIONAL}, \texttt{DMA\_TO\_DEVICE} or \texttt{DMA\_FROM\_DEVICE}.
-When the CPU write something in those descriptor and synchronize them with the DMA, it does not have to care about them anymore, the DMA in now in charge to send them to the device where registers are ready to read the incomming data.
+When the CPU write something in those descriptors and synchronize them with the DMA, it does not have to care about them anymore, the DMA in now in charge to send them to the device where registers are ready to read the incomming data.
 The same goes from the device to the CPU: when the device wants to communicate data to the OS, it writes it on the DMA that will transfer them to the CPU, triggering a flag on the way to notify it.
 
 
@@ -250,12 +254,32 @@ Application level security.
 
 \subsection{IPsec}
 % IPsec as a protocol, strongswan come in the 'implementation' chapter.
-Modification of the IP stack in the kernel space.
-IPsec is a network level security; it examines incomming IP packets and checks if there exists a security association with the destination, and decrypt it on-the-fly if necessary.
+IPsec is a modification of the IP stack in the kernel space.
+It is a network/internet level security; it examines incomming IP packets and checks if there exists a security association with the destination, and decrypt it on-the-fly if necessary.
 
-One of the main disadvantage compared to a user-space VPN is the difficulty to traverse NAT.
+% One of the main disadvantage compared to a user-space VPN is the difficulty to traverse NAT.
 
-%TODO Figure IPsec frame structure.
+IPsec consist of three components~\cite{cryptoencyclopedia2011}, each defined in their respective RFC:
+\begin{description}
+	\item[Traffic protols] Encapsulating Security Payload (ESP,~\cite{rfc4303}) and Authentication Header (AH,~\cite{rfc4302}).
+	\item[Key management] Internet Key Exchange (IKEv2,~\cite{rfc7296}).
+	\item[Policy]Security Policy Database (SPD,~\cite{rfc4301}) and Security Association (SA~\cite{rfc4301}).
+\end{description}
+
+% ESP: TFC padding: traffic flow confidentiality, padding to hide the true nature of the packet, security mesure.
+% Link to the figure fig:esp-packet-structure
+Arguably, the features of AH can be offered by ESP.
+The existance of AH is actually historical; when the protocol was developped in the 1990s, there were laws in the United States and other countries preventing the export of product including encryption features.
+Having an authentication only counterparty allowed such product to be exported without encryption capabilities.\newline{}
+
+IPsec can be deployed in two modes: transport for end-to-end service and protecting the payload, and tunnel to typically connect gateways and protect the entire IP packet.
+The figure~\ref{fig:ipsec-transport-tunnel} shows the space overhead imposed by AH and ESP in transport and tunnel modes.
+
+Both protocols add 10 bytes of fixed size fields (SPI, SN, pad length and next header).
+The other fields are of variable length, or even optional, such as the optional authentication field of minimum 12 bytes, the optional IV of minimum 4 bytes and the padding between 0 and 255 bytes long.
+\citet{Xenakis20063225} reached the conclusion in their paper that the use of lightweight -- and deprecated -- encryption schemes (\textit{e.g.} HMAC-MD5 and DES) hardly had any impact on the throughput of the system and on the delay of the packets.
+Hence, the space overhead of IPsec is negligible when using more serious schemes (\textit{e.g.} AES-256-CBC with HMAC-SHA-256).
+
 
 \begin{figure}[ht]
 \center
@@ -271,7 +295,7 @@ One of the main disadvantage compared to a user-space VPN is the difficulty to t
 	\input{ipsec-tunnel}
 	}
 }
-\caption{IPsec transport (a) and tunnel (b) overheads}{Tunnel mode adds a custom IP header and moves the AH/ESP header in front of the original IP header. Note: ``trl" stands for ``trailer", ``hdr" for ``header"}
+\caption{IPsec (a) transport and (b) tunnel overheads}{Tunnel mode adds a custom IP header and moves the AH/ESP header in front of the original IP header. Note: ``trl" stands for ``trailer", ``hdr" for ``header", reproduced from~\cite{Xenakis20063225}}
 \label{fig:ipsec-transport-tunnel}
 \end{figure}
 
@@ -321,6 +345,3 @@ RFC 7321~\cite{rfc7321} defines the support for only three AES modes: CBC, CTR a
 \caption{ESP packet structure}{as defined in RFC 4303~\cite{rfc4303}.}
 \label{fig:esp-packet-structure}
 \end{figure}
-
-
-Don't forget to talk about the IPsec overhead from~\cite{Xenakis20063225}.

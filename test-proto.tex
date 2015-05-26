@@ -54,3 +54,5 @@ For the IPsec use case, the cipher/authentication pair null/null will be used to
 It should however not be forgotten that it is not to be used as a production configuration.
 As the RFC 7321~\citep[pg. 7]{rfc7321} sates: ``Note that while authentication and encryption can each
    be `NULL', they MUST NOT both be `NULL'".
+
+All the tests will be conducted with the ESP protocol in tunnel mode, so that we have the worst case scenario; as AH imposes a smaller overhead, the perfomance could only be better.
