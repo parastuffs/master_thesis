@@ -1,22 +1,11 @@
-\chapter{Configuration}
+\chapter{Configuration files}
+
+\section{OpenVPN}
+
+\lstinputlisting[language=config, label=list:openvpn-client, caption={OpenVPN client configuration file.}]{configs/openvpn-client.ovpn}
+
+\lstinputlisting[language=config, label=list:openvpn-server, caption={OpenVPN server configuration file.}]{configs/openvpn-server.conf}
 
 \section{Strongswan}
 
-\lstset{commentstyle=\color{colComments}\textit,
-float=hbp,%
-basicstyle=\ttfamily\footnotesize, %
-identifierstyle=\color{colIdentifier}, %
-keywordstyle=\color{colKeys}, %
-stringstyle=\color{colString}, %
-columns=flexible, %
-tabsize=2, %
-extendedchars=true, %
-showspaces=false, %
-showstringspaces=false, %
-numbers=left, %
-numberstyle=\tiny, %
-breaklines=true, %
-breakautoindent=true, %
-captionpos=b}
-\begin{lstlisting}[caption=strongswan configuration files, label=list:strongswan-config]
-\end{lstlisting}
+\lstinputlisting[language=config, label=list:ipsec-client, caption={Strongswan configuration file. Left is the local host, right the remote.}]{configs/ipsec-client.conf}
