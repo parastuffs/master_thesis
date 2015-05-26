@@ -13,11 +13,11 @@
         ylabel = {Response time [ms]},
         xlabel = {ICMP packet size [B]},
         ymin=0, ymax=10,
-        symbolic x coords={56, 1000, 4000, 8000, 16000},
+        symbolic x coords={56, 1000, 8000, 16000},
         xtick = data,
         scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
         legend style={at={(0.5,-0.25)}, anchor=north,legend columns=2},
-        enlarge x limits=0.1,
+        enlarge x limits=0.2,
     ]
 % I would have prefered to have "\addplot[marks only]", but they overlap if they have the same x coordinate,
 % not like bars that automatically shift.
@@ -25,7 +25,6 @@
     coordinates {
         (56, 1.444)
         (1000, 1.929)
-        (4000, 2.376)
         (8000, 2.811)
         (16000, 4.322)
     };
@@ -35,17 +34,33 @@
     coordinates {
         (56, 2.066)
         (1000, 2.561)
-        (4000, 3.373)
         (8000, 4.293)
         (16000, 6.117)
     };
     \label{none-none}
 
+\addplot[style={OliveGreen, fill=OliveGreen},postaction={pattern=north east lines}]
+    coordinates {
+        (56, 2.415)
+        (1000, 3.061)
+        (8000, 5.997)
+        (16000, 9.135)
+    };
+    \label{soft-cbc256-none}
+
+\addplot[style={BrickRed, fill=BrickRed},postaction={pattern=north east lines}]
+    coordinates {
+        (56, 2.416)
+        (1000, 3.052)
+        (8000, 5.963)
+        (16000, 9.207)
+    };
+    \label{ba411e-cbc256-none}
+
 \addplot[style={OliveGreen, fill=OliveGreen}]
     coordinates {
         (56, 2.415)
         (1000, 3.061)
-        (4000, 4.376)
         (8000, 5.997)
         (16000, 9.135)
     };
@@ -55,13 +70,12 @@
     coordinates {
         (56, 2.416)
         (1000, 3.052)
-        (4000, 4.140)
         (8000, 5.963)
         (16000, 9.207)
     };
     \label{ba411e-cbc256-sha256}
 
-\legend{raw, none-none, soft-cbc256-sha256, ba411e-cbc256-sha256}
+\legend{raw, none-none, soft-cbc256-none, ba411e-cbc256-none, soft-cbc256-sha256, ba411e-cbc256-sha256}
 \end{axis}
 \end{tikzpicture}
 % Here, I could show the gcm128, which show better performances with the BA411e, but I would be weird to compare it with aes256cbc.
