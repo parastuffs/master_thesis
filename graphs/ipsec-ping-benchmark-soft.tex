@@ -1,7 +1,7 @@
 \begin{tikzpicture}
 \begin{axis}[
-        title = {Ping benchmark -- IPsec},
-        width  = 0.6\textwidth,
+        title = {Ping benchmark -- IPsec -- Software},
+        width  = \textwidth,
         height = 8cm,
         major x tick style = transparent,
         ybar,
@@ -18,6 +18,23 @@
     ]
 % I would have prefered to have "\addplot[marks only]", but they overlap if they have the same x coordinate,
 % not like bars that automatically shift.
+\addplot[style={black, fill=black}]
+    coordinates {
+        (56, 1.444)
+        (1000, 1.929)
+        (8000, 2.811)
+        (16000, 4.322)
+    };
+    \label{raw}
+
+\addplot[style={NavyBlue, fill=NavyBlue}]
+    coordinates {
+        (56, 1.545)
+        (1000, 2.045)
+        (8000, 2.997)
+        (16000, 4.703)
+    };
+    \label{none-none}
 
 \addplot[style={OliveGreen, fill=OliveGreen},postaction={pattern=north east lines}]
     coordinates {
@@ -29,15 +46,6 @@
     };
     \label{soft-cbc256-none}
 
-\addplot[style={BrickRed, fill=BrickRed},postaction={pattern=north east lines}]
-    coordinates {
-        (56, 1.639)
-        (1000, 2.080)
-        (8000, 3.445)
-        (16000, 5.345)
-    };
-    \label{ba411e-cbc256-none}
-
 \addplot[style={OliveGreen, fill=OliveGreen}]
     coordinates {
         (56, 1.645)
@@ -48,16 +56,7 @@
     };
     \label{soft-cbc256-sha256}
 
-\addplot[style={BrickRed, fill=BrickRed}]
-    coordinates {
-        (56, 1.635)
-        (1000, 2.246)
-        (8000, 4.170)
-        (16000, 6.929)
-    };
-    \label{ba411e-cbc256-sha256}
-
-\legend{soft-cbc256-none, ba411e-cbc256-none, soft-cbc256-sha256, ba411e-cbc256-sha256}
+\legend{raw, none-none, soft-cbc256-none, soft-cbc256-sha256}
 \end{axis}
 \end{tikzpicture}
 % Here, I could show the gcm256, which show better performances with the BA411e, but I would be weird to compare it with aes256cbc.

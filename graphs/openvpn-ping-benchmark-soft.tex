@@ -21,6 +21,23 @@
     ]
 % I would have prefered to have "\addplot[marks only]", but they overlap if they have the same x coordinate,
 % not like bars that automatically shift.
+\addplot[style={black, fill=black}]
+    coordinates {
+        (56, 1.444)
+        (1000, 1.929)
+        (8000, 2.811)
+        (16000, 4.322)
+    };
+    \label{raw}
+
+\addplot[style={NavyBlue, fill=NavyBlue}]
+    coordinates {
+        (56, 2.066)
+        (1000, 2.561)
+        (8000, 4.293)
+        (16000, 6.117)
+    };
+    \label{none:none}
 
 \addplot[style={OliveGreen, fill=OliveGreen},postaction={pattern=north east lines}]
     coordinates {
@@ -31,15 +48,6 @@
     };
     \label{soft-cbc256:none}
 
-\addplot[style={BrickRed, fill=BrickRed},postaction={pattern=north east lines}]
-    coordinates {
-        (56, 2.301)
-        (1000, 2.783)
-        (8000, 5.377)
-        (16000, 8.099)
-    };
-    \label{ba411e-cbc256:none}
-
 \addplot[style={OliveGreen, fill=OliveGreen}]
     coordinates {
         (56, 2.415)
@@ -49,16 +57,7 @@
     };
     \label{soft-cbc256:sha256}
 
-\addplot[style={BrickRed, fill=BrickRed}]
-    coordinates {
-        (56, 2.416)
-        (1000, 3.052)
-        (8000, 5.963)
-        (16000, 9.207)
-    };
-    \label{ba411e-cbc256:sha256}
-
-\legend{soft-cbc256:none, ba411e-cbc256:none, soft-cbc256:sha256, ba411e-cbc256:sha256}
+\legend{raw, none:none, soft-cbc256:none, soft-cbc256:sha256}
 \end{axis}
 \end{tikzpicture}
 % Here, I could show the gcm128, which show better performances with the BA411e, but I would be weird to compare it with aes256cbc.

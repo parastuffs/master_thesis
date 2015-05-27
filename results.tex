@@ -97,11 +97,17 @@ Nevertheless, OpenVPN still needs to proceed to some extra computations (such as
 The following tests are conducted after the connection has been established, so as the clients do not need to undergo any new key negociation.
 
 \subsection{OpenVPN}
-The figure~\ref{fig:ping-benchmark-openvpn} shows the results for different payload sizes, which raw results are presented in table~\ref{tab:ping-benchmark-openvpn}
+The figures~\ref{fig:ping-benchmark-openvpn}~and~\ref{fig:ping-benchmark-openvpn-soft} shows the results for different payload sizes, which raw results are presented in table~\ref{tab:ping-benchmark-openvpn}
+
+\begin{figure}[ht]
+\input{graphs/openvpn-ping-benchmark-soft}
+\caption{OpenVN: ping average response time -- software}{Compares the response for different packet size when using a full-software implementation. OpenVPN adds up to 53\% extra delay when not using encryption nor authentication (none:none).}
+\label{fig:ping-benchmark-openvpn-soft}
+\end{figure}
 
 \begin{figure}[ht]
 \input{graphs/openvpn-ping-benchmark}
-\caption{OpenVN: ping average response time}{OpenVPN adds up to 53\% extra delay and offloading the encryption does not improve the latency.}
+\caption{OpenVN: ping average response time -- Software/Hardware}{When using encryption only, the transfers between the user space and the hardware make the hardware implementation perform worse than the software. Adding the authentication fills the gap by making the encryption synchronize with the authentication.}
 \label{fig:ping-benchmark-openvpn}
 \end{figure}
 
@@ -128,18 +134,34 @@ Eventhough the MAC is not offload, the hardware implementation could have perfor
 The reason is not only all the packets have to go through a virtual interface in the kernel, the payload also has to be sent to the hardware through the kernel.
 In the end, a packet will undergo two full round trips between the user and the kernel space, that is one more than a regular software implementation, plus a final transfer to the physical interface.
 
+\noindent It is interresting to note that for packets of 16000 bytes, the hardware adds an extra 12\% to the latency when using only encryption, but only 1\% when adding the authentication.
+In the second case, the synchronization between the confidentiality and the authentication slows the process down up to the point that the user/kernel space transfers are less an overhead than with confidentiality alone.
+If the MAC were to be done in hardware as well, the extra delay would probably be even larger as the data would have to be transfered to two different IP cores via two different drivers\footnote{A unifed driver is under development, gathering the encryption and authentication in the same kernel module.}.
+
 \noindent All those transfer make the offload useless in such a case in term of raw performance.
 The CPU usage is not even worth mentioning as the operation is only a few milliseconds long.
 
 
 
-\subsection{IPsec}
-The figure~\ref{fig:ping-benchmark-ipsec} studies the same payload size as OpenVPN, but with an extra experimental hardware implementation of AES mode GCM. The raw results are in table~\ref{tab:ping-benchmark-ipsec}.
+\subsection{IPsec}\label{sec:lantecy-ipsec}
+The figures~\ref{fig:ping-benchmark-ipsec} and \ref{fig:ping-benchmark-ipsec-soft-hard}  studies the same payload size as OpenVPN, but with an extra software implementation of AES mode GCM. The raw results are in table~\ref{tab:ping-benchmark-ipsec}.
 
 \begin{figure}[ht]
-\input{graphs/ipsec-ping-benchmark}
-\caption{IPsec: ping average response time}{for different packet sizes.}
-\label{fig:ping-benchmark-ipsec}
+\input{graphs/ipsec-ping-benchmark-soft}
+\caption{IPsec: ping average response time -- Software}{The overhead imposed by IPsec when not using encryption nor authentication is 9\%.}
+\label{fig:ping-benchmark-ipsec-soft}
+\end{figure}
+
+\begin{figure}[ht]
+\center
+\subfloat[\label{fig:ping-benchmark-ipsec-gcm}GCM]{%
+	\input{graphs/ipsec-ping-benchmark-gcm}
+}
+\subfloat[\label{fig:ping-benchmark-ipsec}CBC]{%
+	\input{graphs/ipsec-ping-benchmark}
+}
+\caption{IPsec: ping average response time -- software/Hardware}{\newline{}(a) Processing GCM in hardware yields at least as good results as CBC. Comparing the CBC mode without authentication in hardware with the GCM mode in software thus makes sense.\newline{}(b) With or without authentication, the better results by the same margin.}
+\label{fig:ping-benchmark-ipsec-soft-hard}
 \end{figure}
 
 \begin{table}[ht]
@@ -154,7 +176,7 @@ The figure~\ref{fig:ping-benchmark-ipsec} studies the same payload size as OpenV
 \multicolumn{1}{|l|}{soft-cbc256-sha256} & 1.645 & 2.322 & 4.762 & 7.975 \\ \hline
 \multicolumn{1}{|l|}{ba411e-cbc256-sha256} & 1.635 & 2.246 & 4.170 & 6.929 \\ \hline
 \multicolumn{1}{|l|}{soft-gcm256} & 1.651 & 2.388 & 5.383 & 9.241 \\ \hline
-\multicolumn{1}{|l|}{ba411e-gcm256} & 1.764 & 2.286 & -- & --  \\ \hline
+% \multicolumn{1}{|l|}{ba411e-gcm256} & 1.764 & 2.286 & -- & --  \\ \hline
 \end{tabular}
 \caption{IPsec: ping average response time}{the latency is given in milliseconds. Some results for the GCM mode in hardware are non-existant.}
 \label{tab:ping-benchmark-ipsec}
@@ -165,12 +187,10 @@ In this case, the time overhead imposed by IPsec is not larger than 9\%, corrobo
 When combining encryption and authentication, the hardware implementation steadily takes the advantage over the software with the encrease of the payload length.
 If they both have the same latency at default payload size, the hardware is up to 13\% faster for 16000 bytes payloads.
 
-As for the GCM mode, the support in the BA411E driver is highly experimental and takes more of a proof of concept than a real use case.
-The current implementation could not support payload sizes larger than 1000 bytes, and at this size it is 5\% faster than the software.
-It is not much, but when compared to the 3\% improvement the BA411E offers at the same size for AES-256-CBC, we can expect an accelaration exceeding the 20\% for larger payload sizes. %TODO Instead of comparing with sha256, compare with none, no software holding back;
-Aside from the fact that the driver is not fully working yet, it could still be extensively improved.
-As an example, it still relies on the \texttt{seqiv} kernel module, as the software implementation does.
-Managing the generation of the IV directly in the driver would cut it loose from yet another software boulder.
+As for the GCM mode, the support in the BA411E driver is highly experimental and is not functional enough to be integrated in those results.
+However, the process of GCM packets in hardware should be at least as fast as CBC packets.
+We can thus compare the software implementation of the GCM mode with a hardware implementation of CBC only (wihtout authentication).
+The figure~\ref{fig:ping-benchmark-ipsec-gcm} shows an improved delay by up to 42\% when using the hardware.
 
 
 
@@ -179,7 +199,7 @@ The figure~\ref{fig:ping-benchmark-comparison} summarizes the results for OpenVP
 
 \begin{figure}[ht]
 \input{graphs/ping-bench-comparison}
-\caption{Ping average comparison}{All values are for AES-256-CBC with SHA-256. Globally, IPsec yields better results and propose the most significant hardware offload. Quick reading: the stripped bars are the IPsec results.}
+\caption{Ping average comparison}{All values are for AES-256-CBC with SHA-256. this graph shows two results: the comparison between IPsec and OpenVPN overhead without encryption nor authentication, and the performance of IPsec and OpenVPN in software and hardware. Globally, IPsec yields better results and propose the most significant hardware offload. Quick reading: the stripped bars are the IPsec results.}
 \label{fig:ping-benchmark-comparison}
 \end{figure}
 
@@ -319,12 +339,15 @@ Adding the authentication yields expected results for : an increase of CPU usage
 Both implementation lose 2MB/s and a CPU usage increase of 20\% and 16\%.
 
 In both cases, the hardware implementation exhibited slightly lower performance, but a CPU usage three to four times lower.
-On embedded platforms, this is as important as the raw performance, because lower CPU usage means underclocked CPU, resulting in a lower power consumption.
+On embedded platforms, this is as important as the raw performance, because lower CPU usage means underclocked CPU, resulting in a lower power consumption.\newline{}
 
 The softaware GCM results allows to open a discussion on this mode used in conjunction with IPsec.
 The GCM performance presented clearly shows a drop of throughput and an increase of CPU usage, illustrating the fact that those operations are hard on the software.
 With an hardware offload, we could expect not only a drastic drop of the CPU usage, but an increase of throughput as well, since it's CPU-limited in those results.
-Note that they are achieved using a C-based implementation of galois-field multiplications.
+As we already discussed with the latency results in section~\ref{sec:lantecy-ipsec}, the results of a hardware implementation of GCM should be at least as good as those of AES-CBC wihtout authentication.
+If it were the case, we would increase the throughput by at least 67\% and the decrease the CPU usage by at least 84\%.
+
+Note that the software results for the GCM are achieved using a C-based implementation of galois-field multiplications.
 As we saw in chapter~\ref{chap:theory}, modern processor designers tend to add specialized instruction sets aimed at AES-GCM enhancement.
 Should further tests be conducted concerning IPsec paired with GCM, it would be wise to compare with an assembly implementation exploiting ARM NEON instruction set.
 Some are being developed~\cite{Conrado2013,Danilo2013}, but none have been committed to the Linux kernel repository yet.
