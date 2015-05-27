@@ -29,7 +29,39 @@ The desktop host runs on Windows 7 Professional 64-bit, but a virtual machine us
 \end{framed}
 
 \subsection{ARM DS-5 Streamline}
-% Use a daemon and a driver to get system info and send them to another machine. Has almost no impact on the performance and the load of the system.
+Streamline is a toolsuite included in ARM Development Studio.
+By installing a kernel module and running a daemon on the board, it can fetch a huge amount of data without over-loading the system.
+This tool is able to gather information on the CPU utilisation, the amount of context switches, of interrupts, of memory used, and much more.
+If the applications, libraries and kernel modules have been compiled with the required debugging options, it can also build the call path of a run, giving extensive statistics on the most ressource-hungry functions.
+
+If it has close to no impact on the performance of the board, the same does not go for the hosting machine.
+A serious drawback is his memory consumption that, when combined with the ressources used by the virtual machine, bring the hosting machine to its knees.
+
+\noindent The user should also be aware that if Streamline if a very powerfull and versatile tool, it is not reliable at very high resolution.
+The data should not be analyzed in windows smaller than a millisecond.
+
+\section{Test cases}
+The aim of this work is to test the implementations under realistic situations.
+To reach this goal, three test cases will be used:
+\begin{itemize}
+	\item Lots of connections without fetching any data.
+	\item Latency of the connection. This test can also illustrate the transfer of small amount of data.
+	\item Large file transfer on an established connection.
+\end{itemize}
+
+Each of those tests will go from a raw run, without any encryption nor authentication serving as a comparison ground, gradually increasing security up to a complete encryption/authentication scheme.
+
+\noindent As AES mode CBC and SHA-2 are widely used, they will be used with a serious security paramter using keys of 256-bit.
+Some test case will also experiment some implementation of AES-GCM to compare its performance and justify the need for its offloading in hardware.
+
+For the IPsec and OpenVPN implementation, the cipher/authentication pair null/null will be used to quantify the overhead of the encapsulation.
+It should however not be forgotten that it is not to be used as a production configuration.
+As the RFC 7321~\citep[pg. 7]{rfc7321} sates for IPsec: ``Note that while authentication and encryption can each
+   be `NULL', they MUST NOT both be `NULL'".
+
+We will use two types of drivers for the BA411E: an interuption-based for OpenVPN and OpenSSH, and a polling-based for IPsec.
+
+All the tests will be conducted with the ESP protocol in tunnel mode, so that we have the worst case scenario; as AH imposes a smaller overhead, the perfomance could only be better.
 
 \section{TLS Connections}
 This benchmark is done only with OpenVPN.
@@ -42,9 +74,9 @@ The only option differentiating the clients is their IP address and port number.
 Otherwise, all the clients share the same basic configuration file (see listing~\ref{list:openvpn-config-client}), which tell them to renogociate a new connection every second.
 Hence, if a connection could be made with no delay and if the processes scheduling were ideal, the server would have to address 600 connections per minute.
 
-As this experiment can be very unstable and vastly depends on the operating system scheduling, each test case has been repeated five times to ensure stable results.
-
 \lstinputlisting[language=bash, label=list:openvpn-client-script, caption={Script starting ten clients in parallel who will stress the server.}]{stress-openvpn.sh}
+
+As this experiment can be very unstable and vastly depends on the operating system scheduling, each test case has been repeated five times to ensure stable results.
 
 The security parameter tested is a standard TLS-DHE-RSA, hence forcing the peers the renogociate a new shared secret and ephemeral Diffie-Hellman parameters at each connection attempt.
 
@@ -68,14 +100,8 @@ The file transfered is an un compressed block of 128MB of random data generated 
   $ head -c $((1024*1024*128)) /dev/urandom > heavy.file
 \end{lstlisting}
 
-For the IPsec use case, the cipher/authentication pair null/null will be used to quantify the overhead of the encapsulation.
-It should however not be forgotten that it is not to be used as a production configuration.
-As the RFC 7321~\citep[pg. 7]{rfc7321} sates: ``Note that while authentication and encryption can each
-   be `NULL', they MUST NOT both be `NULL'".
-
-We will also use two types of drivers for the BA411E: an interuption-based for OpenVPN and OpenSSH, and a polling-based for IPsec.
-
-All the tests will be conducted with the ESP protocol in tunnel mode, so that we have the worst case scenario; as AH imposes a smaller overhead, the perfomance could only be better.
-
 For OpenSSH, the commmand \texttt{scp} will be used to transfer the data securely over an SSH tunnel.
 As for OpenVPN and IPsec, a tunnel will be established beforehand, and then the simple \texttt{ftp} command will allow the client to fetch the file on the server.
+
+All the results on the throughput and CPU usage take into account only the file transfer.
+The server authentication, the connection establishement and any other securoty negociation is ignored in this particular test case.
