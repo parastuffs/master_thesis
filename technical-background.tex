@@ -14,8 +14,13 @@ First comes a quick presentation of FPGAs and how they can be driven from the op
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{FPGA}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The aim of this work is to study the impact of offloading cryptographic operations in hardware.
+In order to reach that goal, an FPGA will be used.
 
-Driving from the OS: basically, they will need to share some memory.
+A Field-Prgrammable Gate Array (FPGA) is an integrated circuit that can be programmed after the manufacturing, using a semiconductor intellectual property core (IP core).
+In this work, we will use some of Barco Silex's crypto IP cores.
+
+In order for the operating system to comunicate with the device, they will need to share some memory.
 That memory can be directly mapped and accessed from the user-space using \texttt{/dev/mem}, or can use a direct memory access module (DMA).
 From the operating system, we build a bunch of scatterlist in the kernel-space memory, then map those pages to memory descriptor that have a physical address on the DMA.
 They can be mapped three different ways: \texttt{DMA\_BIDIRECTIONAL}, \texttt{DMA\_TO\_DEVICE} or \texttt{DMA\_FROM\_DEVICE}.
@@ -29,6 +34,17 @@ figure~\ref{fig:barco-ba411e-ipcore} shows a schematic view of a Barco Silex' cr
 \caption{Barco Silex' AES IP Core}{There are two channels to comunicate with the IP core: the data and control paths~\cite{barco-ba411e}.}
 \label{fig:barco-ba411e-ipcore}
 \end{figure}
+
+There are two types of interface with such a device: master or slave.
+The figure~\ref{fig:barco-ba411e-ipcore}  represent one of Barco Silex' crypto IP cores that proposes two interfaces: one of each type.
+\begin{itemize}
+	\item The data path is a master. That is the operating system will not have a direct access to the memory registers of the hardware devide. Instead, they will communicate via a DMA bus: one peer places data on the DMA and notifies the other that he can fetch it.
+	\item The control (ctrl) path is a slave. The operatin system can directly read and write on this part of the device memory.
+\end{itemize}
+
+A master interface has the advantage to offload a part of the memory management to the device, but there is a space overhead to connect the DMA as well as an extra delay to process its data.
+A slave interface is usually used for sporadic data, avoiding the overhead of a DMA.
+As an example, the data path of Barco Silex' symmetric cryptography IP core is a master, as there is a lot of data to process, whilst the same data path of their asymmetric cryptography IP core is a slave, for the operands are larger and the computation takes more time.
 
 
 
