@@ -6,3 +6,7 @@
 *.bbl
 *.blg
 *.lof
+*glg
+*glo
+*gls
+*xdy
