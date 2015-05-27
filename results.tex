@@ -112,8 +112,8 @@ The figure~\ref{fig:ping-benchmark-openvpn} shows the results for different payl
  & 56B & 1000B & 8000B & 16000B \\ \hline
 \multicolumn{1}{|l|}{raw} & 1.444 & 1.929 & 2.811 & 4.322 \\ \hline
 \multicolumn{1}{|l|}{none-none} & 2.066 & 2.561 & 4.293 & 6.117 \\ \hline
-\multicolumn{1}{|l|}{soft-cbc256-none} &  &  &  & \\ \hline
-\multicolumn{1}{|l|}{ba411e-cbc256-none} &  &  &  & \\ \hline
+\multicolumn{1}{|l|}{soft-cbc256-none} & 2.044 & 2.760 & 5.092 & 7.166\\ \hline
+\multicolumn{1}{|l|}{ba411e-cbc256-none} & 2.301 & 2.783 & 5.377 & 8.009\\ \hline
 \multicolumn{1}{|l|}{soft-cbc256-sha256} & 2.415 & 3.061 & 5.997 & 9.135 \\ \hline
 \multicolumn{1}{|l|}{ba411e-cbc256-sha256} & 2.416 & 3.052 & 5.963 & 9.207 \\ \hline
 \end{tabular}
@@ -149,8 +149,8 @@ The figure~\ref{fig:ping-benchmark-ipsec} studies the same payload size as OpenV
  & 56B & 1000B & 8000B & 16000B \\ \hline
 \multicolumn{1}{|l|}{raw} & 1.444 & 1.929 & 2.811 & 4.322 \\ \hline
 \multicolumn{1}{|l|}{none-none} & 1.545 & 2.045 & 2.997 & 4.703 \\ \hline
-\multicolumn{1}{|l|}{soft-cbc256-none} &  &  &  &  \\ \hline
-\multicolumn{1}{|l|}{ba411e-cbc256-none} &  &  &  &  \\ \hline
+\multicolumn{1}{|l|}{soft-cbc256-none} & 1.581 & 2.134 & 3.910 & 6.426 \\ \hline
+\multicolumn{1}{|l|}{ba411e-cbc256-none} & 1.639 & 2.080 & 3.445 & 5.345 \\ \hline
 \multicolumn{1}{|l|}{soft-cbc256-sha256} & 1.645 & 2.322 & 4.762 & 7.975 \\ \hline
 \multicolumn{1}{|l|}{ba411e-cbc256-sha256} & 1.635 & 2.246 & 4.170 & 6.929 \\ \hline
 \multicolumn{1}{|l|}{soft-gcm256} & 1.651 & 2.388 & 5.383 & 9.241 \\ \hline

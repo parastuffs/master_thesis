@@ -1,11 +1,11 @@
 \chapter{Implementation}
-This chapter will present how we implemented the protocols of chapter~\ref{chap:theory} on the board.
+This chapter will present how we implemented the protocols presented in chapter~\ref{chap:theory} on board.
 The figure~\ref{fig:os-path-generic} shows the generic data flow in the operating system through the user and kernel spaces.
 We will first detail the software part, with the OpenVPN and openSSH as the applications, and OpenSSL as a cryptographic library on which both applications rely.
 Then will come strongswan, a user-space abstraction layer giving access to IPsec and we will see how different it is from an OpenVPN implementation.
 Lastly, the standard Linux cryptographic kernel modules and network drivers will be listed and briefly discussed.
 
-Before closing the chapter, we will present the two main IPs to which the cryptographic operations will be offloaded and the associated drivers.
+Before closing the chapter, we will present the two main IP cores to which the cryptographic operations will be offloaded and the associated drivers.
 
 
 \begin{figure}[ht]
@@ -36,7 +36,7 @@ Before closing the chapter, we will present the two main IPs to which the crypto
 OpenVPN is a very popular VPN solution relying on the application layer of the TCP/IP stack by using the SSL/TLS protocols.
 % OpenVPN is also used by the Dutch government to secure all its communications~\cite{openvpn-nl}.
 
-Uses regular TCP/UDP network protocols, which can be an advantage over IPsec if the ISP decides to block the latter.
+It uses regular TCP/UDP network protocols, which can be an advantage over IPsec if the ISP decides to block the latter.
 
 OpenVPN offers two different TUN/TAP virtual interfaces:
 \begin{description}
@@ -44,11 +44,11 @@ OpenVPN offers two different TUN/TAP virtual interfaces:
 	\item[TAP] Virtual layer 2 ethernet tunnel.
 \end{description}
 
-Since OpenVPN aims at network security at the application level, it needs virtual network interface to which to push and from which to read the secured data.
+Since OpenVPN aims at network security at the application level, it needs virtual network interface to read and write the data.
 The \texttt{tun} adapter will be used when OpenVPN wants to establish a point-to-point connection between two client, while the \texttt{tap} device is used when there is one server acting as a bridge, hence managing lots of clients at the same time.
 
 OpenVPN as two choices when it wants to sends its data over the internet: either encapsulating its IP packet into TCP or UDP packets.
-The problem of encapsulating IP into TCP is that inside IP packets are already TCP frames.
+The problem of encapsulating IP into TCP is that inside IP packets, there already are TCP frames.
 The reason is that IP has been designed to work on unreliable networks, and TCP includes in its standard protocols to retry and drop packets.
 Hence, encapsulating an IP packet into a TCP packet produces a redundancy by nesting reliability layers.
 UDP is the unreliable counterparty of TCP, offering a better alternative for encapsulation.
@@ -86,7 +86,7 @@ void encrypt_sign (struct context *c, bool comp_frag)
 }
 \end{lstlisting}
 
-An other way to look at this workflow is to completely isolate the OpenVPN part from both hosts, and exporting it to an independent device such as a router.
+An other way to look at this workflow is to completely isolate the OpenVPN block from both hosts, and exporting it to an independent device such as a router.
 The hosts would be stripped off the virtual interface -- \texttt{tun0} would become physical, and would communicate normally over the internet, at least from their point of view.
 All their communications would be routed by the router of their local area network, incomming on a physical \texttt{tun0} interface and outputed to the internet on the \texttt{eth0} interface.
 Such implementation are used when an adminstrator wishes to secure a whole local area network without bloating each client with a VPN application.
@@ -108,23 +108,23 @@ Still, there is no official support for any other cryptographic library.
 
 If OpenSSH does support most of OpenSSL ciphers by default, it takes some liberties such as disabling the CBC encryption mode and removing the support of no MAC during a transmission.
 
-\noindent The first liberty is a response to an old vulnarability\footnote{A vulnerability note as been issued by Carnegie Mellon University Computer Emergency Response Team in early 2009 (last revision)~\cite{CERT2009}, in response to a research of University of London~\cite{Albrecht:2009} presenting a plaintext-recovering attack against SSH when CBC mode is used, but the OpenSSH update took only place in october 2014.}.
+\noindent The first customization is a response to an old vulnarability\footnote{A vulnerability note as been issued by Carnegie Mellon University Computer Emergency Response Team in early 2009 (last revision)~\cite{CERT2009}, in response to a research of University of London~\cite{Albrecht:2009} presenting a plaintext-recovering attack against SSH when CBC mode is used, but the OpenSSH update took only place in october 2014.}.
 Even if it is not recommended, the user can still enable this mode by explicitly configuring it in the \texttt{sshd\_config} options.
 
-\noindent The second liberty has been taken to prevent the user to strip himself from data authenticity and integrity.
-However, in the case of testing and benchmarking, leaving the MAC behind can be interresting, especially if it is not offloaded in hardware such as the encryption in our case.
-In order to add this feature to OpenSSH, we wrote a patch to apply on OpenSSH 6.7, available in appendix~\ref{chap:openssh-patch}.
+\noindent The second has been taken to prevent the user to strip himself from data authenticity and integrity.
+However, in the case of testing and benchmarking, skipping the MAC can be interresting, especially if it is not offloaded in hardware such as the encryption in our case.
+In order to overcome this limitation, we wrote a patch to apply on OpenSSH 6.7, available in appendix~\ref{chap:openssh-patch}.
 
 
 
 
 \subsection{OpenSSL}
 
-Offers an high-level interface called EVP to be used by other applications.
+OpenSSL offers an high-level interface called EVP to be used by other applications.
 
 
 It is to be noted that the present work uses an implementation with all the debug flags activated.
-Figure~\ref{fig:openssl-speed-dbg-on-off} shows that if it does have an impact on the performance, it is minimal: in the worst case of the benchmark, the throughput drops only by 2.4\%.
+Figure~\ref{fig:openssl-speed-dbg-on-off} shows that if it does have an impact on the performance, it is negligible for our tests: in the worst case of the benchmark, the throughput drops only by 2.4\%.
 Moreover, the benchmark maximizes this difference by doing only OpenSSL operations.
 When OpenSSL will have to share the CPU with other applications, the loss will be even less noticeable.
 \begin{figure}[ht]
@@ -174,14 +174,14 @@ When OpenSSL will have to share the CPU with other applications, the loss will b
 
 \subsection{Strongswan}
 % TODO talk about IKE and SA management
-Strongswan is a full implementation of IPsec relying on the kernel drivers for the networking part, on the crypto API for the cryptographic part, and on user space crypto libraries for the connection negociation.
-An other popular implementation is ipsec-tools, but its development lags behind modern Linux and is not up-to-date with the 3.14 Linux kernel headers, making its cross-compilation painfull.
+Strongswan is a full implementation of IPsec relying on the kernel drivers for the networking part, on the Linux Crypto API for the cryptographic part, and on user space crypto libraries for the connection negociation.
+An other popular implementation is ipsec-tools, but its development lags behind modern Linux and is not up-to-date with the 3.14 Linux kernel headers, making its cross-compilation difficult.
 %Use strongswan 5.3.0
-Strongswan as two advantages: it has a tremendous and exhaustive documentation, and its uer interface is straightforward.
-Once configured, a simple \texttt{ipsec start \&\& ipsec up <connection>} on both sides is enough to create a ready to use VPN.
+Strongswan as two advantages: it has a tremendous and exhaustive documentation, and its user interface is straightforward.
+Once configured, a simple \texttt{ipsec start \&\& ipsec up <connection>} on both sides is enough to create a ready-to-use VPN.
 
 The figure~\ref{fig:ipsec-workflow} illustrates the workflow of Alice communicating with Bob via an IPsec ESP tunnel.
-The XFRM, read ``transform", framework is implementing IPsec and handles the incomming and outgoing packets for established VPNs~\cite{rosen2014}.
+The XFRM (read ``transform") framework is implementing IPsec and handles the incomming and outgoing packets for established VPN connections~\cite{rosen2014}.
 Its name comes from the fact that the kernel transforms packet frames to incorporate IPsec security.
 Depending on the configuration, XFRM uses the AH or ESP kernel module, which in turn calls the crypto API to encrypt and/or sign the IP packet.
 
@@ -225,31 +225,34 @@ The following description addresses all the kernel modules required to run all t
 
 \section{Offload}
 
-The table~\ref{tab:ip-ciphers} summarizes the ciphers supported by the two Barco Silex' IPs used in this work.
+The table~\ref{tab:ip-ciphers} summarizes the ciphers supported by the two Barco Silex' IP cores used in this work.
 
 \begin{table}[ht]
 \begin{tabular}{|l|c|}\hline
-IP & Ciphers \\ \hline
-BA414E & RSA, DH, DSA, EC \\ 
-BA411E & AES modes CBC, CTR, GCM, CCM, CFB, OFB, CTS, ECB \\ \hline
+IP core & Ciphers \\ \hline
+BA414E & RSA, DH, DSA, ECDSA, ECDH \\ 
+BA411E & AES modes CBC, CTR, GCM, CCM, CFB, OFB, XTS, ECB \\ \hline
 \end{tabular}
-\caption{Summary of the ciphers supported by two of Barco Silex' IPs.}{}
+\caption{Summary of the ciphers supported by two of Barco Silex' IP cores.}{}
 \label{tab:ip-ciphers}
 \end{table}
 
+For this tests, only one instance of each IP core will be programmed on the FPGA.
+As all the tests will be single-threaded, having two or more instances of the same IP core would not improve the performance, as they could not be used in parallel anyway.
+
 \subsection{BA411E Driver}
-Takes the rightern path, which is the cleanest because the most versatile.
-By pluging the driver into the crypto API, we offer a standard kernel interface that can be used by any other kernel driver, such as the ESP driver, or user-space application via the cryptodev driver and OpenSSL engine.
+This driver takes the rightern path of figure~\ref{fig:os-path-generic-b}, which is the best because the most versatile.
+By pluging the driver into the Linux Crypto API, we offer a standard kernel interface that can be used by any other kernel driver, such as the ESP driver, or user-space application via the cryptodev driver and OpenSSL engine.
 
 However, at the current state of development, the user-space and the kernel applications do not share the same driver.
 The former is using an IRQ-based driver, whilst the latter is actively polling the hardware.
 The reason why the IRQ-based driver can not be used by kernel-space application is because the current implementation uses sleep methods that, when called on other kernel drivers, put the kernel in panic mode and require the system to reboot.
 An alternative is under development and is further discussed in the last part of this work, in section~\ref{sec:future-work}.
 
-Be it IRQ or polling, the inner workings are the same and follow the exact same canvas as the default software implementation the different AES modes.
+Whichever method is used to fetch the state of the hardware, the rest of the driver follow the exact same canvas as the default software implementation of the different AES modes.
 
 
 \subsection{BA414E Driver and Silex engine}
-At the moment of development, there is no asymetric cryptography interface in the crypto API\footnote{A request for comment patch as been submitted to the Linux kernel mailing list~\cite{crypto-api-pk-encryption} in late April 2015, proposing a standard interface for public key encryption in the crypto API.}.
+At the moment of development, there is no asymmetric cryptography interface in the Linux Crypto API\footnote{A request for comment patch as been submitted to the Linux kernel mailing list~\cite{crypto-api-pk-encryption} in late April 2015, proposing a standard interface for public key encryption in the crypto API.}.
 The BA414E can thus not be accessed using the same path as the BA411E and a user-space driver will be needed, that is the leftern path of figure~\ref{fig:os-path-generic-b}.
 As presented in section~\ref{sec:theory-driver}, we will need to rely on an UIO driver to access the device from the user space.

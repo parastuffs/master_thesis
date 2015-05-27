@@ -1,13 +1,28 @@
 \chapter{Technical background}\label{chap:theory}
 
-This chapter will address the technical ground inherent to this work.
-First comes an overview of Linux operating systems, the distinction between user and kernel mode, and the design of device drivers.
+This chapter will address the technical ground necessary to this work.
+First comes a quick presentation of FPGAs and how they can be driven from the operating system.
 
-\noindent Follow a quick presentation of FPGAs and how they can be driven from the operating system.
+\noindent Follows an overview of Linux operating systems, the distinction between user and kernel mode, and the design of device drivers.
 
-\noindent Next comes An overview of the cryptographic field with the main primitives: message digests, symmetric ciphers and asymmetric ciphers.
+\noindent Next comes an overview of the cryptographic field with the main primitives: message digests, symmetric ciphers and asymmetric ciphers.
 
-\noindent Finally, the ground necessary to understand the inner working and challenges of some VPNs implementations will be covered with SSL/TLS and IPsec.
+\noindent Finally, the ground necessary to understand the inner working and challenges of some VPNs implementations using SSL/TLS and IPsec will be covered.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{FPGA}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Driving from the OS: basically, they will need to share some memory.
+That memory can be directly mapped and accessed from the user-space using \texttt{/dev/mem}, or can use a direct memory access module (DMA).
+From the operating system, we build a bunch of scatterlist in the kernel-space memory, then map those pages to memory descriptor that have a physical address on the DMA.
+They can be mapped three different ways: \texttt{DMA\_BIDIRECTIONAL}, \texttt{DMA\_TO\_DEVICE} or \texttt{DMA\_FROM\_DEVICE}.
+When the CPU write something in those descriptors and synchronize them with the DMA, it does not have to care about them anymore, the DMA in now in charge to send them to the device where registers are ready to read the incomming data.
+The same goes from the device to the CPU: when the device wants to communicate data to the OS, it writes it on the DMA that will transfer them to the CPU, triggering a flag on the way to notify it.
+
++ talk about the slave/master and the two data paths: data and control.
 
 
 
@@ -24,24 +39,11 @@ First comes an overview of Linux operating systems, the distinction between user
 % device driver in userspace: linux userspace i/o (/dev/mem)
 Userspace I/O~\cite{koch2011}
 
-There are two ways to get the results from a hardware device: either by using interruption, or by actively polling the device, relentlessly asking it if it finished its operations.
+There are two ways to get the status of a hardware device: either by using interruption, or by actively polling the device, relentlessly asking if it finished its operations.
 The first case is the cleanest and the most common: when the device has something to send to the driver, or if anything unexpected happened, it sends an interruption request (IRQ) to the processor, which will in turn execute the interruption routine registered by the driver~\citep[chap. 10]{Corbet:2005:LDD:1209083}.
 The second case is the easiest and is always guaranteed to work, but won't let go off the processor willingly, loading it at 100\%, and avoiding any other task to be executed.
-Hopefully, modern monolithic kernels such as the Linux kernel from 2.6 provide preemptive scheduling~\cite{Santhanam2003}, that is the scheduler interrupts the running task and assigns the processor ressources it used to an other one.
+Fortunately, modern monolithic kernels such as the Linux kernel from 2.6 provide preemptive scheduling~\cite{Santhanam2003}, that is the scheduler interrupts the running task and assigns the processor ressources it used to an other one.
 Hence, systems with a lot of processes in need for CPU ressources would not be stalled, but it would not change anything if the only process heavily requesting processor time is the one using the driver.
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{FPGA}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Driving from the OS: basically, they will need to share some memory.
-That memory can be directly mapped and accessed from the user-space using \texttt{/dev/mem}, or can use a direct memory access module (DMA).
-From the operating system, we build a bunch of scatterlist in the kernel-space memory, then map those pages to memory descriptor that have a physical address on the DMA.
-They can be mapped three different ways: \texttt{DMA\_BIDIRECTIONAL}, \texttt{DMA\_TO\_DEVICE} or \texttt{DMA\_FROM\_DEVICE}.
-When the CPU write something in those descriptors and synchronize them with the DMA, it does not have to care about them anymore, the DMA in now in charge to send them to the device where registers are ready to read the incomming data.
-The same goes from the device to the CPU: when the device wants to communicate data to the OS, it writes it on the DMA that will transfer them to the CPU, triggering a flag on the way to notify it.
 
 
 
@@ -50,8 +52,9 @@ The same goes from the device to the CPU: when the device wants to communicate d
 \section{Cryptography}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Cryptography is the corner stone of security.
-The four main goals are the following, as defined in~\cite{Menezes1996}:
+Cryptography is the keystone of security. As \citet{Menezes1996} defines it: ``Cryptography is the study of mathematical techniques related to aspects of information security such as confidentiality, data integrity, entity authentication, and data origin authentication."
+
+The four main goals are:
 \begin{description}
 	\item[Confidentiality] keeping information secret from all but those who are authorized to see it.
 	\item[Integrity] ensuring information has not been altered by unauthorized or unknown means.
@@ -59,7 +62,7 @@ The four main goals are the following, as defined in~\cite{Menezes1996}:
 	\item[Non-repudiation] preventing the denial of previous commitments or actions.
 \end{description}
 
-In order to achieve those, four cryptographic primitives are needed: symmetric and asymmetric ciphers, message digests and digital signatures.
+In order to achieve those, four cryptographic primitives are needed: message digests, symmetric and asymmetric ciphers, and digital signatures.
 
 
 
@@ -71,6 +74,7 @@ In order to achieve those, four cryptographic primitives are needed: symmetric a
 \subsection{Message digest}
 %Not the same as digital signature because we use the same key for both MAC values.
 A message digest is the result of a one-way mathematical function of a fixed size.
+For a given function, each message has a unique digest, comparable to a fingerprint.
 Those hash functions are of two types~\cite{infof405}: manipulation detection codes (MDC) to guarantee integrity and message authentication codes (MAC) to guarantee both integrity and source authentication.
 
 
@@ -83,7 +87,12 @@ An MDC $h(x)$ can follow an iterative construction for a message $x$ including $
 \end{dcases}
 \]
 
-Based on this design and adding a key to the process, the RFC 2104~\cite{rfc2104} defines a MAC:
+In order to create a MAC, we can add a secret key $k$ to the process, $H_i$ becoming:
+\[
+	H_i = f(H_{i-1}, x_i, k), \mbox{with } i \in [1,t]\\
+\]
+
+HMAC is such function $f()$, as defined in RFC 2104~\cite{rfc2104}
 \[
 	HMAC(k, x) = h((k\oplus opad)|h((k\oplus ipad)|x))
 \]
@@ -104,7 +113,7 @@ We will see in section~\ref{sec:theory-network} that if IPsec follows this recom
 
 
 
-\subsection{Symetric cryptography}
+\subsection{Symmetric cryptography}
 Talk about encryption, integrity and authentication.
 
 Look in depth into AES, NIST approved five modes~\cite{nist-sp800-38A}: CBC (Cipher Block Chaining), ECB (Electronic CodeBook), CFB (Cipher FeedBack), OFB (Output FeedBack) and CTR (Counter).
@@ -126,19 +135,19 @@ AEAD => Encryption and authentication: GCM.
 
 
 
-\subsection{Asymetric cryptography}
+\subsection{Asymmetric cryptography}
 % Diffie-Hellman: show the math about the shared key, maybe from the course INFOH405 or RFC2631, and point which operation will be offloaded.
-Asymetric cryptography relies on a pair of keys: one private known only to the owner of the certificate, and one public available to anyone.
-Such cryptography uses two kinds of operations: encryption using the public key of the recipient and digital signature, which is an ecnryption using the private key of the sender.
+Asymmetric cryptography relies on a pair of keys: one private known only to the owner of the certificate, and one public available to anyone.
+Such cryptography uses two kinds of operations: encryption using the public key of the recipient and digital signature, which is an encryption using the private key of the sender.
 
 \subsubsection{RSA}
-RSA is a public-key scheme proposed in 1978 by three MIT researchers who gave it their name~\cite{Rivest:1978:MOD:359340.359342}.
+RSA is a public-key scheme proposed in 1978 by three MIT researchers (who gave it their name)~\cite{Rivest:1978:MOD:359340.359342}.
 A few years later, they founded RSA Laboratories, which is now in charge of maintaining its standards, alongside many others, as the first Public-Key Cryptography Standards, \textit{aka} PKCS \#1.
 The last version of the standard is the version 2.2~\cite{pkcs1} and is defined as a precise key generation protocol allowing encryption and decryption.
 The keys can be generated by respecting a few steps:
 \begin{enumerate}
 	\item randomy choose two large primes $p$ and $q$;
-	\item compute the modulus $n = p q$, and consequently we have $\phi(n) = (p-1)(q-1)$, with $\phi(n)$ as the Euler function;
+	\item compute the modulus $n = p q$, and consequently we have \[\phi(n) = (p-1)(q-1)\]with $\phi(n)$ as the Euler function;
 	\item randomly choose the public exponent $e \in ]1,\phi(n)[\ s.t.\ GCD(e,\phi(n)) = 1$;
 	\item compute $d \in ]1,\phi(n)[\ s.t.\ e \cdot d \equiv 1 (mod\ \phi(n))$
 \end{enumerate}
@@ -151,23 +160,27 @@ The encryption and decryption of a given message $m \in \mathds{Z}_n$ are define
 	\item[Decryption] $m = c^d\ mod\ n$
 \end{description}
 
+The scheme is based on modular artihmetic, which is secure because of the factoring problem.
+For an opponent to decrypt a ciphertext $c$ wihtout knowing the private key $(d, n)$, he would need to compute the $e^{th}$ roots of $c$, modulo $n$.
+This operation is computationally hard, since an efficient solution is yet to be found for sufficiently large key size.
+
 
 \subsubsection{Diffie-Hellman}
-Diffie-Hellman is a secret key exchange protocol: two parties compute a shared secret $ZZ$ that can be used as a symetric key during the following exchanges.
+Diffie-Hellman is a secret key exchange protocol: two parties compute a shared secret $ZZ$ that can be used as a symmetric key during the following exchanges.
 It uses the same kind of operation as RSA, that is modular exponentiation.
-The protocol can be one of two type (\cite{rfc2631}, \cite{Frankel:2005:SGI:2206289}):
+The protocol can be one of three types (\cite{rfc2631}, \cite{Frankel:2005:SGI:2206289}):
 \begin{itemize}
-	\item Static: the actors use their authenticated certificate to compute the shared secret.
-	\item Ephemeral: the actors create a new pair of public/private keys from which the secret key is derived.
-	\item Anonymous: same as ephemeral, but without signing anything, hence not identifying neither of the actors. This mode is not advisable since it's vulnerable to main-in-the-middle attack.
+	\item Static (DH): the actors use their authenticated certificate to compute the shared secret.
+	\item Ephemeral (EDH): the actors create a new pair of public/private keys from which the secret key is derived.
+	\item Anonymous (ADH): same as ephemeral, but without signing anything, hence not identifying neither of the actors, hence not providing any authentication. This mode is not advisable since it's vulnerable to main-in-the-middle attack.
 \end{itemize}
 A static scheme is easier to implement and requires much less operations, but using ephemeral keys is essential to ensure perfect forward secrecy.
 Imagine that somehow, an opponent lays his hand on the shared secret.
 If that secret has already been used, he can decipher all data transfered during past connections.
-However, if the secret is new for every new connection, the compromission of the shared secret des not jeopardize past communications.
-This is perfect forward secrecy: using a new key to protect the past.
+However, if the secret is new for every new connection, the compromission of the shared secret does not jeopardize past communications.
+This is perfect forward secrecy: using a new key to protect the previous messages.
 
-Hereunder is the generation of an ephemeral shared secret.
+Hereunder is the generation algorithm of an ephemeral shared secret.
 For a static secret, Alice and Bob will simply use their static certificate, sparing the modular exponentiation of the ephemeral public key generation.
 \begin{enumerate}
 	\item Alice generates once $p$ and $g$ (using precomputed parameters):
@@ -178,16 +191,16 @@ For a static secret, Alice and Bob will simply use their static certificate, spa
 	\item Alice picks a random integer $x_a$ and computes $g^{x_a} mod\ p = y_a$.
 	\item Alice sends $p$, $g$ and $y_a$ to Bob, signing everything using her private certificate.
 	\item Bob checks the signature and picks $x_b$.
-	\item Bob computes $y_a^{x_b} mod\ p = g^{x_a x_b} mod\ p = ZZ$, the shared secret to use as a premaster key from which will be derived the symetric key for further communications.
+	\item Bob computes $y_a^{x_b} mod\ p = g^{x_a x_b} mod\ p = ZZ$, the shared secret to use as a premaster key from which will be derived the symmetric key for further communications.
 	\item Bob sends $y_b = g^{x_b} mod\ p$, signing everything with his private certificate.
 	\item Alice checks the signature and computes the same shared secret: $ZZ = y_b^{x_a} mod\ p = g^{x_a x_b} mod\ p$
 \end{enumerate}
 
-If the server is Alice, it has to do at least one signature, one signature verification and two modular exponentiations.
+If the server is Alice, it has to do at least one signature generation, one signature verification and two modular exponentiations.
 Note that the client, B in our case, could have one signature less because RFC 5246~\cite{rfc5246} leave it as an optional feature, and the server would then have one verification less.
 However, any sane configuration will have both actors signing their ephemeral public key.
-If the certificate use RSA, we end up with four modular exponentiations, which can become quite heavy computing wise for certain sizes of prime numbers.
-We will see in chapter~\ref{chap:results} that while a 1024-bit prime is easily manageable by full software implementation, hardware offloading become a necessity for 4096-bit primes.
+If the certificate use RSA, we end up with four modular exponentiations, which can become quite heavy computing wise for certain sizes of key.
+We will see in chapter~\ref{chap:results} that while a 1024-bit key size is easily manageable by full software implementation, hardware offloading become a necessity for 4096-bit key sizes.
 Moreover, 1024-bit parameter size, both RSA and Diffie-Hellman, are disallowed by the NIST recommandations since 2013~\cite{nist-sp800-131A}.
 
 
@@ -221,7 +234,7 @@ Layer & Protocols & Layer & Protocols \\ \hline
  & & Session & RPC, PAP \\ \hline
 Transport & TCP, UDP & Transport & TCP, UDP \\ \hline
 Internet & IP, ICMP, IPsec & Network & IP, ICMP, IPsec \\ \hline
-\multirow{2}{*}{Data Link} & \multirow{2}{*}{PPP, MAC, Ethernet, L2TP} & Data link & PPP, MAC, Ethernet, L2TP \\ \cline{3-4}
+\multirow{2}{*}{Link} & \multirow{2}{*}{PPP, MAC, Ethernet, L2TP} & Data link & PPP, MAC, Ethernet, L2TP \\ \cline{3-4}
  & & Physical & USB, DSL, IEEE 802.11 \\ \hline
 \end{tabularx}
 \caption{TCP/IP and OSI model comparison}{They are globaly the same, except for the application layer of the TCP/IP stack which merge togheter the three upper layers of the OSI model. Between parenthsis are examples of protocols resting on each layer.}
@@ -233,6 +246,9 @@ Internet & IP, ICMP, IPsec & Network & IP, ICMP, IPsec \\ \hline
 
 There exist several major implementations of VPN: SSL, IPsec, L2TP and PPTP.
 The later was developped by a vendor consortium leaded by Microsoft and proposed in the RFC 2637 and will not be discussed further.
+
+\noindent L2TP (Layer 2 Tunneling Protocol) is a protocol that simply offers a tunnel without providing confidentiality~\cite{rfc3931}.
+A common use case is to combine IPsec and L2TP, as defined in RFC 3193~\cite{rfc3193}.
 
 \subsection{SSL/TLS}
 % Introduce SSL/TLS, talk about the protocol, the key exchange and stuff, but leaver OpenVPN for the 'implementation' chapter.
@@ -255,7 +271,7 @@ Application level security.
 
 \subsection{IPsec}
 % IPsec as a protocol, strongswan come in the 'implementation' chapter.
-IPsec is a modification of the IP stack in the kernel space.
+IPsec is a protocol whose implementation is a modification of the IP stack in the kernel space.
 It is a network/internet level security; it examines incomming IP packets and checks if there exists a security association with the destination, and decrypt it on-the-fly if necessary.
 
 % One of the main disadvantage compared to a user-space VPN is the difficulty to traverse NAT.

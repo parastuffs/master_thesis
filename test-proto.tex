@@ -3,7 +3,7 @@
 \section{Experimental setup}
 The experimental environment is built around a standard x86 host and an ARM Cortex-A9 alongside an Altera Cyclone V FPGA as the target.
 Both are linked toghether through a network capped by 100Mbps switches.
-Both stations have gigabits ethernet interface and could hence be diretly connected to each other, but in that case the communication would be limited by the I/O transfers of the storage units -- a hard drive disk in one case, an micro-SD card in the second -- on which we can not depend to set a constant throughput limitation, as it is highly influenced by the data block size and general health of the support.
+Both stations have gigabits ethernet interface and could hence be directly connected to each other, but in that case the communication would be limited by the I/O transfers of the storage units -- a hard drive disk in one case, an micro-SD card in the second -- on which we can not depend to set a constant throughput limitation, as it is highly influenced by the data block size and general health of the support.
 
 
 \subsection{x86 host}
@@ -51,6 +51,20 @@ To reach this goal, three test cases will be used:
 
 Each of those tests will go from a raw run, without any encryption nor authentication serving as a comparison ground, gradually increasing security up to a complete encryption/authentication scheme.
 
+The table~\ref{tab:software-version} summarizes the softwares used and tjeir respective version.
+
+\begin{table}
+\center
+\begin{tabular}{|l|l|} \hline
+OpenVPN & 2.3.6 \\ \hline
+OpenSSL & 1.0.2a \\ \hline
+Strongswan & 5.3.0 \\ \hline
+OpenSSH & 6.7p1 \\ \hline
+\end{tabular}
+\caption{Software used for the test}{note that OpenSSH was updated with the patch in appendix~\ref{chap:openssh-patch}.}
+\label{tab:software-version}
+\end{table}
+
 \noindent As AES mode CBC and SHA-2 are widely used, they will be used with a serious security paramter using keys of 256-bit.
 Some test case will also experiment some implementation of AES-GCM to compare its performance and justify the need for its offloading in hardware.
 
@@ -64,14 +78,15 @@ We will use two types of drivers for the BA411E: an interuption-based for OpenVP
 All the tests will be conducted with the ESP protocol in tunnel mode, so that we have the worst case scenario; as AH imposes a smaller overhead, the perfomance could only be better.
 
 \section{TLS Connections}
-This benchmark is done only with OpenVPN.
+This benchmark is done only with OpenVPN 2.3.6.
 Since there is no standard support for those operation in the kernel yet, it would not have made sense to use IPsec, since it would have had to fallback to OpenSSL, then following the same path as OpenVPN do.
-As soon as the public key operations can be plugged into the crypto API, this use case should however be tested.
+As soon as the public key operations can be plugged into the Linux Crypto API, this use case should however be tested.
 
 For this use case, the board is configured in server mode, so that it can accept connections from any client.
+The server does not connect with a specific client and waits for incomming connection requests (see listing~\ref{list:openvpn-server}).
 The virtual machine will then execute then clients in parallel using the script~\ref{list:openvpn-client-script}.
 The only option differentiating the clients is their IP address and port number.
-Otherwise, all the clients share the same basic configuration file (see listing~\ref{list:openvpn-config-client}), which tell them to renogociate a new connection every second.
+Otherwise, all the clients share the same basic configuration file (see listing~\ref{list:openvpn-client}), which tell them to renogociate a new connection every second.
 Hence, if a connection could be made with no delay and if the processes scheduling were ideal, the server would have to address 600 connections per minute.
 
 \lstinputlisting[language=bash, label=list:openvpn-client-script, caption={Script starting ten clients in parallel who will stress the server.}]{stress-openvpn.sh}
@@ -95,13 +110,18 @@ done
 \end{lstlisting}
 
 \section{File transfer}
-The file transfered is an un compressed block of 128MB of random data generated using the following command:
+The file transfered is an uncompressed block of 128MB of random data generated using the following command:
 \begin{lstlisting}[language=bash]
   $ head -c $((1024*1024*128)) /dev/urandom > heavy.file
-\end{lstlisting}
+\end{lstlisting}~\newline{}
 
 For OpenSSH, the commmand \texttt{scp} will be used to transfer the data securely over an SSH tunnel.
 As for OpenVPN and IPsec, a tunnel will be established beforehand, and then the simple \texttt{ftp} command will allow the client to fetch the file on the server.
+In order to use custom temporary security configuration with \texttt{scp}, the following command can be used:
+\begin{lstlisting}[language=bash]
+  $ ./scp -S /path/to/patched_openssh/bin/ssh -o Ciphers=aes256-cbc -o MACs=none@barco.com root@150.158.232.241:heavy.file .
+\end{lstlisting}~\newline{}
+
 
 All the results on the throughput and CPU usage take into account only the file transfer.
 The server authentication, the connection establishement and any other securoty negociation is ignored in this particular test case.
