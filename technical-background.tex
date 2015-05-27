@@ -134,17 +134,43 @@ We will see in section~\ref{sec:theory-network} that if IPsec follows this recom
 
 
 \subsection{Symmetric cryptography}
-Talk about encryption, integrity and authentication.
+Consider a cryptosystem $(P,C,K,E,D)$, with $P$ and $C$ the spaces of plaintexts and ciphertexts, $E$ and $D$ the encryption and decryption algorithms and a keyspace $K$.
+\citet{Menezes1996} and \citet{infof405} define a symmetric scheme as a cryptosystem with two keys $e \in K$ and $d \in K$ respectively associated with the encryption and decryption algorithms.
+When using the key pair ($e$, $d$), it should be computationally easy to compute $d$ knowing only $e$, and $e$ from $d$.
+In the rest of this work, we will consider the most common case: $e = d$, having thus a single key shared between the peers.
 
-Look in depth into AES, NIST approved five modes~\cite{nist-sp800-38A}: CBC (Cipher Block Chaining), ECB (Electronic CodeBook), CFB (Cipher FeedBack), OFB (Output FeedBack) and CTR (Counter).
+There exists numerous cipher types, and one of the most widespread is the block cipher.
+A block cipher splits the message into blocks of fixed size and work on them separately.
+An example of such a cipher is illustrated on the figure~\ref{fig:cbc-encrypt} with the Cipher Block Chaining (CBC) mode.
+This particular mode is easy to implement and has been robust for a long time, before the rise of the padding oracle attack~\cite{vaudenay2002}.
+
+\indent An other interresting block cipher mode is the Counter (CTR).
+Each block of data is treated independently from the others (see figure~\ref{fig:ctr-encrypt}, making the scheme parallelizable and thus more interresting on hardware.
 
 \begin{figure}
 \includegraphics[width=\textwidth]{nist-cbc}
-\caption{CBC encryption and decryption diagram}{taken from the NIST recommendation~\cite{nist-sp800-38A}.}
-\label{fig:cbc-encrypt-decrypt}
+\caption{CBC encryption diagram}{The output of one block is used as the input of the next one. The decryption is very similar. Taken from the NIST recommendation~\cite{nist-sp800-38A}.}
+\label{fig:cbc-encrypt}
 \end{figure}
 
-AEAD => Encryption and authentication: GCM.
+\begin{figure}
+\includegraphics[width=\textwidth]{nist-ctr}
+\caption{CTR encryption diagram}{Each block is processed independently from the others. The decryption is very similar. Taken from the NIST recommendation~\cite{nist-sp800-38A}.}
+\label{fig:ctr-encrypt}
+\end{figure}
+
+Those modes can not work alone and have to be associated with a cipher (``CIPH" on figures~\ref{fig:cbc-encrypt}~and~\ref{fig:ctr-encrypt}).
+In 1997, the NIST hosted a competition to choose the successor of the Data Encryption Standard (DES).
+In 2000, Rijndael emerged victorious and was renamed Advanced Encryption Standard (AES).
+It is still nowadays the most used symmetric block cipher used in a large variety of applications.\newline{}
+
+Most applications want to use confidential and authenticated channels for their sensible communication.
+In order to do so, they need to combine a symmetric cipher and a MAC.
+
+\noindent New block cipher have emerged to answer the need for such combinations and formed the Authenticated Encryption with Associated Data (AEAD) mode of operation.
+The most widespread mode in network applications is the Galois Counter Mode (GCM, see figure~\ref{fig:gcm-encrypt}), combining the CTR block cipher mode and a GHASH function using multiplications in the Galois field.
+The advantage of this mode is that the authentication can be computed in parallel with the encryption, itself parallelizable.
+This mode can thus be highly optimized in hardware, as proved Barco Silex with their BA415 IP core reaching up to 100Gbps~\cite{barco-ba415}.
 
 \begin{figure}
 \includegraphics[width=\textwidth]{nist-gcm-encrypt}
