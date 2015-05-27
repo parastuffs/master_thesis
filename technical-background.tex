@@ -27,8 +27,6 @@ They can be mapped three different ways: \texttt{DMA\_BIDIRECTIONAL}, \texttt{DM
 When the CPU write something in those descriptors and synchronize them with the DMA, it does not have to care about them anymore, the DMA in now in charge to send them to the device where registers are ready to read the incomming data.
 The same goes from the device to the CPU: when the device wants to communicate data to the OS, it writes it on the DMA that will transfer them to the CPU, triggering a flag on the way to notify it.
 
-+ talk about the slave/master and the two data paths: data and control.
-figure~\ref{fig:barco-ba411e-ipcore} shows a schematic view of a Barco Silex' crypto IP core
 \begin{figure}
 \includegraphics[width=\linewidth]{barco-ba411e-ipcore}
 \caption{Barco Silex' AES IP Core}{There are two channels to comunicate with the IP core: the data and control paths~\cite{barco-ba411e}.}
@@ -193,8 +191,8 @@ It uses the same kind of operation as RSA, that is modular exponentiation.
 The protocol can be one of three types (\cite{rfc2631}, \cite{Frankel:2005:SGI:2206289}):
 \begin{itemize}
 	\item Static (DH): the actors use their authenticated certificate to compute the shared secret.
-	\item Ephemeral (EDH): the actors create a new pair of public/private keys from which the secret key is derived.
-	\item Anonymous (ADH): same as ephemeral, but without signing anything, hence not identifying neither of the actors, hence not providing any authentication. This mode is not advisable since it's vulnerable to main-in-the-middle attack.
+	\item Ephemeral (DHE): the actors create a new pair of public/private keys from which the secret key is derived.
+	\item Anonymous: same as ephemeral, but without signing anything, hence not identifying neither of the actors, hence not providing any authentication. This mode is not advisable since it's vulnerable to main-in-the-middle attack.
 \end{itemize}
 A static scheme is easier to implement and requires much less operations, but using ephemeral keys is essential to ensure perfect forward secrecy.
 Imagine that somehow, an opponent lays his hand on the shared secret.

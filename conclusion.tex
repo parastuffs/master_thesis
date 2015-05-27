@@ -18,9 +18,9 @@ In some cases, when the operation is just a few clock cycle long for the IP, an 
 A more thorough comparison of the mutual trade-off deserves some investigation, and as a starting point, the packet size could be treated as a branching point between the two solutions.
 
 
-\paragraph{Registering public key verification with the crypto API}
+\paragraph{Registering public key verification with the Linux Crypto API}
 As we saw in \ref{sec:section-with-RSA-BA414}, the driver is already capable of offloading a large portion of public key operations to the IP, but only with very specific libraries at the time being -- openSSL in our case.
-The next step is to register the very same operations with the crypto API so it can be used without having to rely on a custom openSSL engine.
+The next step is to register the very same operations with the Linux Crypto API so it can be used without having to rely on a custom openSSL engine.
 This feature would require to work very closely to the linux kernel developpement.
 Indeed, if the signature verification using public key cryptography has been available in the kernel since 2013, a public key encryption API has only been proposed in late April 2015~\cite{crypto-api-pk-encryption} and is still under request for comments.
 
