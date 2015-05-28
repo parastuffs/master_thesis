@@ -1,5 +1,14 @@
 # master_thesis
 
+Compilation
+-----------
+pdflatex main.tex
+makeglossaries main
+bibtex main.aux
+pdflatex main.tex
+pdflatex main.tex
+
+
 https://www.overleaf.com/2648656bwxqdm#/7003469/
 
 Socrates info
