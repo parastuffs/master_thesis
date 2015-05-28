@@ -93,6 +93,16 @@ Hence, a small kernel module is still needed to handle this ISR.
 \noindent Of course, this type of driver can also actively poll the status of the device, removing the need for a kernel module as it would not rely on interruptions.
 
 
+\subsection{Linux Crypto API}
+The Linux Crypto API is a cryptographic framework giving access to cryptographic capabilities in the kernel space~\cite{morris2003}.
+Initially, it was developed to support IPsec operations, but it evolved into a general-purpose API.
+
+By providing such an interface, the kernel applications\footnote{Used here as a misnomer to designate the code executed in kernel space.} can used cryptographic primitives without having to rely on their concrete implementation.
+In order to add such an implementation, a kernel has to be developed and register itself with the Linux Crypto API upon its loading.
+Those kernel modules can either be software implementation of some cryptogrpahic ciphers, or a device driver that will offload those operation to a dedicated hardware device.\newline{}
+
+The user space can also gain access to the Linux Crypto API, by using an intermediary virtual device \texttt{/dev/crypto}, \textit{aka} CryptoDev~\cite{cryptodev}.
+That support can be added by registering the CryptoDev kernel module with the kernel, and then access it from the user space, usually using a cryptographic library engine (see section~\ref{sec:implem-openssl}).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -341,7 +351,7 @@ Internet & IP, ICMP, IPsec & Network & IP, ICMP, IPsec \\ \hline
 secure communications mechanism for data and control information transmitted between networks."
 
 There exist several major implementations of VPN: SSL, IPsec, L2TP and PPTP.
-The later was developped by a vendor consortium leaded by Microsoft and proposed in the RFC 2637 and will not be discussed further.
+The later was developed by a vendor consortium leaded by Microsoft and proposed in the RFC 2637 and will not be discussed further.
 
 \noindent L2TP (Layer 2 Tunneling Protocol) is a protocol that simply offers a tunnel without providing confidentiality~\cite{rfc3931}.
 A common use case is to combine IPsec and L2TP, as defined in RFC 3193~\cite{rfc3193}.\newline{}
@@ -351,7 +361,7 @@ The present work will focus and SSL/TLS and IPsec, the figure~\ref{fig:ipsec-tls
 \begin{figure}[ht]
 \center
 \input{tls-ipsec}
-\caption{}{}
+\caption{SSL/TLS and IPsec integration into the TCP/IP network stack}{SSL/TLS works in the application layer in order to secure the transport layer, whilst IPsec secures the Internet layer.}
 \label{fig:tls-ipsec}
 \end{figure}
 
@@ -363,7 +373,7 @@ Secure Socket Layer (SSL) and Transport Layer Security (TLS) are two protocols e
 The last version of SSL (version 3.0) dates from 1996~\cite{rfc6101} and has been found a critical vulnerability by Google in 2014~\cite{poodle}.
 As a consequence, SSL 3.0 support is being dropped, and the IETF is working on a depracation of the standard~\cite{sslv3-diediedie-03}.
 
-\noindent TLS is the successor of SSL is at version 1.2~\cite{rfc5246}, the next version being developped by the IETF~\cite{tls13-05}.
+\noindent TLS is the successor of SSL is at version 1.2~\cite{rfc5246}, the next version being developed by the IETF~\cite{tls13-05}.
 TLS uses X.509 certificates for the asymmetric cryptography used during the key exchange.
 Those certificates come in pair: one public and a second private, and rely on a chain of trust for the validity of the certificate.
 Usually, the term certificate is use for the public certificate, and private key for the corresponding private certificate.
@@ -462,7 +472,7 @@ It differs from the standard padding because its length is not limited to 255 by
 
 \noindent AH is the same as ESP, except is does not offer encryption features, only the authentication.
 Since ESP can use a null cipher, it arguably offers the same features as AH.
-The existance of AH is actually historical; when the protocol was developped in the 1990s, there were laws in the United States and other countries preventing the export of product including encryption features.
+The existance of AH is actually historical; when the protocol was developed in the 1990s, there were laws in the United States and other countries preventing the export of product including encryption features.
 Having an authentication only counterparty allowed such product to be exported without encryption capabilities.\newline{}
 
 IPsec can be deployed in two modes: 
