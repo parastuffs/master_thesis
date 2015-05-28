@@ -309,7 +309,7 @@ Moreover, 1024-bit parameter size, both RSA and Diffie-Hellman, are disallowed b
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Network and VPN implementation}\label{sec:theory-network}
+\section{Network and VPN}\label{sec:theory-network}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Present the TCP/IP layering
@@ -344,19 +344,67 @@ There exist several major implementations of VPN: SSL, IPsec, L2TP and PPTP.
 The later was developped by a vendor consortium leaded by Microsoft and proposed in the RFC 2637 and will not be discussed further.
 
 \noindent L2TP (Layer 2 Tunneling Protocol) is a protocol that simply offers a tunnel without providing confidentiality~\cite{rfc3931}.
-A common use case is to combine IPsec and L2TP, as defined in RFC 3193~\cite{rfc3193}.
+A common use case is to combine IPsec and L2TP, as defined in RFC 3193~\cite{rfc3193}.\newline{}
+
+The present work will focus and SSL/TLS and IPsec, the figure~\ref{fig:ipsec-tls} showing their respective integration in the network stack.
+
+\begin{figure}[ht]
+\center
+\input{tls-ipsec}
+\caption{}{}
+\label{fig:tls-ipsec}
+\end{figure}
 
 \subsection{SSL/TLS}
 % Introduce SSL/TLS, talk about the protocol, the key exchange and stuff, but leaver OpenVPN for the 'implementation' chapter.
 % Question the security? Apparently, it does mac-then-encrypt, which is insecure regarding certain types of attacks \cite{cryptoeprint:2001:045}.
 % Plus, SSLv3 is to be deprecated, according to a queued RFC: http://www.rfc-editor.org/internet-drafts/draft-ietf-tls-sslv3-diediedie-03.txt, and is not supported anymore by many servers since poodle.
-Application level security.
+Secure Socket Layer (SSL) and Transport Layer Security (TLS) are two protocols ensuring secure communications from the application layer, securing the transport layer.
+The last version of SSL (version 3.0) dates from 1996~\cite{rfc6101} and has been found a critical vulnerability by Google in 2014~\cite{poodle}.
+As a consequence, SSL 3.0 support is being dropped, and the IETF is working on a depracation of the standard~\cite{sslv3-diediedie-03}.
+
+\noindent TLS is the successor of SSL is at version 1.2~\cite{rfc5246}, the next version being developped by the IETF~\cite{tls13-05}.
+TLS uses X.509 certificates for the asymmetric cryptography used during the key exchange.
+Those certificates come in pair: one public and a second private, and rely on a chain of trust for the validity of the certificate.
+Usually, the term certificate is use for the public certificate, and private key for the corresponding private certificate.
+
+\noindent The figure~\ref{fig:tls-handshake} shows the messages exchanged during the establishement of a connection between two peers.
 
 
+\begin{figure}[ht]
+\begin{verbatim}
+Client                                             Server
 
+ClientHello                -------->
+                                              ServerHello
+                                             Certificate*
+                                       ServerKeyExchange*
+                                      CertificateRequest*
+                           <--------      ServerHelloDone
+Certificate*
+ClientKeyExchange
+CertificateVerify*
+[ChangeCipherSpec]
+Finished                   -------->
+                                       [ChangeCipherSpec]
+                           <--------             Finished
+Application Data           <------->     Application Data
+\end{verbatim}
+\caption{TLS handshake}{The * denotes messages that are sent only in some situations. Reproduce from~\cite{rfc5246}.}
+\label{fig:tls-handshake}
+\end{figure}
 
+\begin{enumerate}
+	\item Client: ClientHello. The client sends a series of specifications to the server, such as the protocol version and the supported cipher suites.
+	\item Server: ServerHello and others. The server replies by setting the protocol and the cipher suite to use.
+	It can send its own certificate and request the client's.
+	In some cases, the server can already begin the key echange protocol (\textit{e.g.} Diffie-Hellman).
+	\item Client: ClientKeyExchange and others. The client veryfies the validity of the server certificate, if any, and sends its own. If necessary, the client may have to change its cipher specification based on the constraints of the server, or request a new specification from the server.
+	The client can also participate in the key exchange protocol.
+	\item Server: Finished. If the client asked for a new cipher specification, the server can set a new one. Otherwise, the exchange is simply finished and the connection has been successfully established.
+\end{enumerate}
 
-
+Once the connection is established, the peers can exchange application data using the symmetric key negociated during the handshake.
 
 
 
