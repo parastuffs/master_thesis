@@ -20,12 +20,8 @@ In order to reach that goal, an FPGA will be used.
 A Field-Prgrammable Gate Array (FPGA) is an integrated circuit that can be programmed after the manufacturing, using a semiconductor intellectual property core (IP core).
 In this work, we will use some of Barco Silex's crypto IP cores.
 
-In order for the operating system to comunicate with the device, they will need to share some memory.
-That memory can be directly mapped and accessed from the user-space using \texttt{/dev/mem}, or can use a direct memory access module (DMA).
-From the operating system, we build a bunch of scatterlist in the kernel-space memory, then map those pages to memory descriptor that have a physical address on the DMA.
-They can be mapped three different ways: \texttt{DMA\_BIDIRECTIONAL}, \texttt{DMA\_TO\_DEVICE} or \texttt{DMA\_FROM\_DEVICE}.
-When the CPU write something in those descriptors and synchronize them with the DMA, it does not have to care about them anymore, the DMA in now in charge to send them to the device where registers are ready to read the incomming data.
-The same goes from the device to the CPU: when the device wants to communicate data to the OS, it writes it on the DMA that will transfer them to the CPU, triggering a flag on the way to notify it.
+The operating system and the device need to share some memory to communicate.
+One possibility is to directly map and access from the user-space using \texttt{/dev/mem}, and an other is to use a direct memory access module (DMA).
 
 \begin{figure}
 \includegraphics[width=\linewidth]{barco-ba411e-ipcore}
@@ -36,13 +32,18 @@ The same goes from the device to the CPU: when the device wants to communicate d
 There are two types of interface with such a device: master or slave.
 The figure~\ref{fig:barco-ba411e-ipcore}  represent one of Barco Silex' crypto IP cores that proposes two interfaces: one of each type.
 \begin{itemize}
-	\item The data path is a master. That is the operating system will not have a direct access to the memory registers of the hardware devide. Instead, they will communicate via a DMA bus: one peer places data on the DMA and notifies the other that he can fetch it.
-	\item The control (ctrl) path is a slave. The operatin system can directly read and write on this part of the device memory.
+	\item The data path is a master. That is the operating system will not have a direct access to the data registers of the hardware device. Instead, they will communicate via a DMA: one peer places data on the DDR memory and notifies the other that he can fetch it.
+	\item The control (ctrl) path is a slave. The operating system can directly read and write on this part of the device memory.
 \end{itemize}
 
-A master interface has the advantage to offload a part of the memory management to the device, but there is a space overhead to connect the DMA as well as an extra delay to process its data.
-A slave interface is usually used for sporadic data, avoiding the overhead of a DMA.
-As an example, the data path of Barco Silex' symmetric cryptography IP core is a master, as there is a lot of data to process, whilst the same data path of their asymmetric cryptography IP core is a slave, for the operands are larger and the computation takes more time.
+A master interface has the advantage to offload data access operations to the device, but there is a ressource and area overhead to connect the DMA as well as an extra complexity to process its data.
+A slave interface is usually used for sporadic data (\textit{e.g.} status, control flags), avoiding the overhead of a DMA.
+As an example, the data path of Barco Silex' symmetric cryptography IP core is a master, as there is a lot of data to process, whilst the same data path of their asymmetric cryptography IP core is a slave, for the operands are larger and the computation takes more time.\newline{}
+
+If a master interface with a DMA is used, the operating system buils scatterlists in the kernel-space memory, then map those pages to memory descriptor that have a physical address on the DMA.
+They can be mapped three different ways: \texttt{DMA\_BIDIRECTIONAL}, \texttt{DMA\_TO\_DEVICE} or \texttt{DMA\_FROM\_DEVICE}.
+When the CPU write something in those descriptors and synchronize them with the DMA, it does not have to care about them anymore, the DMA in now in charge to send them to the device where registers are ready to read the incomming data.
+The same goes from the device to the CPU: when the device wants to communicate data to the OS, it writes it on the DMA that will transfer them to the CPU, triggering a flag on the way to notify it.
 
 
 
@@ -73,14 +74,14 @@ Device drivers allows the operating system to interact with hardware devices.
 On a Linux operating system, a driver can be loaded into the system while it is running, simply registering itself into the kernel.
 This dynamic loading and unloading offers a phenomenal modularity to the system, and consequently, a device driver is also called a kernel module.\newline{}
 
-There are two ways to get the status of a hardware device: either by using interruption, or by actively polling the device, relentlessly asking if it finished its operations.
-The first case is the cleanest and the most common: when the device has something to send to the driver, or if anything unexpected happened, it sends an interruption request (IRQ) to the processor, which will in turn execute the interruption service routine (ISR) registered by the driver~\citep[chap. 10]{Corbet:2005:LDD:1209083}.
-The second case is the easiest and is always guaranteed to work, but won't let go of the processor willingly, loading it at 100\%, and avoiding any other task to be executed.
-Fortunately, modern monolithic kernels such as the Linux kernel from 2.6 provide preemptive scheduling~\cite{Santhanam2003}, that is the scheduler interrupts the running task and assigns the processor ressources it used to an other one.
+There are two ways to get the status of a hardware device: either by using interruption, or by actively polling the status register fo the device, relentlessly asking if it finished its operations or tasks.
+The first case is the cleanest and the most common: when the hardware device has something to send to the driver, or if anything unexpected happened, it sends an interruption request (IRQ) to the processor, which will execute the interruption service routine (ISR) registered by the driver~\citep[chap. 10]{Corbet:2005:LDD:1209083}.
+The second case is the easiest and is always guaranteed to work, but will monopolize the processir, loading it at 100\%, and avoiding any other task to be executed.
+Fortunately, modern monolithic kernels such as the Linux kernel from 2.6 provide preemptive scheduling~\cite{Santhanam2003}, \textit{i.e.} the scheduler interrupts the running task and assigns the processor ressources it used to an other one.
 Hence, systems with a lot of processes in need for CPU ressources would not be stalled, but it would not change anything if the only process heavily requesting processor time is the one using the driver.\newline{}
 
 The vast majority of drivers are meant to be run in kernel space, but some use cases may require the user space to directly access the hardware.
-In those cases, one can use the Userspace I/O framework.
+In those cases, one can use the Userspace I/O framework on a slave interface.
 
 \citet{koch2011} explains that a device driver has two roles: accessing the device memory and dealing with its interruptions.
 The device memory can already be accessed from the user space without the need for UIO via \texttt{/dev/mem}, but UIO improves this method by preventing the user space from mapping memory that does not belong to the device.
@@ -184,10 +185,10 @@ In the rest of this work, we will consider the most common case: $e = d$, having
 There exists numerous cipher types, and one of the most widespread is the block cipher.
 A block cipher splits the message into blocks of fixed size and work on them separately.
 An example of such a cipher is illustrated on the figure~\ref{fig:cbc-encrypt} with the Cipher Block Chaining (CBC) mode.
-This particular mode is easy to implement and has been robust for a long time, before the rise of the padding oracle attack~\cite{vaudenay2002}.
+This particular mode is easy to implement and has been considered robust for a long time, before the rise of the padding oracle attack~\cite{vaudenay2002}.
 
 \indent An other interresting block cipher mode is the Counter (CTR).
-Each block of data is treated independently from the others (see figure~\ref{fig:ctr-encrypt}, making the scheme parallelizable and thus more interresting on hardware.
+Each block of data is treated independently from the others (see figure~\ref{fig:ctr-encrypt}), making the scheme parallelizable and thus more interresting on hardware.
 
 \begin{figure}
 \includegraphics[width=\textwidth]{nist-cbc}
@@ -212,7 +213,7 @@ In order to do so, they need to combine a symmetric cipher and a MAC.
 \noindent New block cipher have emerged to answer the need for such combinations and formed the Authenticated Encryption with Associated Data (AEAD) mode of operation.
 The most widespread mode in network applications is the Galois Counter Mode (GCM, see figure~\ref{fig:gcm-encrypt}), combining the CTR block cipher mode and a GHASH function using multiplications in the Galois field.
 The advantage of this mode is that the authentication can be computed in parallel with the encryption, itself parallelizable.
-This mode can thus be highly optimized in hardware, as proved Barco Silex with their BA415 IP core reaching up to 100Gbps~\cite{barco-ba415}.
+This mode can thus be highly optimized in hardware, as proved by Barco Silex with their BA415 IP core reaching up to 100Gbps~\cite{barco-ba415}.
 
 \begin{figure}
 \includegraphics[width=\textwidth]{nist-gcm-encrypt}
