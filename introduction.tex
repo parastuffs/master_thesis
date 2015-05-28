@@ -15,45 +15,29 @@ As CPUs are largely responsible for the power consumption, it makes their design
 A solution is to use a hybrid architecture, combining a general-purpose micro-processor with an integrated circuit configurable on-the-fly.
 This is a path Intel is exploring with its new Xeon product line, a processor aimed at servers, that combines a Xeon CPU with an FPGA from Altera\cite{xeon2014}.\newline{}
 
-
+On a different scale, Altera developed an ARM based SoC FPGA platform, combining an FPGA with an ARM Cortex-A9.
+This platform allows an increase of performance, lower power consumption and reduced board size compared with a solution with an FPGA separated from the CPU.
+Such architecture is aimed at embedded and low-energy systems, where not only the performance, but also the power consumption matters.
 % on its way to expand that market with the merger with Altera~\cite{2015-intel-altera-merger}.
 
 
+
+
+
+
+
 \section{Aim and purpose of this thesis}
-
-
-
-
-
-
-
-
-
-
-
-
-% Hardware offloading consists in using a dedicated hardware device to process data instead of the CPU.
-
-In the scope of this work, the testing platform will be the SoCFPGA SoCrates from Altera (see figure~\ref{socrates-photo}.
-This SoC combines an ARM dual-core Cortex-A9 with an Altera Cyclone V.
+The aim of this thesis is to implement various popular cryptographic schemes on the board, and make use of the embedded hardware device to improve the performance and decrease the ressources utilization.
+This work will focus on the network security and the impact of hardware offloading of cryptographic operations.
+The testing platform will be the SoCFPGA SoCrates from Altera (see figure~\ref{socrates-photo}), embedding an ARM dual-core Cortex-A9 with an Altera Cyclone V.
 Its ethernet interface will allow us to set the platform in a networked environment and test network security protocols.
 
-This work will focus on the network security and the impact of hardware offloading of cryptographic operations.
 
-Altera and Xilinx are trying to push those SoC plateforms to the market to popularize the FPGAs.
+% Altera and Xilinx are trying to push those SoC plateforms to the market to popularize the FPGAs.
 
-Power is critical nowadays, esapcially in datacenters.
-Several solutions exists: abandonning general purpose processors altoghether and turn towards ARM cores, or add an FPGA to the processor for example.
-Intel proposed the latter solution in 2014~\cite{intel-xeon-fpga} and is on its way to expand that market with the merger with Altera~\cite{2015-intel-altera-merger}.
-
-There a re diffirent ways to add cryptographic capabilities to an application:
-\begin{itemize}
-	\item Having the cipher built in.
-	\item Using a cryptographic library, such as OpenSSL.
-	\item Using the Linux Crypto API.
-\end{itemize}
-
-Present the two IP cores that will be used in this work: BA411E and BA414E.
+% Power is critical nowadays, esapcially in datacenters.
+% Several solutions exists: abandonning general purpose processors altoghether and turn towards ARM cores, or add an FPGA to the processor for example.
+% Intel proposed the latter solution in 2014~\cite{intel-xeon-fpga} and is on its way to expand that market with the merger with Altera~\cite{2015-intel-altera-merger}.
 
 \begin{figure}[ht]
 \includegraphics[width=\linewidth]{socrates-photo}
@@ -66,8 +50,16 @@ Present the two IP cores that will be used in this work: BA411E and BA414E.
 
 
 \section{Context}
-The work presented in this thesis has been conducted under the supervision of Sébastien Rabou, in Barco Silex' office in Louvain-la-Neuve.
+The work presented in this thesis has been conducted under the supervision of Sébastien Rabou, in Barco Silex' office in Louvain-la-Neuve, between November 2014 and May 2015.\newline{}
 
+% There are diffirent ways to add cryptographic capabilities to an application:
+% \begin{itemize}
+% 	\item Having the cipher built in.
+% 	\item Using a cryptographic library, such as OpenSSL.
+% 	\item Using the Linux Crypto API.
+% \end{itemize}
+
+In order to make use of the embedded FPGA, two crypto IP cores of Barco Silex will be used: the BA411E~\cite{barco-ba411e} for AES, and the BA414E~\cite{barco-ba414e} for the public key operations.
 
 
 
