@@ -54,16 +54,43 @@ As an example, the data path of Barco Silex' symmetric cryptography IP core is a
 
 %Crypto API
 
+Modern operating systems run on several levels of privilege.
+Under Unix, the kernel runs under the highest level and it has no restriction, whereas applications run on the lowest level.
+We call those two levels kernel space and user space, segragating the privilege and the memory between the two modes (\citet{tanenbaum2014} and \citet[chap. 2]{Corbet:2005:LDD:1209083}).
+The figure~\ref{fig:user-kernel} shows this separation.
+In order for the applications in the user space to reach the hardware, they need to go through the kernel and use the device drivers that are registered there.
+
+\begin{figure}[ht]
+\center
+\input{user-kernel}
+\caption{User and kernel space separation}{The applications and libraries from the the user space communicates with the kernel space via the system calls.}
+\label{fig:user-kernel}
+\end{figure}
+
 \subsection{Device Driver}\label{sec:theory-driver}
 % General idea of it works
-% device driver in userspace: linux userspace i/o (/dev/mem)
-Userspace I/O~\cite{koch2011}
+Device drivers allows the operating system to interact with hardware devices.
+On a Linux operating system, a driver can be loaded into the system while it is running, simply registering itself into the kernel.
+This dynamic loading and unloading offers a phenomenal modularity to the system, and consequently, a device driver is also called a kernel module.\newline{}
 
 There are two ways to get the status of a hardware device: either by using interruption, or by actively polling the device, relentlessly asking if it finished its operations.
-The first case is the cleanest and the most common: when the device has something to send to the driver, or if anything unexpected happened, it sends an interruption request (IRQ) to the processor, which will in turn execute the interruption routine registered by the driver~\citep[chap. 10]{Corbet:2005:LDD:1209083}.
-The second case is the easiest and is always guaranteed to work, but won't let go off the processor willingly, loading it at 100\%, and avoiding any other task to be executed.
+The first case is the cleanest and the most common: when the device has something to send to the driver, or if anything unexpected happened, it sends an interruption request (IRQ) to the processor, which will in turn execute the interruption service routine (ISR) registered by the driver~\citep[chap. 10]{Corbet:2005:LDD:1209083}.
+The second case is the easiest and is always guaranteed to work, but won't let go of the processor willingly, loading it at 100\%, and avoiding any other task to be executed.
 Fortunately, modern monolithic kernels such as the Linux kernel from 2.6 provide preemptive scheduling~\cite{Santhanam2003}, that is the scheduler interrupts the running task and assigns the processor ressources it used to an other one.
-Hence, systems with a lot of processes in need for CPU ressources would not be stalled, but it would not change anything if the only process heavily requesting processor time is the one using the driver.
+Hence, systems with a lot of processes in need for CPU ressources would not be stalled, but it would not change anything if the only process heavily requesting processor time is the one using the driver.\newline{}
+
+The vast majority of drivers are meant to be run in kernel space, but some use cases may require the user space to directly access the hardware.
+In those cases, one can use the Userspace I/O framework.
+
+\citet{koch2011} explains that a device driver has two roles: accessing the device memory and dealing with its interruptions.
+The device memory can already be accessed from the user space without the need for UIO via \texttt{/dev/mem}, but UIO improves this method by preventing the user space from mapping memory that does not belong to the device.
+
+\noindent As for the interruptions, the user space alone is not enough.
+When the device sends an IRQ, the system will react by executing an ISR.
+The IRQ flag however needs to be deactivated at the end of the routine, and this must be done in kernel mode.
+Hence, a small kernel module is still needed to handle this ISR.
+
+\noindent Of course, this type of driver can also actively poll the status of the device, removing the need for a kernel module as it would not rely on interruptions.
 
 
 
@@ -133,9 +160,14 @@ We will see in section~\ref{sec:theory-network} that if IPsec follows this recom
 
 
 
-\subsection{Symmetric cryptography}
+
+
+
+
+\subsection{Symmetric cryptography}\label{sec:symmetric}
 Consider a cryptosystem $(P,C,K,E,D)$, with $P$ and $C$ the spaces of plaintexts and ciphertexts, $E$ and $D$ the encryption and decryption algorithms and a keyspace $K$.
 \citet{Menezes1996} and \citet{infof405} define a symmetric scheme as a cryptosystem with two keys $e \in K$ and $d \in K$ respectively associated with the encryption and decryption algorithms.
+Hence, for all messages $x$ in the message space $M$: $D_d(E_e(x)) = x$.
 When using the key pair ($e$, $d$), it should be computationally easy to compute $d$ knowing only $e$, and $e$ from $d$.
 In the rest of this work, we will consider the most common case: $e = d$, having thus a single key shared between the peers.
 
@@ -181,10 +213,26 @@ This mode can thus be highly optimized in hardware, as proved Barco Silex with t
 
 
 
+
+
+
+
+
 \subsection{Asymmetric cryptography}
-% Diffie-Hellman: show the math about the shared key, maybe from the course INFOH405 or RFC2631, and point which operation will be offloaded.
-Asymmetric cryptography relies on a pair of keys: one private known only to the owner of the certificate, and one public available to anyone.
-Such cryptography uses two kinds of operations: encryption using the public key of the recipient and digital signature, which is an encryption using the private key of the sender.
+Asymmetric cryptography relies on a pair of keys: one private known only to its owner, and one public available to anyone.
+If we use the same notation for the cryptosystem as in section~\ref{sec:symmetric}, the public key would be $e$, and the private key $d$.
+Such cryptography uses two kinds of operations: 
+\begin{itemize}
+	\item Encryption: the sender uses the public key of the recipient to encrypt the message $m$ into a ciphertext $c = E_e(m)$, and the recipient uses his private key to decrypt it: $m = D_d(m)$.
+	\item Digital signature: the sender generates the signature $s$ of the message with his private key: $s = D_d(m)$, and the recipient uses the public key of the sender to verify the signature: $m = E_e(s)$.
+	Since the sender can not deny having signed the message with his private key, this adds a non-repudiation of origin property to the scheme.
+\end{itemize}
+
+Eventhough the signature algorithms are often more efficient than the usual MACs and the key pairs key stay in use for very long period of time, asymmetric cryptography can not supplant its symmetric counterpart.
+The throughput rates of modern asymmetric schemes are still well under the symmetric schemes, plus the key sizes are much larger.
+Whereas the most efficient search for the symmetric key (ignoring the weaknesses specific to certain modes) is an exhaustive search, all public-key systems are vulnerable to more efficient attacks (\textit{e.g.} factorization or discrete logarithm).
+
+In practice, public-key cryptography is used to estalish a secure channel between two or more peers and exchange a shared secret key that will be used the encrypt the subsequent communications.
 
 \subsubsection{RSA}
 RSA is a public-key scheme proposed in 1978 by three MIT researchers (who gave it their name)~\cite{Rivest:1978:MOD:359340.359342}.
@@ -289,6 +337,8 @@ Internet & IP, ICMP, IPsec & Network & IP, ICMP, IPsec \\ \hline
 
 
 % First explain what a VPN is.
+\citet{Frankel:2005:SGI:2206289} define a VPN as: ``virtual network built on top of existing physical networks that can provide a
+secure communications mechanism for data and control information transmitted between networks."
 
 There exist several major implementations of VPN: SSL, IPsec, L2TP and PPTP.
 The later was developped by a vendor consortium leaded by Microsoft and proposed in the RFC 2637 and will not be discussed further.
