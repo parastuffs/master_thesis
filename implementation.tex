@@ -27,6 +27,20 @@ Before closing the chapter, we will present the two main IP cores to which the c
 \end{figure}
 
 \section{Software}
+In order to implement all the required cryptographic protocol, several softwares are needed.
+Their role is summarized in table~\ref{tab:soft-role}.
+
+\begin{table}[ht]
+\center
+\begin{tabular}{|l|l|} \hline
+OpenVPN & SSL/TLS \\ \hline
+OpenSSH & SSH \\ \hline
+OpenSSL & Cryptographic ciphers implementation \\ \hline
+Strongswan & IPsec \\ \hline
+\end{tabular}
+\caption{Role of the softwares}{Each software implements different protocols. OpenSSL is particular since it implements the cryptographic algorithms themselves and is used by the other applications.}
+\label{tab:soft-role}
+\end{table}
 
 \subsection{OpenVPN}
 % By default, point-to-point, but since the version 2.0 can be configured in server mode, hence being able to manage hundreds of clients.
@@ -118,9 +132,25 @@ In order to overcome this limitation, we wrote a patch to apply on OpenSSH 6.7, 
 
 
 
-\subsection{OpenSSL}
+\subsection{OpenSSL}\label{sec:implem-openssl}
 
-OpenSSL offers an high-level interface called EVP to be used by other applications.
+OpenSSL is an implementation of the SSL/TLS protocols.
+Unlike OpenVPN, it does implement all the cryptographic suites supported by the protocols in C and assembly.
+OpenSSL his mainly used as a cryptographic library and offers an high-level interface called EVP to be used by other applications.
+
+OpenSSL can extend its features by supporting cyrptographic engines.
+Those engines offer custom implementation for specific ciphers.
+In a sense, a crypto engine is to OpenSSL what the crypto kernel modules are to the Linux Crypto API.
+
+\noindent A widely used engine is one of Intel's, proposing acceleration for the AES operations on its processor using the AES-NI instruction set.
+
+Two engines will be used in this work:
+\begin{itemize}
+	\item cryptodev, to gain access to the BA411E from the user space.
+	\item silex engine, a custom-made engine to access the BA414E from user space using UIO.
+\end{itemize}
+
+
 
 
 It is to be noted that the present work uses an implementation with all the debug flags activated.
@@ -242,17 +272,27 @@ As all the tests will be single-threaded, having two or more instances of the sa
 
 \subsection{BA411E Driver}
 This driver takes the rightern path of figure~\ref{fig:os-path-generic-b}, which is the best because the most versatile.
-By pluging the driver into the Linux Crypto API, we offer a standard kernel interface that can be used by any other kernel driver, such as the ESP driver, or user-space application via the cryptodev driver and OpenSSL engine.
+By pluging the driver into the Linux Crypto API, we offer a standard kernel interface that can be used by any other kernel driver, such as the ESP driver, or user-space applications via the cryptodev driver and OpenSSL engine.
 
 However, at the current state of development, the user-space and the kernel applications do not share the same driver.
 The former is using an IRQ-based driver, whilst the latter is actively polling the hardware.
-The reason why the IRQ-based driver can not be used by kernel-space application is because the current implementation uses sleep methods that, when called on other kernel drivers, put the kernel in panic mode and require the system to reboot.
-An alternative is under development and is further discussed in the last part of this work, in section~\ref{sec:future-work}.
+The reason why the IRQ-based driver can not be used by kernel-space application is because the current implementation uses sleep methods in order to free ressources while the hardware is busy.
+The problem is that the functions that called the device driver do not support to sleep during their execution.
+Hence, when the device driver tells the scheduler to put him into sleep mode, the parent function panics and crashes the kernel, forcing the system to reboot.
+An alternative is under development and is further discussed in the last part of this work, in section~\ref{sec:future-work}. \newline{}
 
 Whichever method is used to fetch the state of the hardware, the rest of the driver follow the exact same canvas as the default software implementation of the different AES modes.
 
 
 \subsection{BA414E Driver and Silex engine}
 At the moment of development, there is no asymmetric cryptography interface in the Linux Crypto API\footnote{A request for comment patch as been submitted to the Linux kernel mailing list~\cite{crypto-api-pk-encryption} in late April 2015, proposing a standard interface for public key encryption in the crypto API.}.
-The BA414E can thus not be accessed using the same path as the BA411E and a user-space driver will be needed, that is the leftern path of figure~\ref{fig:os-path-generic-b}.
-As presented in section~\ref{sec:theory-driver}, we will need to rely on an UIO driver to access the device from the user space.
+
+Pressed by exhibitions and the complexity of interfacing the functions with the crypto API, Barco Silex' developmement team took the choice to access the hardware from user space.
+
+\noindent The BA414E can thus not be accessed using the same path as the BA411E and a user-space driver will be needed, that is the leftern path of figure~\ref{fig:os-path-generic-b}.
+The complete work flow thus needs three elements:
+\begin{itemize}
+	\item A device driver handling the IRQ, initializing the device and creating a simple file system that will be used from the user space.
+	\item The UIO kernel module supervising the memory access of the user space.
+	\item The custom OpenSSL silex engine that translates the requests from OpenSSL into operations processable by the IP core.
+\end{itemize}
