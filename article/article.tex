@@ -636,14 +636,16 @@ pdfkeywords={Computer Society, IEEEtran, journal, LaTeX, paper,
 % As a general rule, do not put math, special symbols or citations
 % in the abstract or keywords.
 \IEEEtitleabstractindextext{%
-\begin{abstract}
-The abstract goes here.
-\end{abstract}
-
+% \begin{abstract}
+% The abstract goes here.
+% \end{abstract}
+\center
+May 29, 2015
 % Note that keywords are not normally used for peerreview papers.
-\begin{IEEEkeywords}
-Computer Society, IEEEtran, journal, \LaTeX, paper, template.
-\end{IEEEkeywords}}
+% \begin{IEEEkeywords}
+% Computer Society, IEEEtran, journal, \LaTeX, paper, template.
+% \end{IEEEkeywords}
+}
 
 
 % make the title area
@@ -673,12 +675,12 @@ Computer Society, IEEEtran, journal, \LaTeX, paper, template.
 \IEEEpeerreviewmaketitle
 
 
-\ifCLASSOPTIONcompsoc
-\IEEEraisesectionheading{\section{Introduction}\label{sec:introduction}}
-\else
-\section{Introduction}
-\label{sec:introduction}
-\fi
+% \ifCLASSOPTIONcompsoc
+% \IEEEraisesectionheading{\section{Introduction}\label{sec:introduction}}
+% \else
+% \section{Introduction}
+% \label{sec:introduction}
+% \fi
 % Computer Society journal (but not conference!) papers do something unusual
 % with the very first section heading (almost always called "Introduction").
 % They place it ABOVE the main text! IEEEtran.cls does not automatically do
@@ -705,64 +707,92 @@ Computer Society, IEEEtran, journal, \LaTeX, paper, template.
 % 
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
-\IEEEPARstart{T}{his} demo file is intended to serve as a ``starter file''
-for IEEE Computer Society journal papers produced under \LaTeX\ using
-IEEEtran.cls version 1.8a and later.
-% You must have at least 2 lines in the paragraph with the drop letter
-% (should never be an issue)
-I wish you the best of success.
-
-\hfill mds
+% \IEEEPARstart{T}{his} demo file is intended to serve as a ``starter file''
+% for IEEE Computer Society journal papers produced under \LaTeX\ using
+% IEEEtran.cls version 1.8a and later.
+% % You must have at least 2 lines in the paragraph with the drop letter
+% % (should never be an issue)
+% I wish you the best of success.
  
-\hfill September 17, 2014
+% \hfill May 29, 2015
 
 
 % needed in second column of first page if using \IEEEpubid
 %\IEEEpubidadjcol
 
-Now that we know who you are, I know who I am. I'm not a mistake! It all makes sense! In a comic, you know how you can tell who the arch-villain's going to be? He's the exact opposite of the hero. And most times they're friends, like you and me! I should've known way back when... You know why, David? Because of the kids. They called me Mr Glass.
+In 1965, Gordon Moore, co-founder of Intel, stated that for the same footprint, the number of transistors in an integrated circuit should double every two years.
+It became the Moore's law, an empirical prediction that drived inovation for fifty years.
+Nowadays, it is reaching its limits, as Intel in delaying the manufacturing of its next-generation processors.
 
-Well, the way they make shows is, they make one show. That show's called a pilot. Then they show that show to the people who make shows, and on the strength of that one show they decide if they're going to make more shows. Some pilots get picked and become television programs. Some don't, become nothing. She starred in one of the ones that became nothing.
+The technological limitation is not the only parameter slowing the development of new integrated circuits.
+The second law of Moore states that the cost to design, manufacture and test the new architectures doubles every four years.
+This economical growth will eventually collide with the Moore's law, stopping its progression.
 
-Now that there is the Tec-9, a crappy spray gun from South Miami. This gun is advertised as the most popular gun in American crime. Do you believe that shit? It actually says that in the little book that comes with it: the most popular gun in American crime. Like they're actually proud of that shit. 
+The domination of multi-purpose processors is reaching its limits, and even the biggest actors on the market are considering alternatives to the Moore's Law.
 
-My money's in that office, right? If she start giving me some bullshit about it ain't there, and we got to go someplace else and get it, I'm gonna shoot you in the head then and there. Then I'm gonna shoot that bitch in the kneecaps, find out where my goddamn money is. She gonna tell me too. Hey, look at me when I'm talking to you, motherfucker. You listen: we go in there, and that nigga Winston or anybody else is in there, you the first motherfucker to get shot. You understand?
+A report of the Natural Resources Defense Council forecasts the US datacenter electrity bill to reach \$13.7 billion by 2020.
+As CPUs are largely responsible for the power consumption, it makes their design critical.
+A solution is to use a hybrid architecture, combining a general-purpose micro-processor with an integrated circuit configurable on-the-fly.
+This is a path Intel is exploring with its new Xeon product line, a processor aimed at servers, that combines a Xeon CPU with an FPGA from Altera.
+An FPGA is an integrated circuit that can be reconfigured after the manufacturing.
+Adding such a device to a micro-processor makes it a true System on a Chip capable to reconfigure itself on-the-fly to accelerate specific operations.
+\newline{}
 
-Well, the way they make shows is, they make one show. That show's called a pilot. Then they show that show to the people who make shows, and on the strength of that one show they decide if they're going to make more shows. Some pilots get picked and become television programs. Some don't, become nothing. She starred in one of the ones that became nothing.
+On a different scale, Altera developed an ARM based SoC FPGA platform, combining an FPGA with an ARM Cortex-A9, a low-power processor.
+This platform allows an increase of performance, lower power consumption and reduced board size compared with a solution with an FPGA separated from the CPU.
+Such architecture is aimed at embedded and low-energy systems, where not only the performance, but also the power consumption matters.\newline{}
+% on its way to expand that market with the merger with Altera~\cite{2015-intel-altera-merger}.
 
-Now that we know who you are, I know who I am. I'm not a mistake! It all makes sense! In a comic, you know how you can tell who the arch-villain's going to be? He's the exact opposite of the hero. And most times they're friends, like you and me! I should've known way back when... You know why, David? Because of the kids. They called me Mr Glass.
+The aim of this thesis is to implement various popular cryptographic schemes on the board, and make use of the embedded hardware device to improve the performance and decrease the ressources utilization.
+This work will focus on the network security and the impact of hardware offloading of cryptographic operations.\newline{}
 
-Do you see any Teletubbies in here? Do you see a slender plastic tag clipped to my shirt with my name printed on it? Do you see a little Asian child with a blank expression on his face sitting outside on a mechanical helicopter that shakes when you put quarters in it? No? Well, that's what you see at a toy store. And you must think you're in a toy store, because you're here shopping for an infant named Jeb.
+There are mainly two types of cryptographic schemes: symmetric and asymmetric.
+The symmetry actually applies to the key used to encrypt the message.
+In the first case, the same key is used for encryption and decryption and must be kept secret between the two peers.
+In the second case, there is a pair of keys: one private, only known from its owner, and a public avaible to anyone.
+When Bob wants to send an encrypted message to Alice, Bob encrypts the message using the public key of Alice.
+Once encrypted, the message can only be decrypted using the corresponding private key owned by Alice.
 
-Look, just because I don't be givin' no man a foot massage don't make it right for Marsellus to throw Antwone into a glass motherfuckin' house, fuckin' up the way the nigger talks. Motherfucker do that shit to me, he better paralyze my ass, 'cause I'll kill the motherfucker, know what I'm sayin'?
+Why the need for two paradigms, you ask?
+Asymmetric cryptography may be practical, but its operations are complex and take time.
+Symmetric cryptography, however, is much more efficient.
+The only downside is that a common key must shared between Alice and Bob.\newline{}
 
-Now that there is the Tec-9, a crappy spray gun from South Miami. This gun is advertised as the most popular gun in American crime. Do you believe that shit? It actually says that in the little book that comes with it: the most popular gun in American crime. Like they're actually proud of that shit. 
+This is where network security protocols come into play.
+% There exists several protocols that set rules as to how establish a secure connection and how to use it once it is done.
+The first step is to establish a connection.
+To do so, most protocols take advantage of the public key infrastructure associated with asymmetric cryptography to initiate a ``key exchange protocol" (\textit{e.g.} Diffie-Hellman) during wich Alice and Bob will agree on a shared secret.
+From this secret, they derive a key that they will use the encrypt their communication.
+This work focuses on three protocols: SSH, implemented by OpenSSH, TLS/SSL, implemented by OpenVPN, and IPsec, already implemented in the Linux operating system.
+\newline{}
 
-Well, the way they make shows is, they make one show. That show's called a pilot. Then they show that show to the people who make shows, and on the strength of that one show they decide if they're going to make more shows. Some pilots get picked and become television programs. Some don't, become nothing. She starred in one of the ones that became nothing.
+All those encryptions, decryptions, key computations, authentications, and many others can be \textit{offloaded} to a dedicated hardware device, that is, sent to the device for it do the computations instead of the CPU.
 
-Now that we know who you are, I know who I am. I'm not a mistake! It all makes sense! In a comic, you know how you can tell who the arch-villain's going to be? He's the exact opposite of the hero. And most times they're friends, like you and me! I should've known way back when... You know why, David? Because of the kids. They called me Mr Glass.
+This is what the figures show.
+The figure~\ref{fig:openvpn-tls-bench} shows the number of secure connections per minute that can be addressed when using a software or a hardware implementation, for different levels of security.
+For the highest level, the hardware is able to connect almost six times more clients for nineteen times less CPU usage.
 
-Well, the way they make shows is, they make one show. That show's called a pilot. Then they show that show to the people who make shows, and on the strength of that one show they decide if they're going to make more shows. Some pilots get picked and become television programs. Some don't, become nothing. She starred in one of the ones that became nothing.
+\begin{figure}[ht]
+\input{graphs/openvpn-tls-bench}
+\caption{Comparison of file transfer methods -- the background stripped bars are the CPU usage.}
+\label{fig:openvpn-tls-bench}
+\end{figure}
+~\newline{}
 
-Now that there is the Tec-9, a crappy spray gun from South Miami. This gun is advertised as the most popular gun in American crime. Do you believe that shit? It actually says that in the little book that comes with it: the most popular gun in American crime. Like they're actually proud of that shit. 
+The figure~\ref{fig:ftp-bench-comparison} compares different implementations doing a file transfer over different type of secure channels.
+OpenSSH is interresting if the performance is the priority, but if the efficiency and the power consumption are the main concern, IPsec is a better solution.
+In any case, OpenVPN is not suited for such a platform as it poorly uses the hardware device.
 
-My money's in that office, right? If she start giving me some bullshit about it ain't there, and we got to go someplace else and get it, I'm gonna shoot you in the head then and there. Then I'm gonna shoot that bitch in the kneecaps, find out where my goddamn money is. She gonna tell me too. Hey, look at me when I'm talking to you, motherfucker. You listen: we go in there, and that nigga Winston or anybody else is in there, you the first motherfucker to get shot. You understand?
+\begin{figure}[ht]
+\input{graphs/ftp-bench-comparison}
+\caption{Comparison of file transfer methods -- the background stripped bars are the CPU usage. Low, medium and high correspong to the key size of the assymetric cipher used (RSA).}
+\label{fig:ftp-bench-comparison}
+\end{figure}
+~\newline{}
 
-Well, the way they make shows is, they make one show. That show's called a pilot. Then they show that show to the people who make shows, and on the strength of that one show they decide if they're going to make more shows. Some pilots get picked and become television programs. Some don't, become nothing. She starred in one of the ones that became nothing.
-
-Now that we know who you are, I know who I am. I'm not a mistake! It all makes sense! In a comic, you know how you can tell who the arch-villain's going to be? He's the exact opposite of the hero. And most times they're friends, like you and me! I should've known way back when... You know why, David? Because of the kids. They called me Mr Glass.
-
-Do you see any Teletubbies in here? Do you see a slender plastic tag clipped to my shirt with my name printed on it? Do you see a little Asian child with a blank expression on his face sitting outside on a mechanical helicopter that shakes when you put quarters in it? No? Well, that's what you see at a toy store. And you must think you're in a toy store, because you're here shopping for an infant named Jeb.
-
-Look, just because I don't be givin' no man a foot massage don't make it right for Marsellus to throw Antwone into a glass motherfuckin' house, fuckin' up the way the nigger talks. Motherfucker do that shit to me, he better paralyze my ass, 'cause I'll kill the motherfucker, know what I'm sayin'?
-
-Now that there is the Tec-9, a crappy spray gun from South Miami. This gun is advertised as the most popular gun in American crime. Do you believe that shit? It actually says that in the little book that comes with it: the most popular gun in American crime. Like they're actually proud of that shit. 
-
-Well, the way they make shows is, they make one show. That show's called a pilot. Then they show that show to the people who make shows, and on the strength of that one show they decide if they're going to make more shows. Some pilots get picked and become television programs. Some don't, become nothing. She starred in one of the ones that became nothing.
-
-
-
-
+This thesis is a proof of concept that hardware offloading of cryptographic protocols can add tremendous features to embedded platforms.
+Be it to improve the performance or decrease the CPU utilization, and thus the consumption of the board,
+hardware offloading is the way to go if you want your embedded system to become an efficient security platform.
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
 % For figures, \caption should occur after the \includegraphics.
@@ -859,24 +889,12 @@ Well, the way they make shows is, they make one show. That show's called a pilot
 % \fnbelowfloat command of the stfloats package.
 
 
-\section{Results}
-\begin{figure}[ht]
-\input{graphs/ftp-bench-comparison}
-\caption{Comparison of file transfer methods -- the background stripped bars are the CPU usage.}
-\label{fig:ftp-bench-comparison}
-\end{figure}
-
-
-\begin{figure}[ht]
-\input{graphs/openvpn-tls-bench}
-\caption{Comparison of file transfer methods -- the background stripped bars are the CPU usage.}
-\label{fig:openvpn-tls-bench}
-\end{figure}
+% \section{Results}
 
 
 
-\section{Conclusion}
-The conclusion goes here.
+
+% \section{Conclusion}
 
 
 
@@ -908,16 +926,16 @@ The conclusion goes here.
 
 
 % use section* for acknowledgment
-\ifCLASSOPTIONcompsoc
-  % The Computer Society usually uses the plural form
-  \section*{Acknowledgments}
-\else
-  % regular IEEE prefers the singular form
-  \section*{Acknowledgment}
-\fi
+% \ifCLASSOPTIONcompsoc
+%   % The Computer Society usually uses the plural form
+%   \section*{Acknowledgments}
+% \else
+%   % regular IEEE prefers the singular form
+%   \section*{Acknowledgment}
+% \fi
 
 
-The authors would like to thank...
+% The authors would like to thank...
 
 
 % Can use something like this to put references on a page
@@ -950,13 +968,17 @@ The authors would like to thank...
 % <OR> manually copy in the resultant .bbl file
 % set second argument of \begin to the number of references
 % (used to reserve space for the reference number labels box)
-\begin{thebibliography}{1}
 
-\bibitem{IEEEhowto:kopka}
-H.~Kopka and P.~W. Daly, \emph{A Guide to {\LaTeX}}, 3rd~ed.\hskip 1em plus
-  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
 
-\end{thebibliography}
+% \begin{thebibliography}{1}
+
+% \bibitem{IEEEhowto:kopka}
+% H.~Kopka and P.~W. Daly, \emph{A Guide to {\LaTeX}}, 3rd~ed.\hskip 1em plus
+%   0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+
+% \end{thebibliography}
+
+
 
 % biography section
 % 
