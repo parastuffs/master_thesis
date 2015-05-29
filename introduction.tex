@@ -1,7 +1,7 @@
 \chapter{Introduction}
 % What is hardware offloading?
 In 1965, Gordon Moore, co-founder of Intel, stated that for the same footprint, the number of transistors in an integrated circuit should double every two years~\cite{moore1965}.
-It became the Moore's law, an empirical prediction that drived inovation for fifty years.
+It became the Moore's law, an empirical prediction that drived innovation for fifty years.
 Nowadays, it is reaching its limits, as Intel in delaying the manufacturing of its next-generation processors.
 
 The technological limitation is not the only parameter slowing the development of new ICs.
@@ -10,7 +10,7 @@ This economical growth will eventually collide with the Moore's law, stopping it
 
 The domination of multi-purpose processors is reaching its limits, and even the biggest actors on the market are considering alternatives to the Moore's Law.
 
-\noindent A report of the Natural Resources Defense Council~\cite{nrdc2014} forecasts the US datacenter electrity bill to reach \$13.7 billion by 2020.
+\noindent A report of the Natural Resources Defense Council~\cite{nrdc2014} forecasts the US datacenter electricity bill to reach \$13.7 billion by 2020.
 As CPUs are largely responsible for the power consumption, it makes their design critical.
 A solution is to use a hybrid architecture, combining a general-purpose micro-processor with an integrated circuit configurable on-the-fly.
 This is a path Intel is exploring with its new Xeon product line, a processor aimed at servers, that combines a Xeon CPU with an FPGA from Altera\cite{xeon2014}.\newline{}
@@ -36,7 +36,7 @@ Its ethernet interface will allow us to set the platform in a networked environm
 % Altera and Xilinx are trying to push those SoC plateforms to the market to popularize the FPGAs.
 
 % Power is critical nowadays, esapcially in datacenters.
-% Several solutions exists: abandonning general purpose processors altoghether and turn towards ARM cores, or add an FPGA to the processor for example.
+% Several solutions exists: abandonning general purpose processors altogether and turn towards ARM cores, or add an FPGA to the processor for example.
 % Intel proposed the latter solution in 2014~\cite{intel-xeon-fpga} and is on its way to expand that market with the merger with Altera~\cite{2015-intel-altera-merger}.
 
 \begin{figure}[ht]
@@ -66,7 +66,7 @@ In order to make use of the embedded FPGA, two crypto IP cores of Barco Silex wi
 
 \section{Structure}
 The present document will begin with the technical ground necessary to this work.
-After a presentation on how to drive a hardware device from the operating system and details on device driver design, we will adress the cryptography.
+After a presentation on how to drive a hardware device from the operating system and details on device driver design, we will address the cryptography.
 Only most relevant part of cryptography will be detailed: message digests, symmetric cryptography and more specifically the CBC and GCM modes of operation, and asymmetric cryptography with an accent on RSA and Diffie-Hellman.
 
 The next chapter will present the implementation methods for the protocols theoretically introduced.

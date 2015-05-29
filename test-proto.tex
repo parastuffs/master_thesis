@@ -5,12 +5,12 @@ This chapter presents the platform on which the tests will be undertaken, as wel
 
 \section{Experimental setup}
 The experimental environment is built around a standard x86 host and an ARM Cortex-A9 alongside an Altera Cyclone V FPGA as the target.
-Both are linked toghether through a network capped by 100Mbps switches.
+Both are linked together through a network capped by 100Mbps switches.
 Both stations have gigabits ethernet interface and could hence be directly connected to each other, but in that case the communication would be limited by the I/O transfers of the storage units -- a hard drive disk in one case, an micro-SD card in the second -- on which we can not depend to set a constant throughput limitation, as it is highly influenced by the data block size and general health of the support.
 
 
 \subsection{x86 host}
-The desktop host runs on Windows 7 Professional 64-bit, but a virtual machine using a Linux distribution is used for the developement and testings.
+The desktop host runs on Windows 7 Professional 64-bit, but a virtual machine using a Linux distribution is used for the development and testings.
 
 \begin{framed}
 \begin{description}
@@ -41,8 +41,8 @@ If the applications, libraries and kernel modules have been compiled with the re
 If it has close to no impact on the performance of the board, the same does not go for the hosting machine.
 A serious drawback is his memory consumption that, when combined with the ressources used by the virtual machine, bring the hosting machine to its knees.
 
-\noindent The user should also be aware that if Streamline if a very powerfull and versatile tool, it is not reliable at very high resolution.
-The data should not be analyzed in windows smaller than a millisecond.
+\noindent The user should also be aware that if Streamline if a very powerful and versatile tool, it is not reliable at very high resolution.
+The data should not be analysed in windows smaller than a millisecond.
 
 \section{Test cases}
 The aim of this work is to test the implementations under realistic situations.
@@ -55,7 +55,7 @@ To reach this goal, three test cases will be used:
 
 Each of those tests will go from a raw run, without any encryption nor authentication serving as a comparison ground, gradually increasing security up to a complete encryption/authentication scheme.
 
-The table~\ref{tab:software-version} summarizes the softwares used and tjeir respective version.
+The table~\ref{tab:software-version} summarizes the software used and their respective version.
 
 \begin{table}
 \center
@@ -69,7 +69,7 @@ OpenSSH & 6.7p1 \\ \hline
 \label{tab:software-version}
 \end{table}
 
-\noindent As AES mode CBC and SHA-2 are widely used, they will be used with a serious security paramter using keys of 256-bit.
+\noindent As AES mode CBC and SHA-2 widely are used, they will be used with a serious security parameter using keys of 256-bit.
 Some test case will also experiment some implementation of AES-GCM to compare its performance and justify the need for its offloading in hardware.
 
 For the IPsec and OpenVPN implementation, the cipher/authentication pair null/null will be used to quantify the overhead of the encapsulation.
@@ -79,25 +79,25 @@ As the RFC 7321~\citep[pg. 7]{rfc7321} sates for IPsec: ``Note that while authen
 
 We will use two types of drivers for the BA411E: an interuption-based for OpenVPN and OpenSSH, and a polling-based for IPsec.
 
-All the tests will be conducted with the ESP protocol in tunnel mode, so that we have the worst case scenario; as AH imposes a smaller overhead, the perfomance could only be better.
+All the tests will be conducted with the ESP protocol in tunnel mode, so that we have the worst case scenario; as AH imposes a smaller overhead, the performance could only be better.
 
 \subsection{TLS Connections}
 This benchmark is done only with OpenVPN 2.3.6.
-Since there is no standard support for those operation in the kernel yet, it would not have made sense to use IPsec, since it would have had to fallback to OpenSSL, then following the same path as OpenVPN do.
+Since there is no standard support for those operations in the kernel yet, it would not have made sense to use IPsec, since it would have had to fallback to OpenSSL, then following the same path as OpenVPN do.
 As soon as the public key operations can be plugged into the Linux Crypto API, this use case should however be tested.
 
 For this use case, the board is configured in server mode, so that it can accept connections from any client.
-The server does not connect with a specific client and waits for incomming connection requests (see listing~\ref{list:openvpn-server}).
+The server does not connect with a specific client and waits for incoming connection requests (see listing~\ref{list:openvpn-server}).
 The virtual machine will then execute then clients in parallel using the script~\ref{list:openvpn-client-script}.
 The only option differentiating the clients is their IP address and port number.
-Otherwise, all the clients share the same basic configuration file (see listing~\ref{list:openvpn-client}), which tell them to renogociate a new connection every second.
+Otherwise, all the clients share the same basic configuration file (see listing~\ref{list:openvpn-client}), which tell them to renogotiate a new connection every second.
 Hence, if a connection could be made with no delay and if the processes scheduling were ideal, the server would have to address 600 connections per minute.
 
 \lstinputlisting[language=bash, label=list:openvpn-client-script, caption={Script starting ten clients in parallel who will stress the server.}]{stress-openvpn.sh}
 
 As this experiment can be very unstable and vastly depends on the operating system scheduling, each test case has been repeated five times to ensure stable results.
 
-The security parameter tested is a standard TLS-DHE-RSA, hence forcing the peers the renogociate a new shared secret and ephemeral Diffie-Hellman parameters at each connection attempt.
+The security parameter tested is a standard TLS-DHE-RSA, hence forcing the peers the renogotiate a new shared secret and ephemeral Diffie-Hellman parameters at each connection attempt.
 
 
 \subsection{Response time -- latency}
@@ -114,12 +114,12 @@ done
 \end{lstlisting}
 
 \subsection{File transfer}
-The file transfered is an uncompressed block of 128MB of random data generated using the following command:
+The file transferred is an uncompressed block of 128MB of random data generated using the following command:
 \begin{lstlisting}[language=bash]
   $ head -c $((1024*1024*128)) /dev/urandom > heavy.file
 \end{lstlisting}~\newline{}
 
-For OpenSSH, the commmand \texttt{scp} will be used to transfer the data securely over an SSH tunnel.
+For OpenSSH, the command \texttt{scp} will be used to transfer the data securely over an SSH tunnel.
 As for OpenVPN and IPsec, a tunnel will be established beforehand, and then the simple \texttt{ftp} command will allow the client to fetch the file on the server.
 In order to use custom temporary security configuration with \texttt{scp}, the following command can be used:
 \begin{lstlisting}[language=bash]
@@ -128,4 +128,4 @@ In order to use custom temporary security configuration with \texttt{scp}, the f
 
 
 All the results on the throughput and CPU usage take into account only the file transfer.
-The server authentication, the connection establishement and any other security negociation is ignored in this particular test case.
+The server authentication, the connection establishment and any other security negotiation is ignored in this particular test case.

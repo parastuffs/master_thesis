@@ -11,7 +11,7 @@
 		\textbf{Implementation of high level cryptographic protocols using a SoC platform}
 	\end{center}
 The aim of this thesis is to study the impact on the performance and ressource usage of the implementation of cryptographic protocols on a SoC platform.
-The platform consist of the combination of an ARM core with an Altera FPGA, on which Barco Silex' crypto IP cores are programmed.
+The platform consists of the combination of an ARM core with an Altera FPGA, on which Barco Silex' crypto IP cores are programmed.
 
 The focus is set on specific cryptographic schemes: AES and its CBC mode of operation, as well as RSA and Diffie-Hellman, all being supported in hardware.
 The GCM mode of AES is also part of the results of the software implementation. Doing so opens the discussion on the performance gain if the device driver could use the hardware.
@@ -36,13 +36,13 @@ As for the TLS connections, the hardware is able to process up to 7.8 times more
 \begin{abstract}
 	\begin{verse}
 	\small \textit{
-	par Quentin Delhaye, Master en ingénieur civil en informatique, à finalité finalité Software and Critical Systems Design, Université Libre de Bruxelles, 2014--2015.}
+	par Quentin Delhaye, Master en ingénieur civil en informatique, à finalité Software and Critical Systems Design, Université Libre de Bruxelles, 2014--2015.}
 	\normalsize
 	\end{verse}
 	\begin{center}
 		\textbf{Implementation of high level cryptographic protocols using a SoC platform}
 	\end{center}
-Le but de ce mémoire est d'étudier l'implémentation de protocol cryptographiques sur une plateforme SoC et leur impact sur les performances et l'utilisation des ressources.
+Le but de ce mémoire est d'étudier l'implémentation de protocoles cryptographiques sur une plateforme SoC et leur impact sur les performances et l'utilisation des ressources.
 La plateforme consiste en la combinaison d'un cœur ARM avec un FPGA d'Altera sur lequel sont programmées des IP cores de Barco Silex.
 
 L'accent est mis sur certains algorithmes cryptographiques~: AES et son mode CBC, ainsi que RSA et Diffie-Hellman, tous étant supportés par le hardware.
@@ -53,7 +53,7 @@ Leur implémentation permet d'effectuer des tests réalistes de connexions TLS, 
 
 Les résultats sont sans appel~: le coût imposé par OpenVPN non seulement diminue les performance (56~\% de perte sans chiffrement ni authentification), mais en plus il n'exploite pas le hardware, donnant des résultats encore plus mauvais quand les opérations sont déchargées sur le périphérique.
 En revanche, IPsec combiné au hardware utilise quatre fois moins de CPU que le software pour des performances similaires de transfert de fichier.
-Concernant les connections TLS, le hardware est capable de traiter jusqu'à 7.8 fois plus de connexions par minute que le software avec des paramètre de sécurité élevés, et ce en utilisant 19 fois moins de CPU.
+Concernant les connections TLS, le hardware est capable de traiter jusqu'à 5.89 fois plus de connexions par minute que le software avec des paramètre de sécurité élevés, et ce en utilisant 19 fois moins de CPU.
 
 ~\newline{}
 \textbf{Mots-clés:} \textit{Cryptographie, sécurité réseau, hardware offloading, plaeforme SoC, IPsec}

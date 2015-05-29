@@ -27,7 +27,7 @@ Before closing the chapter, we will present the two main IP cores to which the c
 \end{figure}
 
 \section{Software}
-In order to implement all the required cryptographic protocol, several softwares are needed.
+In order to implement all the required cryptographic protocol, several software are needed.
 Their role is summarized in table~\ref{tab:soft-role}.
 
 \begin{table}[ht]
@@ -38,7 +38,7 @@ OpenSSH & SSH \\ \hline
 OpenSSL & Cryptographic ciphers implementation \\ \hline
 Strongswan & IPsec \\ \hline
 \end{tabular}
-\caption{Role of the softwares}{Each software implements different protocols. OpenSSL is particular since it implements the cryptographic algorithms themselves and is used by the other applications.}
+\caption{Role of the software}{Each software implements different protocols. OpenSSL is particular since it implements the cryptographic algorithms themselves and is used by the other applications.}
 \label{tab:soft-role}
 \end{table}
 
@@ -59,14 +59,14 @@ OpenVPN offers two different TUN/TAP virtual interfaces:
 \end{description}
 
 Since OpenVPN aims at network security at the application level, it needs virtual network interface to read and write the data.
-The \texttt{tun} adapter will be used when OpenVPN wants to establish a point-to-point connection between two client, while the \texttt{tap} device is used when there is one server acting as a bridge, hence managing lots of clients at the same time.
+The \texttt{tun} adapter will be used when OpenVPN wants to establish a point-to-point connection between two clients, while the \texttt{tap} device is used when there is one server acting as a bridge, hence managing lots of clients at the same time.
 
-OpenVPN as two choices when it wants to sends its data over the internet: either encapsulating its IP packet into TCP or UDP packets.
+OpenVPN as two choices when it wants to send its data over the internet: either encapsulating its IP packet into TCP or UDP packets.
 The problem of encapsulating IP into TCP is that inside IP packets, there already are TCP frames.
 The reason is that IP has been designed to work on unreliable networks, and TCP includes in its standard protocols to retry and drop packets.
 Hence, encapsulating an IP packet into a TCP packet produces a redundancy by nesting reliability layers.
 UDP is the unreliable counterparty of TCP, offering a better alternative for encapsulation.
-If we refer to the figure~\ref{fig:openvpn-packet-flow}, \texttt{iperf} would send its regular \texttt{IP(TCP)} packet over the virtual \texttt{tun} device, which will then compress, fragment and encrypt the frame before encaspulating it into a new UDP packet that will finally be sent through the physical \texttt{eth0} interface.
+If we refer to the figure~\ref{fig:openvpn-packet-flow}, \texttt{iperf} would send its regular \texttt{IP(TCP)} packet over the virtual \texttt{tun} device, which will then compress, fragment and encrypt the frame before encapsulating it into a new UDP packet that will finally be sent through the physical \texttt{eth0} interface.
 
 \begin{figure}[ht]
 \includegraphics[width=\textwidth]{OpenVPN-packetflow}
@@ -74,12 +74,12 @@ If we refer to the figure~\ref{fig:openvpn-packet-flow}, \texttt{iperf} would se
 \label{fig:openvpn-packet-flow}
 \end{figure}
 
-\noindent At this point, it is important to note that if the figure~\ref{fig:openvpn-packet-flow} shows a workflow in which the encryption taking place before the fragmentation, a quick look at the source code proves the opposite.
-A sample of the said code has been writen down in the listing~\ref{list:openvpn-workflow}.
+\noindent At this point, it is important to note that if the figure~\ref{fig:openvpn-packet-flow} shows a work flow in which the encryption taking place before the fragmentation, a quick look at the source code proves the opposite.
+A sample of the said code has been written down in the listing~\ref{list:openvpn-workflow}.
 
 
 \lstset{language=c}
-\begin{lstlisting}[caption={openvpn compress then encrypt -- sample from \texttt{forward.c}. It clearly shows that the order of operations in the packet workflow is compression, then fragmentation and finally encryption.}, label=list:openvpn-workflow, float]% The 'float' option makes the listing unbreakable.
+\begin{lstlisting}[caption={openvpn compress then encrypt -- sample from \texttt{forward.c}. It clearly shows that the order of operations in the packet work flow is compression, then fragmentation and finally encryption.}, label=list:openvpn-workflow, float]% The 'float' option makes the listing unbreakable.
 /* Compress, fragment, encrypt and HMAC-sign an outgoing packet. */
 void encrypt_sign (struct context *c, bool comp_frag)
 {
@@ -100,19 +100,19 @@ void encrypt_sign (struct context *c, bool comp_frag)
 }
 \end{lstlisting}
 
-An other way to look at this workflow is to completely isolate the OpenVPN block from both hosts, and exporting it to an independent device such as a router.
+Another way to look at this workflow is to completely isolate the OpenVPN block from both hosts, and exporting it to an independent device such as a router.
 The hosts would be stripped off the virtual interface -- \texttt{tun0} would become physical, and would communicate normally over the internet, at least from their point of view.
-All their communications would be routed by the router of their local area network, incomming on a physical \texttt{tun0} interface and outputed to the internet on the \texttt{eth0} interface.
-Such implementation are used when an adminstrator wishes to secure a whole local area network without bloating each client with a VPN application.
+All their communications would be routed by the router of their local area network, incoming on a physical \texttt{tun0} interface and output to the internet on the \texttt{eth0} interface.
+Such implementation are used when an administrator wishes to secure a whole local area network without bloating each client with a VPN application.
 In this case, there exist router firmware packages running OpenVPN, such as DD-WRT and OpenWRT.
 Whatever the method used, the crucial point is that the VPN tunnel usage is transparent to the application.\newline{}
 
 OpenVPN relies on a cryptographic library, OpenSSL in our case, for all the security operations: encryption, signature, certificate management, etc.\newline{}
 
-A previous study highlighted that OpenVPN would divide the throughput by two from raw to tunneled without encryption nor authentication~\cite{Hoekstra2011}.
+A previous study highlighted that OpenVPN would divide the throughput by two from raw to tunnelled without encryption nor authentication~\cite{Hoekstra2011}.
 Such a behaviour would not be surprising, considered all the transfers and context switches the data would have to operate and provoke in an OpenVPN tunnel.
 
-\noindent Note that if one wants to use the \texttt{none} cipher with a version of OpenVPN ealier than 2.3.7, he would have to update it using a community patch~\cite{openvpn-patch-none}.
+\noindent Note that if one wants to use the \texttt{none} cipher with a version of OpenVPN earlier than 2.3.7, he would have to update it using a community patch~\cite{openvpn-patch-none}.
 
 
 \subsection{OpenSSH}
@@ -124,17 +124,17 @@ It is very close to SSL/TLS in its principle and can also establish secure chann
 However, this work focus is on OpenVPN and the underlying SSL/TLS protocol, and as such SSH is not studied any further than a comparison use case.\newline{}
 
 OpenSSH relies on an external cryptographic library for all its security operations.
-Up until the version 6.7 published in october 2014, it had to be compiled against OpenSSL.
-However, after the infamous security vulnerability heartbleed in april 2014, the developpers took a step to move towards LibreSSL, a fork of OpenSSL managed by OpenBSD  developers.
+Up until the version 6.7 published in October 2014, it had to be compiled against OpenSSL.
+However, after the infamous security vulnerability heartbleed in April 2014, the developers took a step to move towards LibreSSL, a fork of OpenSSL managed by OpenBSD  developers.
 Still, there is no official support for any other cryptographic library.
 
 If OpenSSH does support most of OpenSSL ciphers by default, it takes some liberties such as disabling the CBC encryption mode and removing the support of no MAC during a transmission.
 
-\noindent The first customization is a response to an old vulnarability\footnote{A vulnerability note as been issued by Carnegie Mellon University Computer Emergency Response Team in early 2009 (last revision)~\cite{CERT2009}, in response to a research of University of London~\cite{Albrecht:2009} presenting a plaintext-recovering attack against SSH when CBC mode is used, but the OpenSSH update took only place in october 2014.}.
+\noindent The first customization is a response to an old vulnarability\footnote{A vulnerability note as been issued by Carnegie Mellon University Computer Emergency Response Team in early 2009 (last revision)~\cite{CERT2009}, in response to a research of University of London~\cite{Albrecht:2009} presenting a plaintext-recovering attack against SSH when CBC mode is used, but the OpenSSH update took only place in October 2014.}.
 Even if it is not recommended, the user can still enable this mode by explicitly configuring it in the \texttt{sshd\_config} options.
 
 \noindent The second has been taken to prevent the user to strip himself from data authenticity and integrity.
-However, in the case of testing and benchmarking, skipping the MAC can be interresting, especially if it is not offloaded in hardware such as the encryption in our case.
+However, in the case of testing and benchmarking, skipping the MAC can be interesting, especially if it is not offloaded in hardware such as the encryption in our case.
 In order to overcome this limitation, we wrote a patch to apply on OpenSSH 6.7, available in appendix~\ref{chap:openssh-patch}.
 
 
@@ -146,7 +146,7 @@ OpenSSL is an implementation of the SSL/TLS protocols.
 Unlike OpenVPN, it does implement all the cryptographic suites supported by the protocols in C and assembly.
 OpenSSL his mainly used as a cryptographic library and offers an high-level interface called EVP to be used by other applications.
 
-OpenSSL can extend its features by supporting cyrptographic engines.
+OpenSSL can extend its features by supporting cryptographic engines.
 Those engines offer custom implementation for specific ciphers.
 In a sense, a crypto engine is to OpenSSL what the crypto kernel modules are to the Linux Crypto API.
 
@@ -207,31 +207,31 @@ When OpenSSL will have to share the CPU with other applications, the loss will b
 \label{fig:openssl-speed-dbg-on-off}
 \end{figure}
 
-% Talk about the assembly implementation, maybe show the difference in an appendice with the C implementation. Not /that/ interresting.
+% Talk about the assembly implementation, maybe show the difference in an appendice with the C implementation. Not /that/ interesting.
 
 
 \subsection{Strongswan}
 % TODO talk about IKE and SA management
-Strongswan is a full implementation of IPsec relying on the kernel drivers for the networking part, on the Linux Crypto API for the cryptographic part, and on user space crypto libraries for the connection negociation.
-An other popular implementation is ipsec-tools, but its development lags behind modern Linux and is not up-to-date with the 3.14 Linux kernel headers, making its cross-compilation difficult.
+Strongswan is a full implementation of IPsec relying on the kernel drivers for the networking part, on the Linux Crypto API for the cryptographic part, and on user space crypto libraries for the connection negotiation.
+Another popular implementation is ipsec-tools, but its development lags behind modern Linux and is not up-to-date with the 3.14 Linux kernel headers, making its cross-compilation difficult.
 %Use strongswan 5.3.0
 Strongswan as two advantages: it has a tremendous and exhaustive documentation, and its user interface is straightforward.
 Once configured, a simple \texttt{ipsec start \&\& ipsec up <connection>} on both sides is enough to create a ready-to-use VPN.
 
-The figure~\ref{fig:ipsec-workflow} illustrates the workflow of Alice communicating with Bob via an IPsec ESP tunnel.
-The XFRM (read ``transform") framework is implementing IPsec and handles the incomming and outgoing packets for established VPN connections~\cite{rosen2014}.
+The figure~\ref{fig:ipsec-workflow} illustrates the work flow of Alice communicating with Bob via an IPsec ESP tunnel.
+The XFRM (read ``transform") framework is implementing IPsec and handles the incoming and outgoing packets for established VPN connections~\cite{rosen2014}.
 Its name comes from the fact that the kernel transforms packet frames to incorporate IPsec security.
 Depending on the configuration, XFRM uses the AH or ESP kernel module, which in turn calls the crypto API to encrypt and/or sign the IP packet.
 
 We can also clearly see one of the main advantages of IPsec: it works in the kernel space.
-Since it does not require a virtual network interface like OpenVPN, the only transfer between the user/kernel space happens when the former wishes to send a packet on the network, passing it to the later -- or \textit{vice versa} for incomming packets.
+Since it does not require a virtual network interface like OpenVPN, the only transfer between the user/kernel space happens when the former wishes to send a packet on the network, passing it to the later -- or \textit{vice versa} for incoming packets.
 
 \begin{figure}[ht]
 \Large
 \resizebox{\linewidth}{!}{%
 \input{ipsec-transfer}
 }
-\caption{IPsec user/kernel space workflow, using \texttt{ping} as a test case.}{}
+\caption{IPsec user/kernel space work flow, using \texttt{ping} as a test case.}{}
 \label{fig:ipsec-workflow}
 \end{figure}
 
@@ -258,7 +258,7 @@ The following description addresses all the kernel modules required to run all t
 	\item[\texttt{esp4}] IPv4 ESP implementation. The AH counterparty is also available in the \texttt{ah4} module.
 	\item[\texttt{ipcomp}] IP compression module. Needed by IPsec if the option is activated in the configuration.
 	\item[\texttt{cryptodev}] Creates \texttt{/dev/crypto}, giving access to the crypto API in the user space.
-	\item[\texttt{uio}] User-space I/O driver, allowing to access the hardware memory from the user space, needed by our implementation of the BA414E driver.
+	\item[\texttt{uio}] User-space I/O driver, allowing accessing the hardware memory from the user space, needed by our implementation of the BA414E driver.
 \end{description}
 
 \section{Offload}
@@ -280,8 +280,8 @@ For this tests, only one instance of each IP core will be programmed on the FPGA
 As all the tests will be single-threaded, having two or more instances of the same IP core would not improve the performance, as they could not be used in parallel anyway.
 
 \subsection{BA411E Driver}\label{sec:implem-ba411e-driver}
-This driver takes the rightern path of figure~\ref{fig:os-path-generic-b}, which is the best because the most versatile.
-By pluging the driver into the Linux Crypto API, we offer a standard kernel interface that can be used by any other kernel driver, such as the ESP driver, or user-space applications via the cryptodev driver and OpenSSL engine.
+This driver takes the righten path of figure~\ref{fig:os-path-generic-b}, which is the best because the most versatile.
+By pluging the driver in the Linux Crypto API, we offer a standard kernel interface that can be used by any other kernel driver, such as the ESP driver, or user-space applications via the cryptodev driver and OpenSSL engine.
 
 However, at the current state of development, the user-space and the kernel applications do not share the same driver.
 The former is using an IRQ-based driver, whilst the latter is actively polling the hardware.
@@ -296,9 +296,9 @@ Whichever method is used to fetch the state of the hardware, the rest of the dri
 \subsection{BA414E Driver and Silex engine}
 At the moment of development, there is no asymmetric cryptography interface in the Linux Crypto API\footnote{A request for comment patch as been submitted to the Linux kernel mailing list~\cite{crypto-api-pk-encryption} in late April 2015, proposing a standard interface for public key encryption in the crypto API.}.
 
-Pressed by exhibitions and the complexity of interfacing the functions with the crypto API, Barco Silex' developmement team took the choice to access the hardware from user space.
+Pressed by exhibitions and the complexity of interfacing the functions with the crypto API, Barco Silex' development team took the choice to access the hardware from user space.
 
-\noindent The BA414E can thus not be accessed using the same path as the BA411E and a user-space driver will be needed, that is the leftern path of figure~\ref{fig:os-path-generic-b}.
+\noindent The BA414E can thus not be accessed using the same path as the BA411E and a user-space driver will be needed, that is the path to the left of figure~\ref{fig:os-path-generic-b}.
 The complete work flow thus needs three elements:
 \begin{itemize}
 	\item A device driver handling the IRQ, initializing the device and creating a simple file system that will be used from the user space.

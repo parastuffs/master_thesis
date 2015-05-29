@@ -25,7 +25,7 @@ One possibility is to directly map and access from the user-space using \texttt{
 
 \begin{figure}
 \includegraphics[width=\linewidth]{barco-ba411e-ipcore}
-\caption{Barco Silex' AES IP Core}{There are two channels to comunicate with the IP core: the data and control paths~\cite{barco-ba411e}.}
+\caption{Barco Silex' AES IP Core}{There are two channels to communicate with the IP core: the data and control paths~\cite{barco-ba411e}.}
 \label{fig:barco-ba411e-ipcore}
 \end{figure}
 
@@ -36,13 +36,13 @@ The figure~\ref{fig:barco-ba411e-ipcore}  represent one of Barco Silex' crypto I
 	\item The control (ctrl) path is a slave. The operating system can directly read and write on this part of the device memory.
 \end{itemize}
 
-A master interface has the advantage to offload data access operations to the device, but there is a ressource and area overhead to connect the DMA as well as an extra complexity to process its data.
+A master interface has the advantage to offload data access operations to the device, but there is a resource and area overhead to connect the DMA as well as an extra complexity to process its data.
 A slave interface is usually used for sporadic data (\textit{e.g.} status, control flags), avoiding the overhead of a DMA.
 As an example, the data path of Barco Silex' symmetric cryptography IP core is a master, as there is a lot of data to process, whilst the same data path of their asymmetric cryptography IP core is a slave, for the operands are larger and the computation takes more time.\newline{}
 
-If a master interface with a DMA is used, the operating system buils scatterlists in the kernel-space memory, then map those pages to memory descriptor that have a physical address on the DMA.
+If a master interface with a DMA is used, the operating system builds scatterlists in the kernel-space memory, then map those pages to memory descriptor that have a physical address on the DMA.
 They can be mapped three different ways: \texttt{DMA\_BIDIRECTIONAL}, \texttt{DMA\_TO\_DEVICE} or \texttt{DMA\_FROM\_DEVICE}.
-When the CPU write something in those descriptors and synchronize them with the DMA, it does not have to care about them anymore, the DMA in now in charge to send them to the device where registers are ready to read the incomming data.
+When the CPU write something in those descriptors and synchronize them with the DMA, it does not have to care about them any more, the DMA in now in charge to send them to the device where registers are ready to read the incoming data.
 The same goes from the device to the CPU: when the device wants to communicate data to the OS, it writes it on the DMA that will transfer them to the CPU, triggering a flag on the way to notify it.
 
 
@@ -57,14 +57,14 @@ The same goes from the device to the CPU: when the device wants to communicate d
 
 Modern operating systems run on several levels of privilege.
 Under Unix, the kernel runs under the highest level and it has no restriction, whereas applications run on the lowest level.
-We call those two levels kernel space and user space, segragating the privilege and the memory between the two modes (\citet{tanenbaum2014} and \citet[chap. 2]{Corbet:2005:LDD:1209083}).
+We call those two levels kernel space and user space, segregating the privilege and the memory between the two modes (\citet{tanenbaum2014} and \citet[chap. 2]{Corbet:2005:LDD:1209083}).
 The figure~\ref{fig:user-kernel} shows this separation.
 In order for the applications in the user space to reach the hardware, they need to go through the kernel and use the device drivers that are registered there.
 
 \begin{figure}[ht]
 \center
 \input{user-kernel}
-\caption{User and kernel space separation}{The applications and libraries from the the user space communicates with the kernel space via the system calls.}
+\caption{User and kernel space separation}{The applications and libraries from the user space communicates with the kernel space via the system calls.}
 \label{fig:user-kernel}
 \end{figure}
 
@@ -76,9 +76,9 @@ This dynamic loading and unloading offers a phenomenal modularity to the system,
 
 There are two ways to get the status of a hardware device: either by using interruption, or by actively polling the status register fo the device, relentlessly asking if it finished its operations or tasks.
 The first case is the cleanest and the most common: when the hardware device has something to send to the driver, or if anything unexpected happened, it sends an interruption request (IRQ) to the processor, which will execute the interruption service routine (ISR) registered by the driver~\citep[chap. 10]{Corbet:2005:LDD:1209083}.
-The second case is the easiest and is always guaranteed to work, but will monopolize the processir, loading it at 100\%, and avoiding any other task to be executed.
-Fortunately, modern monolithic kernels such as the Linux kernel from 2.6 provide preemptive scheduling~\cite{Santhanam2003}, \textit{i.e.} the scheduler interrupts the running task and assigns the processor ressources it used to an other one.
-Hence, systems with a lot of processes in need for CPU ressources would not be stalled, but it would not change anything if the only process heavily requesting processor time is the one using the driver.\newline{}
+The second case is the easiest and is always guaranteed to work, but will monopolize the processor, loading it at 100\%, and avoiding any other task to be executed.
+Fortunately, modern monolithic kernels such as the Linux kernel from 2.6 provide preemptive scheduling~\cite{Santhanam2003}, \textit{i.e.} the scheduler interrupts the running task and assigns the processor resources it used to another one.
+Hence, systems with a lot of processes in need for CPU resources would not be stalled, but it would not change anything if the only process heavily requesting processor time is the one using the driver.\newline{}
 
 The vast majority of drivers are meant to be run in kernel space, but some use cases may require the user space to directly access the hardware.
 In those cases, one can use the Userspace I/O framework on a slave interface.
@@ -100,7 +100,7 @@ Initially, it was developed to support IPsec operations, but it evolved into a g
 
 By providing such an interface, the kernel applications\footnote{Used here as a misnomer to designate the code executed in kernel space.} can used cryptographic primitives without having to rely on their concrete implementation.
 In order to add such an implementation, a kernel has to be developed and register itself with the Linux Crypto API upon its loading.
-Those kernel modules can either be software implementation of some cryptogrpahic ciphers, or a device driver that will offload those operation to a dedicated hardware device.\newline{}
+Those kernel modules can either be software implementation of some cryptographic ciphers, or a device driver that will offload those operations to a dedicated hardware device.\newline{}
 
 The user space can also gain access to the Linux Crypto API, by using an intermediary virtual device \texttt{/dev/crypto}, \textit{aka} CryptoDev~\cite{cryptodev}.
 That support can be added by registering the CryptoDev kernel module with the kernel, and then access it from the user space, usually using a cryptographic library engine (see section~\ref{sec:implem-openssl}).
@@ -162,7 +162,7 @@ In both schemes, data integrity can be guaranteed because the flip of one bit wi
 However, only a MAC can ensure source authentication since it is the only one based on a shared secret key.
 
 Now rises the question of what and when authenticating.
-\citet{Bellare2000} prooved that the most secure solution is to encrypt then compute the MAC from the ciphertext.
+\citet{Bellare2000} proved that the most secure solution is to encrypt then compute the MAC from the ciphertext.
 We will see in section~\ref{sec:theory-network} that if IPsec follows this recommandation, SSL/TLS does not and MAC first the plaintext then encrypt the message.
 
 
@@ -239,11 +239,11 @@ Such cryptography uses two kinds of operations:
 	Since the sender can not deny having signed the message with his private key, this adds a non-repudiation of origin property to the scheme.
 \end{itemize}
 
-Eventhough the signature algorithms are often more efficient than the usual MACs and the key pairs key stay in use for very long period of time, asymmetric cryptography can not supplant its symmetric counterpart.
+Even though the signature algorithms are often more efficient than the usual MACs and the key pairs key stay in use for very long period of time, asymmetric cryptography can not supplant its symmetric counterpart.
 The throughput rates of modern asymmetric schemes are still well under the symmetric schemes, plus the key sizes are much larger.
 Whereas the most efficient search for the symmetric key (ignoring the weaknesses specific to certain modes) is an exhaustive search, all public-key systems are vulnerable to more efficient attacks (\textit{e.g.} factorization or discrete logarithm).
 
-In practice, public-key cryptography is used to estalish a secure channel between two or more peers and exchange a shared secret key that will be used the encrypt the subsequent communications.
+In practice, public-key cryptography is used to establish a secure channel between two or more peers and exchange a shared secret key that will be used the encrypt the subsequent communications.
 
 \subsubsection{RSA}
 RSA is a public-key scheme proposed in 1978 by three MIT researchers (who gave it their name)~\cite{Rivest:1978:MOD:359340.359342}.
@@ -251,7 +251,7 @@ A few years later, they founded RSA Laboratories, which is now in charge of main
 The last version of the standard is the version 2.2~\cite{pkcs1} and is defined as a precise key generation protocol allowing encryption and decryption.
 The keys can be generated by respecting a few steps:
 \begin{enumerate}
-	\item randomy choose two large primes $p$ and $q$;
+	\item randomly choose two large primes $p$ and $q$;
 	\item compute the modulus $n = p q$, and consequently we have \[\phi(n) = (p-1)(q-1)\]with $\phi(n)$ as the Euler function;
 	\item randomly choose the public exponent $e \in ]1,\phi(n)[\ s.t.\ GCD(e,\phi(n)) = 1$;
 	\item compute $d \in ]1,\phi(n)[\ s.t.\ e \cdot d \equiv 1 (mod\ \phi(n))$
@@ -265,7 +265,7 @@ The encryption and decryption of a given message $m \in \mathds{Z}_n$ are define
 	\item[Decryption] $m = c^d\ mod\ n$
 \end{description}
 
-The scheme is based on modular artihmetic, which is secure because of the factoring problem.
+The scheme is based on modular arithmetic, which is secure because of the factoring problem.
 For an opponent to decrypt a ciphertext $c$ wihtout knowing the private key $(d, n)$, he would need to compute the $e^{th}$ roots of $c$, modulo $n$.
 This operation is computationally hard, since an efficient solution is yet to be found for sufficiently large key size.
 
@@ -281,8 +281,8 @@ The protocol can be one of three types (\cite{rfc2631}, \cite{Frankel:2005:SGI:2
 \end{itemize}
 A static scheme is easier to implement and requires much less operations, but using ephemeral keys is essential to ensure perfect forward secrecy.
 Imagine that somehow, an opponent lays his hand on the shared secret.
-If that secret has already been used, he can decipher all data transfered during past connections.
-However, if the secret is new for every new connection, the compromission of the shared secret does not jeopardize past communications.
+If that secret has already been used, he can decipher all data transferred during past connections.
+However, if the secret is new for every new connection, the compromise of the shared secret does not jeopardize past communications.
 This is perfect forward secrecy: using a new key to protect the previous messages.
 
 Hereunder is the generation algorithm of an ephemeral shared secret.
@@ -306,7 +306,7 @@ Note that the client, B in our case, could have one signature less because RFC 5
 However, any sane configuration will have both actors signing their ephemeral public key.
 If the certificate use RSA, we end up with four modular exponentiations, which can become quite heavy computing wise for certain sizes of key.
 We will see in chapter~\ref{chap:results} that while a 1024-bit key size is easily manageable by full software implementation, hardware offloading become a necessity for 4096-bit key sizes.
-Moreover, 1024-bit parameter size, both RSA and Diffie-Hellman, are disallowed by the NIST recommandations since 2013~\cite{nist-sp800-131A}.
+Moreover, 1024-bit parameter size, both RSA and Diffie-Hellman, are disallowed by the NIST recommendations since 2013~\cite{nist-sp800-131A}.
 
 
 
@@ -324,7 +324,7 @@ Moreover, 1024-bit parameter size, both RSA and Diffie-Hellman, are disallowed b
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Present the TCP/IP layering
-Computer networks are described by two models: the TCP/IP stack and the OSI model, each splitting the network workflow into more or less abstract layers.
+Computer networks are described by two models: the TCP/IP stack and the OSI model, each splitting the network work flow into more or less abstract layers.
 The RFC 1122~\cite{rfc1122} defines the TCP/IP, and the international standard ISO/IEC 7498-1~\cite{ISOIEC7498} defines the OSI stack as in the table~\ref{tab:tcp-ip-stack}.
 The main difference between the two is the application layer of the TCP/IP stack which corresponds to the three upper layers of the OSI model.
 Some references, such as~\citet{tanenbaum2011}, conceptually split the TCP/IP link layer into an additional physical layer.
@@ -342,7 +342,7 @@ Internet & IP, ICMP, IPsec & Network & IP, ICMP, IPsec \\ \hline
 \multirow{2}{*}{Link} & \multirow{2}{*}{PPP, MAC, Ethernet, L2TP} & Data link & PPP, MAC, Ethernet, L2TP \\ \cline{3-4}
  & & Physical & USB, DSL, IEEE 802.11 \\ \hline
 \end{tabularx}
-\caption{TCP/IP and OSI model comparison}{They are globaly the same, except for the application layer of the TCP/IP stack which merge togheter the three upper layers of the OSI model. Between parenthsis are examples of protocols resting on each layer.}
+\caption{TCP/IP and OSI model comparison}{They are globally the same, except for the application layer of the TCP/IP stack which merge together the three upper layers of the OSI model. Between parenthesis are examples of protocols resting on each layer.}
 \label{tab:tcp-ip-stack}
 \end{table}
 
@@ -357,7 +357,7 @@ The later was developed by a vendor consortium leaded by Microsoft and proposed 
 \noindent L2TP (Layer 2 Tunneling Protocol) is a protocol that simply offers a tunnel without providing confidentiality~\cite{rfc3931}.
 A common use case is to combine IPsec and L2TP, as defined in RFC 3193~\cite{rfc3193}.\newline{}
 
-The present work will focus and SSL/TLS and IPsec, the figure~\ref{fig:ipsec-tls} showing their respective integration in the network stack.
+The present work will focus and SSL/TLS and IPsec, the figure~\ref{fig:tls-ipsec} showing their respective integration in the network stack.
 
 \begin{figure}[ht]
 \center
@@ -372,14 +372,14 @@ The present work will focus and SSL/TLS and IPsec, the figure~\ref{fig:ipsec-tls
 % Plus, SSLv3 is to be deprecated, according to a queued RFC: http://www.rfc-editor.org/internet-drafts/draft-ietf-tls-sslv3-diediedie-03.txt, and is not supported anymore by many servers since poodle.
 Secure Socket Layer (SSL) and Transport Layer Security (TLS) are two protocols ensuring secure communications from the application layer, securing the transport layer.
 The last version of SSL (version 3.0) dates from 1996~\cite{rfc6101} and has been found a critical vulnerability by Google in 2014~\cite{poodle}.
-As a consequence, SSL 3.0 support is being dropped, and the IETF is working on a depracation of the standard~\cite{sslv3-diediedie-03}.
+As a consequence, SSL 3.0 support is being dropped, and the IETF is working on a deprecation of the standard~\cite{sslv3-diediedie-03}.
 
 \noindent TLS is the successor of SSL is at version 1.2~\cite{rfc5246}, the next version being developed by the IETF~\cite{tls13-05}.
 TLS uses X.509 certificates for the asymmetric cryptography used during the key exchange.
 Those certificates come in pair: one public and a second private, and rely on a chain of trust for the validity of the certificate.
 Usually, the term certificate is use for the public certificate, and private key for the corresponding private certificate.
 
-\noindent The figure~\ref{fig:tls-handshake} shows the messages exchanged during the establishement of a connection between two peers.
+\noindent The figure~\ref{fig:tls-handshake} shows the messages exchanged during the establishment of a connection between two peers.
 
 
 \begin{figure}[ht]
@@ -409,13 +409,13 @@ Application Data           <------->     Application Data
 	\item Client: ClientHello. The client sends a series of specifications to the server, such as the protocol version and the supported cipher suites.
 	\item Server: ServerHello and others. The server replies by setting the protocol and the cipher suite to use.
 	It can send its own certificate and request the client's.
-	In some cases, the server can already begin the key echange protocol (\textit{e.g.} Diffie-Hellman).
-	\item Client: ClientKeyExchange and others. The client veryfies the validity of the server certificate, if any, and sends its own. If necessary, the client may have to change its cipher specification based on the constraints of the server, or request a new specification from the server.
+	In some cases, the server can already begin the key exchange protocol (\textit{e.g.} Diffie-Hellman).
+	\item Client: ClientKeyExchange and others. The client verifies the validity of the server certificate, if any, and sends its own. If necessary, the client may have to change its cipher specification based on the constraints of the server, or request a new specification from the server.
 	The client can also participate in the key exchange protocol.
 	\item Server: Finished. If the client asked for a new cipher specification, the server can set a new one. Otherwise, the exchange is simply finished and the connection has been successfully established.
 \end{enumerate}
 
-Once the connection is established, the peers can exchange application data using the symmetric key negociated during the handshake.
+Once the connection is established, the peers can exchange application data using the symmetric key negotiated during the handshake.
 
 
 
@@ -427,7 +427,7 @@ Once the connection is established, the peers can exchange application data usin
 \subsection{IPsec}
 % IPsec as a protocol, strongswan come in the 'implementation' chapter.
 IPsec is a protocol whose implementation is a modification of the IP stack in the kernel space.
-It is a network/internet level security; it examines incomming IP packets and checks if there exists a security association with the destination, and decrypt it on-the-fly if necessary.
+It is a network/internet level security; it examines incoming IP packets and checks if there exists a security association with the destination, and decrypt it on-the-fly if necessary.
 
 % One of the main disadvantage compared to a user-space VPN is the difficulty to traverse NAT.
 
@@ -441,7 +441,7 @@ IPsec consist of three components~\cite{cryptoencyclopedia2011}, each defined in
 As~\citet{Paterson200672} present them, the SAs are used as repository for cryptographic parameters, and the SPD defines the policies to apply.
 If the SPD can be populated by hand, typically in a configuration file, the SA management should be left to an automated mechanism: the IKEv2.
 
-\noindent The IKEv2 protocol uses four different types of exchanges to fulfill its role:
+\noindent The IKEv2 protocol uses four different types of exchanges to fulfil its role:
 \begin{itemize}
 	\item \texttt{IKE\_SA\_INIT}: The two peers agree on cryptographic parameters to use. Among these is a Diffie-Hellman shared secret from which are derived symmetric keys used for a special IKE SA.
 	\item \texttt{IKE\_AUTH}: Once the peers are protected by the IKE SA, they can authenticate themselves to each other and add a first SA in the SA database (SADB).
@@ -468,17 +468,17 @@ This authentication covers the whole packet, whilst the confidentiality excludes
 The padding is needed when using block ciphers to obtain a payload which length is an integral multiple of the block length.
 
 \noindent The ESP payload includes an optional IV and an optional Traffic Flow Confidentiality (TFC) padding.
-The TFC padding allows to modify the length of the packet with dummy data, somewhat hiding the true nature of the payload.
+The TFC padding allows modifying the length of the packet with dummy data, somewhat hiding the true nature of the payload.
 It differs from the standard padding because its length is not limited to 255 bytes like the latter.
 
 \noindent AH is the same as ESP, except is does not offer encryption features, only the authentication.
 Since ESP can use a null cipher, it arguably offers the same features as AH.
-The existance of AH is actually historical; when the protocol was developed in the 1990s, there were laws in the United States and other countries preventing the export of product including encryption features.
+The existence of AH is actually historical; when the protocol was developed in the 1990s, there were laws in the United States and other countries preventing the export of product including encryption features.
 Having an authentication only counterparty allowed such product to be exported without encryption capabilities.\newline{}
 
 IPsec can be deployed in two modes: 
 \begin{itemize}
-	\item Transport for end-to-end service and protecting the payload. IPsec examines the incomming payload, checks it has not been tampered with and pass it to the next layer.
+	\item Transport for end-to-end service and protecting the payload. IPsec examines the incoming payload, checks it has not been tampered with and pass it to the next layer.
 	\item Tunnel protects the entire IP packet by encapsulating it into a new IP packet. As the destination contained in the new IP header can be different from the original, this mode can be used to manage gateways.
 \end{itemize}
 The figure~\ref{fig:ipsec-transport-tunnel} shows the space overhead imposed by AH and ESP in transport and tunnel modes.

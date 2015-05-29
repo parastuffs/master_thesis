@@ -2,15 +2,15 @@
 
 \section{Future work}\label{sec:future-work}
 
-Although the present work presents some promissing results, the implementation can certainly be improved in several ways and some further experiments should be conducted.
+Although the present work presents some promising results, the implementation can certainly be improved in several ways and some further experiments should be conducted.
 
 \paragraph{Driver improvement}
-The driver of the BA411E can be made less ressources hungry by improving the initialisation of the descriptors and their linking, but the gain would not be significant enough to justify the time investment at this point.
+The driver of the BA411E can be made less resources hungry by improving the initialisation of the descriptors and their linking, but the gain would not be significant enough to justify the time investment at this point.
 % TODO refer to a stack analysis of an ipsec file transfer, showing the most expensive instructions. If I remember correctly, it was something like the DMA transfer and DMA something freeing.
-A better alternative would be to avoid descriptors altogether by modifiying the interface with the IP so that it can use the scatterlists directly.
+A better alternative would be to avoid descriptors altogether by modifying the interface with the IP so that it can use the scatterlists directly.
 We would then spare a lot of DMA mapping instructions and thus some precious cycles on the software side.
 
-As we already remarked in section \ref{sec:implem-ba411e-driver}, the use cases involving IPsec were conducted using a previous revision of the driver still activelly polling the IP for its results.
+As we already remarked in section \ref{sec:implem-ba411e-driver}, the use cases involving IPsec were conducted using a previous revision of the driver still actively polling the IP for its results.
 A better and cleaner way to proceed is to use interruption routines.
 However, the kernel does not support their current implementation and panics upon usage.
 If one were to be willing to spend the time replacing the active polling by clean asynchronous interruptions, he should be aware of the overhead imposed by an interruption.
@@ -21,7 +21,7 @@ A more thorough comparison of the mutual trade-off deserves some investigation, 
 \paragraph{Registering public key verification with the Linux Crypto API}
 The BA414E driver is already capable of offloading a large portion of public key operations to the IP core, but only with very specific libraries at the time being -- OpenSSL in our case.
 The next step is to register the very same operations with the Linux Crypto API so they can be used without having to rely on a custom OpenSSL engine.
-This feature would require to work very closely to the linux kernel developpement.
+This feature would require to work very closely to the linux kernel development.
 Indeed, if the signature verification using public key cryptography has been available in the kernel since 2013, a public key encryption API has only been proposed in late April 2015~\cite{crypto-api-pk-encryption} and is still under request for comments.
 
 \paragraph{Conditional offloading in cryptodev}
@@ -29,16 +29,16 @@ Indeed, if the signature verification using public key cryptography has been ava
 The figure \ref{fig:openssl-speed} clearly shows a threshold on the packet size from which the hardware has a clear advantage, and below which the user mode software implementation is to go for.
 %TODO include a listing to where it could be a good place to branch on the packet size. I already found it.
 %TODO at least add a pseudo-code to illustrate this shit.
-Using this breakeven point, one could patch the cryptodev cryptodev engine of OpenSSL to branch on the packet size, using the hardware if the packet is large enough, or fallback on the default software implementation otherwise. %openssl-1.0.2a/crypto/engine/eng_cryptodev.c
+Using this break even point, one could patch the cryptodev cryptodev engine of OpenSSL to branch on the packet size, using the hardware if the packet is large enough, or fallback on the default software implementation otherwise. %openssl-1.0.2a/crypto/engine/eng_cryptodev.c
 It would probably not be as trivial and beneficial as it may sound:
 \begin{itemize}
 	\item the encryption contexts would need to be synchronized between the hardware and the software;
 	% \item we would already suffer from some context switches when sending the information to the cryptodev driver; %No, we are still in the openssl engine.
 	% \item if we always branch to the fallback functions, the time overhead due to crytodev would lower the performance; %No, we don't leave the user space, the overhead is minimum.
-	\item as the breakeven point is around 1024kB, the performance for a network application would be very close to those of a full software implementation, knowing that the ethernet frame size, the MTU, is set by default at 1500 bytes.
+	\item as the break even point is around 1024kB, the performance for a network application would be very close to those of a full software implementation, knowing that the ethernet frame size, the MTU, is set by default at 1500 bytes.
 \end{itemize}
 
-Such a conditional offloading would be interresting for applications involving mainly very large packets and a few periodic smaller ones, like large data transfer between two hosts on a infrastructure supporting ethernet jumbo frames\footnote{Jumbo frames have an ethernet MTU of 9000 bytes, whilst standard frames are set to 1500.} with periodic ICMP heartbeats.
+Such a conditional offloading would be interesting for applications involving mainly very large packets and a few periodic smaller ones, like large data transfer between two hosts on a infrastructure supporting ethernet jumbo frames\footnote{Jumbo frames have an ethernet MTU of 9000 bytes, whilst standard frames are set to 1500.} with periodic ICMP heartbeats.
 
 \paragraph{Disk encryption}
 As the hardware is better used with larger blocks of data, disk encryption could be an interesting application to look into.
@@ -46,7 +46,7 @@ As the hardware is better used with larger blocks of data, disk encryption could
 \paragraph{Cryptographic libraries}
 OpenSSL is not the only cryptographic library available; GnuTLS is also a very popular alternative and supports cryptodev engines too.
 
-However, one library definitely worth to keep an eye on is mbed TLS, formally known as PolarSSL, recently bought by ARM~\cite{2015-arm-buy-polarssl}.
+However, one library definitely worth to keep an eye on is mbed TLS, formerly known as PolarSSL, recently bought by ARM~\cite{2015-arm-buy-polarssl}.
 We can expect the future releases of this library to be more optimized for ARM platforms, and maybe the software footprint and overhead to be reduced.
 
 
@@ -70,16 +70,16 @@ This thesis studied the implementation of cryptographic protocols on a platform 
 The analysis of the results lead to the conclusion that a user-space VPN such as OpenVPN is not a good choice when the objective is to profit from a dedicated physical device.
 Instead, if one has all the operations he wants registered in the kernel, he should turn toward IPsec.
 OpenVPN took over the market ten years ago when IPsec was not a standard feature of the Linux kernel yet and was quite complex to implement.
-Technologic inertia left OpenVPN at the top of the tree, but modern infrastructures should favor IPsec.\newline{}
+Technological inertia left OpenVPN at the top of the tree, but modern infrastructures should favour IPsec.\newline{}
 
 Security is needed everywhere.
-But security is ressource-hungry, and consequently increase the power consumption of the platform.
-An ARM core is not meant for comple cryptographic operations.
-Combining it with an FPGA like Altera did opens a new field of application for such a SoC platform.
-Embedding this SoC into a low-energy platform could add cryptogrpahic capabilities in places it was not possible before.
+But security is resource-hungry, and consequently increase the power consumption of the platform.
+An ARM core is not meant for complex cryptographic operations.
+Combining it with an FPGA like Altera did open a new field of application for such a SoC platform.
+Embedding this SoC into a low-energy platform could add cryptographic capabilities in places it was not possible before.
 
-The strength of this systems also lies into its configurability.
-It is not a closed and frozen system, the client has a plaform that can evolve and is reconfigurable according to his needs.\newline{}
+The strength of this systems also lies into its reconfigurability.
+It is not a closed and frozen system, the client has a platform that can evolve and is reconfigurable according to his needs.\newline{}
 
 This work is just the beginning of something bigger.
 This constitutes a preliminary proof-of-concept for the integration of cryptographic protocols.
