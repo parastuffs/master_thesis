@@ -61,11 +61,30 @@ As such, any real day-to-day use case can not be fully offloaded to hardware yet
 The implementation of the GCM mode, combining encryption and authentication, showed us that stopping relying on the software implementation of MACs would be a huge step forward.
 
 
-% This work is just the beginning of something far larger. The aim is to build a fully secured platform, from software to hardware, using maximum security at each stage.
+
+
 
 \section{Conclusion}
 
+This thesis studied the implementation of cryptographic protocols on a platform with hardware offloading, using realistic use cases.
+The analysis of the results lead to the conclusion that a user-space VPN such as OpenVPN is not a good choice when the objective is to profit from a dedicated physical device.
+Instead, if one has all the operations he wants registered in the kernel, he should turn toward IPsec.
+OpenVPN took over the market ten years ago when IPsec was not a standard feature of the Linux kernel yet and was quite complex to implement.
+Technologic inertia left OpenVPN at the top of the tree, but modern infrastructures should favor IPsec.\newline{}
 
+Security is needed everywhere.
+But security is ressource-hungry, and consequently increase the power consumption of the platform.
+An ARM core is not meant for comple cryptographic operations.
+Combining it with an FPGA like Altera did opens a new field of application for such a SoC platform.
+Embedding this SoC into a low-energy platform could add cryptogrpahic capabilities in places it was not possible before.
 
-Security is everywhere.
-But security is not cheap, security is power-hungry.
+The strength of this systems also lies into its configurability.
+It is not a closed and frozen system, the client has a plaform that can evolve and is reconfigurable according to his needs.\newline{}
+
+This work is just the beginning of something bigger.
+This constitutes a preliminary proof-of-concept for the integration of cryptographic protocols.
+The aim is to build a fully secured platform, from software to hardware, using maximum security at each stage.
+
+\begin{center}
+Security is the goal, hardware offloading is the way.
+\end{center}
