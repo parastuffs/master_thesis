@@ -34,7 +34,7 @@
         (8000, 2.997)
         (16000, 4.703)
     };
-    \label{none-none}
+    \label{none:none}
 
 \addplot[style={OliveGreen, fill=OliveGreen},postaction={pattern=north east lines}]
     coordinates {
@@ -44,7 +44,7 @@
         (16000, 6.426)
 
     };
-    \label{soft-cbc256-none}
+    \label{soft-cbc256:none}
 
 \addplot[style={OliveGreen, fill=OliveGreen}]
     coordinates {
@@ -54,9 +54,9 @@
         (16000, 7.975)
 
     };
-    \label{soft-cbc256-sha256}
+    \label{soft-cbc256:sha256}
 
-\legend{raw, none-none, soft-cbc256-none, soft-cbc256-sha256}
+\legend{raw, none:none, soft-cbc256:none, soft-cbc256:sha256}
 \end{axis}
 \end{tikzpicture}
 % Here, I could show the gcm256, which show better performances with the BA411e, but I would be weird to compare it with aes256cbc.

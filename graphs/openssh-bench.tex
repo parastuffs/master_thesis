@@ -27,7 +27,7 @@
         (aes256cbc:none, 96.26)
         (aes256cbc:sha256, 89.29)
     };
-    \label{software}
+    \label{software-cpu}
 
 \addplot[style={black,fill=RedOrange,postaction={pattern=north east lines},mark=none}]
     coordinates {
@@ -35,7 +35,7 @@
         (aes256cbc:none, 46.01)
         (aes256cbc:sha256, 68.19)
     };
-    \label{ba411e}
+    \label{ba411e-cpu}
 
 \addplot[style={black,fill=gray,postaction={pattern=north east lines},mark=none}]
     coordinates {
@@ -43,8 +43,7 @@
         (aes256cbc:none, 0)
         (aes256cbc:sha256, 0)
     };
-    \label{out-of-tunnel}%"oot" for "out of tunnel"
-\legend{software, ba411e, out-of-tunnel}
+    \label{out-of-tunnel-cpu}%"oot" for "out of tunnel"
 \end{axis}
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -59,13 +58,13 @@
         bar width=8pt,
         enlarge x limits={abs=1},
         ymajorgrids = true,
-        ylabel = {Throughtput [MB/s]},
+        ylabel = {Throughput [MB/s]},
         xlabel = {},
         ymin=0, ymax=12,
         symbolic x coords={oot, none:none, aes256cbc:none, aes256cbc:sha256},
         xtick = data,
         scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
-        legend style={at={(0.5,-0.25)}, anchor=north,legend columns=2},
+        legend style={at={(0.5,-0.15)}, anchor=north,legend columns=4},
         enlarge x limits=0.1,
     ]
 
@@ -75,7 +74,7 @@
         (aes256cbc:none, 10.89)
         (aes256cbc:sha256, 8.19)
     };
-    \label{soft-tp}
+    \label{software}
 
 \addplot[style={black,fill=BrickRed,mark=none}]
     coordinates {
@@ -83,7 +82,7 @@
         (aes256cbc:none, 10.67)
         (aes256cbc:sha256, 10.39)
     };
-    \label{ba411e-tp}
+    \label{ba411e}
 
 \addplot[style={black,fill=black,mark=none}]
     coordinates {
@@ -91,8 +90,8 @@
         (aes256cbc:none, 0)
         (aes256cbc:sha256, 0)
     };
-    \label{oot-tp}%"tp" for "throughput"
-\legend{}
+    \label{out-of-tunnel}%"tp" for "throughput"
+\legend{software, ba411e, out-of-tunnel}
 \end{axis}
 
 \end{tikzpicture}

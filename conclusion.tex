@@ -7,11 +7,11 @@ Although the present work presents some promissing results, the implementation c
 \paragraph{Driver improvement}
 The driver of the BA411E can be made less ressources hungry by improving the initialisation of the descriptors and their linking, but the gain would not be significant enough to justify the time investment at this point.
 % TODO refer to a stack analysis of an ipsec file transfer, showing the most expensive instructions. If I remember correctly, it was something like the DMA transfer and DMA something freeing.
-A better alternative would be to avoid descriptors altogether by modifiying the interface with the IP so that it can use the scatterlist directly.
-We would then spare a lot of DMA mapping instruction and thus some precious cycles on the software side.
+A better alternative would be to avoid descriptors altogether by modifiying the interface with the IP so that it can use the scatterlists directly.
+We would then spare a lot of DMA mapping instructions and thus some precious cycles on the software side.
 
-As we already remarked in \ref{sec:section-where-we-see-the-CPU-usage-of-ba411e-usage-with-active-polling}, the use cases involving IPsec were conducted using a previous revision of the driver still activelly polling the IP for its results.
-A better and cleaner way to proceed is to use interruption routines, as shown in \ref{sec:section-ba411e-with-irq}.
+As we already remarked in section \ref{sec:implem-ba411e-driver}, the use cases involving IPsec were conducted using a previous revision of the driver still activelly polling the IP for its results.
+A better and cleaner way to proceed is to use interruption routines.
 However, the kernel does not support their current implementation and panics upon usage.
 If one were to be willing to spend the time replacing the active polling by clean asynchronous interruptions, he should be aware of the overhead imposed by an interruption.
 In some cases, when the operation is just a few clock cycle long for the IP, an active polling could still be the better way to go.
@@ -19,8 +19,8 @@ A more thorough comparison of the mutual trade-off deserves some investigation, 
 
 
 \paragraph{Registering public key verification with the Linux Crypto API}
-As we saw in \ref{sec:section-with-RSA-BA414}, the driver is already capable of offloading a large portion of public key operations to the IP, but only with very specific libraries at the time being -- openSSL in our case.
-The next step is to register the very same operations with the Linux Crypto API so it can be used without having to rely on a custom openSSL engine.
+The BA414E driver is already capable of offloading a large portion of public key operations to the IP core, but only with very specific libraries at the time being -- OpenSSL in our case.
+The next step is to register the very same operations with the Linux Crypto API so they can be used without having to rely on a custom OpenSSL engine.
 This feature would require to work very closely to the linux kernel developpement.
 Indeed, if the signature verification using public key cryptography has been available in the kernel since 2013, a public key encryption API has only been proposed in late April 2015~\cite{crypto-api-pk-encryption} and is still under request for comments.
 
@@ -38,7 +38,7 @@ It would probably not be as trivial and beneficial as it may sound:
 	\item as the breakeven point is around 1024kB, the performance for a network application would be very close to those of a full software implementation, knowing that the ethernet frame size, the MTU, is set by default at 1500 bytes.
 \end{itemize}
 
-Such a conditional offloading would be interresting for applications involving mainly very large packets and a few periodic smaller ones, like large data transfer between two hosts on a infrastructure supporting ethernet jumbo frames\footnote{Jumbo frames have an ethernet MTU of 9000 bytes, whilst standard frames are set to 1500.} with periodic ICMP heartbeat.
+Such a conditional offloading would be interresting for applications involving mainly very large packets and a few periodic smaller ones, like large data transfer between two hosts on a infrastructure supporting ethernet jumbo frames\footnote{Jumbo frames have an ethernet MTU of 9000 bytes, whilst standard frames are set to 1500.} with periodic ICMP heartbeats.
 
 \paragraph{Disk encryption}
 As the hardware is better used with larger blocks of data, disk encryption could be an interesting application to look into.
@@ -55,7 +55,7 @@ If patches adding the GCM support to cryptodev have already been released, those
 Adapting the interface would open the GCM hardware offload to the whole user space applications park.
 
 \paragraph{MAC offloading}
-While the symetric and asymetric encryption ciphers IPs are usable from the operating system, the IP computing MACs does not have a usable driver yet.
+While the symmetric and asymmetric encryption ciphers IP cores are usable from the operating system, the IP core computing MACs does not have a usable driver yet.
 Wherever there is encryption, authentication is also needed.
 As such, any real day-to-day use case can not be fully offloaded to hardware yet, even if some tricks and patches allowed us to bypass this requirement.
 The implementation of the GCM mode, combining encryption and authentication, showed us that stopping relying on the software implementation of MACs would be a huge step forward.

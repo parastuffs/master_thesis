@@ -107,7 +107,10 @@ Such implementation are used when an adminstrator wishes to secure a whole local
 In this case, there exist router firmware packages running OpenVPN, such as DD-WRT and OpenWRT.
 Whatever the method used, the crucial point is that the VPN tunnel usage is transparent to the application.\newline{}
 
-OpenVPN relies on a cryptographic library, OpenSSL in our case, for all the security operations: encryption, signature, certificate management, etc.
+OpenVPN relies on a cryptographic library, OpenSSL in our case, for all the security operations: encryption, signature, certificate management, etc.\newline{}
+
+A previous study highlighted that OpenVPN would divide the throughput by two from raw to tunneled without encryption nor authentication~\cite{Hoekstra2011}.
+Such a behaviour would not be surprising, considered all the transfers and context switches the data would have to operate and provoke in an OpenVPN tunnel.
 
 \noindent Note that if one wants to use the \texttt{none} cipher with a version of OpenVPN ealier than 2.3.7, he would have to update it using a community patch~\cite{openvpn-patch-none}.
 
@@ -115,6 +118,11 @@ OpenVPN relies on a cryptographic library, OpenSSL in our case, for all the secu
 \subsection{OpenSSH}
 % Talk about the MAC=none patch
 % connection using SSL/TLS, then AES, but without fragmentation (unlike openvpn)
+OpenSSH is an implementation of the Secure Shell (SSH) network protocol defined in RFC 4251~\cite{rfc4251}.
+SSH lies in the application layer, as does SSL/TLS.
+It is very close to SSL/TLS in its principle and can also establish secure channel between two peers, ensuring confidentiality and authentication for the communication.
+However, this work focus is on OpenVPN and the underlying SSL/TLS protocol, and as such SSH is not studied any further than a comparison use case.\newline{}
+
 OpenSSH relies on an external cryptographic library for all its security operations.
 Up until the version 6.7 published in october 2014, it had to be compiled against OpenSSL.
 However, after the infamous security vulnerability heartbleed in april 2014, the developpers took a step to move towards LibreSSL, a fork of OpenSSL managed by OpenBSD  developers.
@@ -237,14 +245,14 @@ The following description addresses all the kernel modules required to run all t
 
 
 \begin{description}
-	\item[\texttt{aes\_arm}] Assembly implementation of AES. This version is optimized to use the ARMv7 instruction set.
+	\item[\texttt{aes\_arm}] Assembly implementation of AES. This version is optimized to use the ARMv7 NEON instruction set.
 	\item[\texttt{sha256-generic}] C implementation of SHA-256.
-	\item[\texttt{gfmult128}] Multiplication in $GF(2^128)$, needed by the GCM mode.
+	\item[\texttt{gfmult128}] Multiplication in $GF(2^{128})$, needed by the GCM mode.
 	\item[\texttt{ghash}] GHASH function needed by the authentication of the GCM mode.
 	\item[\texttt{seqiv}] Sequence IV number generator, needed by the CTR and GCM modes.
 	\item[\texttt{cbc}] C based CBC mode.
-	\item[\texttt{gcm}] C base GCM mode.
-	\item[\texttt{crypto\_null}] Null cipher. This basically does nothing on the plaintext, but it is still needed to propose the interface in the kernel.
+	\item[\texttt{gcm}] C based GCM mode.
+	\item[\texttt{crypto\_null}] Null cipher. This basically does nothing on the plaintext, but it is still needed to make the interface available in the kernel.
 	\item[\texttt{tun}] TUN/TAP network device, needed by OpenVPN.
 	\item[\texttt{xfrm\_user}] XFRM operations.
 	\item[\texttt{esp4}] IPv4 ESP implementation. The AH counterparty is also available in the \texttt{ah4} module.
@@ -258,6 +266,7 @@ The following description addresses all the kernel modules required to run all t
 The table~\ref{tab:ip-ciphers} summarizes the ciphers supported by the two Barco Silex' IP cores used in this work.
 
 \begin{table}[ht]
+\center
 \begin{tabular}{|l|c|}\hline
 IP core & Ciphers \\ \hline
 BA414E & RSA, DH, DSA, ECDSA, ECDH \\ 
@@ -270,7 +279,7 @@ BA411E & AES modes CBC, CTR, GCM, CCM, CFB, OFB, XTS, ECB \\ \hline
 For this tests, only one instance of each IP core will be programmed on the FPGA.
 As all the tests will be single-threaded, having two or more instances of the same IP core would not improve the performance, as they could not be used in parallel anyway.
 
-\subsection{BA411E Driver}
+\subsection{BA411E Driver}\label{sec:implem-ba411e-driver}
 This driver takes the rightern path of figure~\ref{fig:os-path-generic-b}, which is the best because the most versatile.
 By pluging the driver into the Linux Crypto API, we offer a standard kernel interface that can be used by any other kernel driver, such as the ESP driver, or user-space applications via the cryptodev driver and OpenSSL engine.
 

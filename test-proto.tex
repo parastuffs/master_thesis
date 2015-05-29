@@ -81,7 +81,7 @@ We will use two types of drivers for the BA411E: an interuption-based for OpenVP
 
 All the tests will be conducted with the ESP protocol in tunnel mode, so that we have the worst case scenario; as AH imposes a smaller overhead, the perfomance could only be better.
 
-\section{TLS Connections}
+\subsection{TLS Connections}
 This benchmark is done only with OpenVPN 2.3.6.
 Since there is no standard support for those operation in the kernel yet, it would not have made sense to use IPsec, since it would have had to fallback to OpenSSL, then following the same path as OpenVPN do.
 As soon as the public key operations can be plugged into the Linux Crypto API, this use case should however be tested.
@@ -100,7 +100,7 @@ As this experiment can be very unstable and vastly depends on the operating syst
 The security parameter tested is a standard TLS-DHE-RSA, hence forcing the peers the renogociate a new shared secret and ephemeral Diffie-Hellman parameters at each connection attempt.
 
 
-\section{Response time -- latency}
+\subsection{Response time -- latency}
 This use case exchanges ICMP request of various sizes via the \texttt{ping} command.
 The initiating peer sends an ICMP echo request to the remote peer, which then answers with an ICMP echo reply.
 
@@ -113,7 +113,7 @@ for i in 56 1000 8000 16000; do
 done
 \end{lstlisting}
 
-\section{File transfer}
+\subsection{File transfer}
 The file transfered is an uncompressed block of 128MB of random data generated using the following command:
 \begin{lstlisting}[language=bash]
   $ head -c $((1024*1024*128)) /dev/urandom > heavy.file
@@ -128,4 +128,4 @@ In order to use custom temporary security configuration with \texttt{scp}, the f
 
 
 All the results on the throughput and CPU usage take into account only the file transfer.
-The server authentication, the connection establishement and any other securoty negociation is ignored in this particular test case.
+The server authentication, the connection establishement and any other security negociation is ignored in this particular test case.

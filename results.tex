@@ -35,8 +35,8 @@ Those are summarized in table~\ref{tab:openvpn-con-time}.
 \end{table}
 
 It already shows that when using the hardware, the connection latency is divided by 2 for low security RSA, and up to by 7.8 for higher security parameters.
-The figure~\ref{fig:openvpn-tls-bench} shows the number of TLS connections per minute for three RSA exponent sizes: 1024-, 2048- and 4096-bit.
-The higher the exponent size, the higher the performance boost.
+The figure~\ref{fig:openvpn-tls-bench} shows the number of TLS connections per minute for three RSA key sizes: 1024-, 2048- and 4096-bit.
+The higher the key size, the higher the performance boost.
 
 
 \begin{table}[ht]
@@ -65,18 +65,19 @@ It should be noted that at this point, the number of clients is probably too low
 It is however an interesting comparison case with the next level of security: RSA-2048.
 
 \noindent RSA-2048 is a much more common configuration, espacially since the NIST deprecated RSA-1024 in 2013.
-The full software implementation is visibly affected by the increase of the exponent size: the CPU usage doubles and the server processes three time less connections.
+The full software implementation is visibly affected by the increase of the key size: the CPU usage doubles and the server processes three time less connections compared to the RSA-1024 results.
 At the same time, the hardware loses less than 20\% connections for a third of the CPU usage.
 %TODO check if it is hardware limited or limited by the performances of the VM. It is not to be forgotten that it has to keep up with the server, even when the latter is helped by the high-performance hardware. My guess is that the VM is capping the perf, hence the exact same CPU usage for RSA-2048 and RSA-4096.
 
-\noindent The results obtained for RSA-4096 can be interpreted similarly to those of RSA-2048, except that the CPU usage is exactly the same for th hardware configuration.
+\noindent The results obtained for RSA-4096 can be interpreted similarly to those of RSA-2048, except that the CPU usage is exactly the same for the hardware configuration.
 One way too look at those results is to directly compare the raw performance, and the hardware can then process almost six times more connections per minute than the software.
 However, this is only half of it, since it leaves the CPU usage drop aside.
 If we look at the efficiency, the software can process 0.24 connection per percentage of CPU usage, whilst the hardware can process 24 of them.
 The efficiency is thus multipled by a factor 1000.
 
 Such interesting results, particularly regarding the CPU usage, are possible because at least 87\% of the operations are RSA and Diffie-Hellman operations, which are entirely offloaded in hardware.
-Nevertheless, OpenVPN still needs to proceed to some extra computations (such as SHA-1 integrity), and the hardware operations are not instantaneous, so the performance gain can only be that high.
+Nevertheless, OpenVPN still needs to proceed to some extra computations (such as a default SHA-1 integrity), and the hardware operations are not instantaneous, so the performance gain can only be that high.
+Having a CPU usage of less than 5\% for both RSA-2048 and -4096 in hardware shows that the device is actually the bottleneck at this point.
 
 
 
@@ -97,11 +98,11 @@ Nevertheless, OpenVPN still needs to proceed to some extra computations (such as
 The following tests are conducted after the connection has been established, so as the clients do not need to undergo any new key negociation.
 
 \subsection{OpenVPN}
-The figures~\ref{fig:ping-benchmark-openvpn}~and~\ref{fig:ping-benchmark-openvpn-soft} shows the results for different payload sizes, which raw results are presented in table~\ref{tab:ping-benchmark-openvpn}
+The figures~\ref{fig:ping-benchmark-openvpn-soft}~and~\ref{fig:ping-benchmark-openvpn} shows the results for different payload sizes, whose raw results are presented in table~\ref{tab:ping-benchmark-openvpn}
 
 \begin{figure}[ht]
 \input{graphs/openvpn-ping-benchmark-soft}
-\caption{OpenVN: ping average response time -- software}{Compares the response for different packet size when using a full-software implementation. OpenVPN adds up to 53\% extra delay when not using encryption nor authentication (none:none).}
+\caption{OpenVPN: ping average response time -- software}{Compares the response for different packet size when using a full-software implementation. OpenVPN adds up to 53\% extra delay when not using encryption nor authentication (none:none).}
 \label{fig:ping-benchmark-openvpn-soft}
 \end{figure}
 
@@ -117,20 +118,20 @@ The figures~\ref{fig:ping-benchmark-openvpn}~and~\ref{fig:ping-benchmark-openvpn
 \begin{tabular}{l|c|c|c|c|} \cline{2-5}
  & 56B & 1000B & 8000B & 16000B \\ \hline
 \multicolumn{1}{|l|}{raw} & 1.444 & 1.929 & 2.811 & 4.322 \\ \hline
-\multicolumn{1}{|l|}{none-none} & 2.066 & 2.561 & 4.293 & 6.117 \\ \hline
-\multicolumn{1}{|l|}{soft-cbc256-none} & 2.044 & 2.760 & 5.092 & 7.166\\ \hline
-\multicolumn{1}{|l|}{ba411e-cbc256-none} & 2.301 & 2.783 & 5.377 & 8.009\\ \hline
-\multicolumn{1}{|l|}{soft-cbc256-sha256} & 2.415 & 3.061 & 5.997 & 9.135 \\ \hline
-\multicolumn{1}{|l|}{ba411e-cbc256-sha256} & 2.416 & 3.052 & 5.963 & 9.207 \\ \hline
+\multicolumn{1}{|l|}{none:none} & 2.066 & 2.561 & 4.293 & 6.117 \\ \hline
+\multicolumn{1}{|l|}{soft-cbc256:none} & 2.044 & 2.760 & 5.092 & 7.166\\ \hline
+\multicolumn{1}{|l|}{ba411e-cbc256:none} & 2.301 & 2.783 & 5.377 & 8.009\\ \hline
+\multicolumn{1}{|l|}{soft-cbc256:sha256} & 2.415 & 3.061 & 5.997 & 9.135 \\ \hline
+\multicolumn{1}{|l|}{ba411e-cbc256:sha256} & 2.416 & 3.052 & 5.963 & 9.207 \\ \hline
 \end{tabular}
-\caption{OpenVN: ping average response time}{the latency is given in milliseconds.}
+\caption{OpenVN: ping average response time}{the latency is given in milliseconds. The key is <implementation>-<encryption>:<authentication>. The difference between ``raw" an ``none:none" is that the former is processed outside the tunnel, whilst the latter is processed inside the tunnel, but without encryption/authentication.}
 \label{tab:ping-benchmark-openvpn}
 \end{table}
 
-Firstly, is the impact of OpenVPN's operation on the delay: when no encryption nor authentication is used, the exchange is 33\% to 53\% longer. This is simply because the packet has to go through a virtual interface, hence even without the security time overhead, the latency is much longer.
+First is the impact of OpenVPN's operation on the delay: when no encryption nor authentication is used, the exchange is 33\% to 53\% longer. This is simply because the packet has to go through a virtual interface, hence even without the security operations time overhead, the latency is much longer.
 
 When combining encryption and authentication, the software and hardware implementation are neck and neck.
-Eventhough the MAC is not offload, the hardware implementation could have performed better.
+Eventhough the MAC is not offloaded, the hardware implementation could have performed better.
 The reason is not only all the packets have to go through a virtual interface in the kernel, the payload also has to be sent to the hardware through the kernel.
 In the end, a packet will undergo two full round trips between the user and the kernel space, that is one more than a regular software implementation, plus a final transfer to the physical interface.
 
@@ -144,7 +145,7 @@ The CPU usage is not even worth mentioning as the operation is only a few millis
 
 
 \subsection{IPsec}\label{sec:lantecy-ipsec}
-The figures~\ref{fig:ping-benchmark-ipsec} and \ref{fig:ping-benchmark-ipsec-soft-hard}  studies the same payload size as OpenVPN, but with an extra software implementation of AES mode GCM. The raw results are in table~\ref{tab:ping-benchmark-ipsec}.
+The figures~\ref{fig:ping-benchmark-ipsec-soft} and \ref{fig:ping-benchmark-ipsec-soft-hard}  studies the same payload size as OpenVPN, but with an extra software implementation of AES mode GCM. The raw results are in table~\ref{tab:ping-benchmark-ipsec}.
 
 \begin{figure}[ht]
 \input{graphs/ipsec-ping-benchmark-soft}
@@ -160,7 +161,7 @@ The figures~\ref{fig:ping-benchmark-ipsec} and \ref{fig:ping-benchmark-ipsec-sof
 \subfloat[\label{fig:ping-benchmark-ipsec}CBC]{%
 	\input{graphs/ipsec-ping-benchmark}
 }
-\caption{IPsec: ping average response time -- software/Hardware}{\newline{}(a) Processing GCM in hardware yields at least as good results as CBC. Comparing the CBC mode without authentication in hardware with the GCM mode in software thus makes sense.\newline{}(b) With or without authentication, the better results by the same margin.}
+\caption{IPsec: ping average response time -- software/Hardware}{\newline{}(a) Processing GCM in hardware yields at least as good results as CBC. Comparing the CBC mode without authentication in hardware with the GCM mode in software thus makes sensena yields 42\% less delay for larger payload size.\newline{}(b) With or without authentication, the hardware offers better results up to 13\% less delay.}
 \label{fig:ping-benchmark-ipsec-soft-hard}
 \end{figure}
 
@@ -170,21 +171,21 @@ The figures~\ref{fig:ping-benchmark-ipsec} and \ref{fig:ping-benchmark-ipsec-sof
 \begin{tabular}{l|c|c|c|c|} \cline{2-5}
  & 56B & 1000B & 8000B & 16000B \\ \hline
 \multicolumn{1}{|l|}{raw} & 1.444 & 1.929 & 2.811 & 4.322 \\ \hline
-\multicolumn{1}{|l|}{none-none} & 1.545 & 2.045 & 2.997 & 4.703 \\ \hline
-\multicolumn{1}{|l|}{soft-cbc256-none} & 1.581 & 2.134 & 3.910 & 6.426 \\ \hline
-\multicolumn{1}{|l|}{ba411e-cbc256-none} & 1.639 & 2.080 & 3.445 & 5.345 \\ \hline
-\multicolumn{1}{|l|}{soft-cbc256-sha256} & 1.645 & 2.322 & 4.762 & 7.975 \\ \hline
-\multicolumn{1}{|l|}{ba411e-cbc256-sha256} & 1.635 & 2.246 & 4.170 & 6.929 \\ \hline
+\multicolumn{1}{|l|}{none:none} & 1.545 & 2.045 & 2.997 & 4.703 \\ \hline
+\multicolumn{1}{|l|}{soft-cbc256:none} & 1.581 & 2.134 & 3.910 & 6.426 \\ \hline
+\multicolumn{1}{|l|}{ba411e-cbc256:none} & 1.639 & 2.080 & 3.445 & 5.345 \\ \hline
+\multicolumn{1}{|l|}{soft-cbc256:sha256} & 1.645 & 2.322 & 4.762 & 7.975 \\ \hline
+\multicolumn{1}{|l|}{ba411e-cbc256:sha256} & 1.635 & 2.246 & 4.170 & 6.929 \\ \hline
 \multicolumn{1}{|l|}{soft-gcm256} & 1.651 & 2.388 & 5.383 & 9.241 \\ \hline
 % \multicolumn{1}{|l|}{ba411e-gcm256} & 1.764 & 2.286 & -- & --  \\ \hline
 \end{tabular}
-\caption{IPsec: ping average response time}{the latency is given in milliseconds. Some results for the GCM mode in hardware are non-existant.}
+\caption{IPsec: ping average response time}{the latency is given in milliseconds. Even if there is no results for a hardware implementation of GCM, the result should have been close to those of \textit{ba411e-cbc256:none}.}
 \label{tab:ping-benchmark-ipsec}
 \end{table}
 
 In this case, the time overhead imposed by IPsec is not larger than 9\%, corroborating the results of~\citet{Xenakis20063225}.
 
-When combining encryption and authentication, the hardware implementation steadily takes the advantage over the software with the encrease of the payload length.
+When combining encryption and authentication, the hardware implementation steadily takes the advantage over the software with the increase of the payload length.
 If they both have the same latency at default payload size, the hardware is up to 13\% faster for 16000 bytes payloads.
 
 As for the GCM mode, the support in the BA411E driver is highly experimental and is not functional enough to be integrated in those results.
@@ -195,7 +196,7 @@ The figure~\ref{fig:ping-benchmark-ipsec-gcm} shows an improved delay by up to 4
 
 
 \subsection{Comparison}
-The figure~\ref{fig:ping-benchmark-comparison} summarizes the results for OpenVPN and IPsec for the most realistic use case: the combination of encryption and authentication.
+The figure~\ref{fig:ping-benchmark-comparison} summarizes the results for OpenVPN and IPsec for the most realistic use case: the combination of encryption and authentication (aes256cbc:sha256).
 
 \begin{figure}[ht]
 \input{graphs/ping-bench-comparison}
@@ -209,7 +210,7 @@ Even if those configurations are not realistic, it puts forward the advantage of
 As for the combination of encryption and authentication, IPsec is between 13\% and 32\% faster than OpenVPN.
 IPsec loses its advantage with the increase of the payload size, the time lost when moving around the data between the user and the kernel space being less important compared to the security operations.
 
-\noindent In hardware, as OpenVPN could not take advantage of the accelaration of the encryption, IPsec is even faster, ranging from 25\% to 33\% faster than OpenVPN.
+\noindent In hardware, as OpenVPN could not take effeciently advantage of the accelaration of the encryption, IPsec is even faster, ranging from 25\% to 33\% faster than OpenVPN.
 
 
 
@@ -257,7 +258,7 @@ The raw results are gathered in table~\ref{tab:openssh-bench}.
 \multicolumn{1}{|c|}{Software} & -- & -- & 10.89 & 96.26 & 8.19 &  89.29 \\ \hline
 \multicolumn{1}{|c|}{BA414E} & -- & -- & 10.67 & 46.01 & 10.39 & 68.19 \\ \hline
 \end{tabular}
-\caption{File transfer over an SSH tunnel}{The throughput is in MB/s.}
+\caption{File transfer over an SSH tunnel}{The throughput (Tp.) is in MB/s.}
 \label{tab:openssh-bench}
 \end{table}
 
@@ -275,7 +276,7 @@ The data is gathered in table~\ref{tab:openvpn-ftp-bench}.
 
 \begin{figure}[ht]
 \input{graphs/openvpn-ftp-bench}
-\caption{FTP file transfer over an OpenVPN tunnel}{The results inside the tunnel with no encryption nor authentication highlights the overhead OpenVPN adds to the transfer. From there, the throughput only change by a small extent. The poor hardware results also shows the heaviness of OpenVPN on hardware offloading. The background stripped bars are the CPU usage.}
+\caption{FTP file transfer over an OpenVPN tunnel}{The results inside the tunnel with no encryption nor authentication highlights the overhead OpenVPN adds to the transfer. From there, the throughput only changes by a small extent. The poor hardware results also shows the heaviness of OpenVPN on hardware offloading. The background stripped bars are the CPU usage.}
 \label{fig:openvpn-ftp-bench}
 \end{figure}
 
@@ -290,15 +291,16 @@ The data is gathered in table~\ref{tab:openvpn-ftp-bench}.
 \multicolumn{1}{|c|}{Software} & -- & -- & 4.78 & 76.60 & 3.87 & 76.03 \\ \hline
 \multicolumn{1}{|c|}{BA414E} & -- & -- & 3.35 & 83.74 & 2.84 & 80.89 \\ \hline
 \end{tabular}
-\caption{FTP file transfer over an OpenVPN tunnel}{The throughput is in MB/s.}
+\caption{FTP file transfer over an OpenVPN tunnel}{The throughput (Tp.) is in MB/s.}
 \label{tab:openvpn-ftp-bench}
 \end{table}
 
-As it was already the case for the ping benchmark, the overhead imposed by the manipulation of OpenVPN is extremely heavy: the CPU usage jumps from 7.16\% to 42.60\%, and the throughput drops by 55\%, from 11.39MB/s to 5.18MB/s.
+As it was already the case for the ping benchmark, the overhead imposed by the manipulations of OpenVPN is extremely heavy: without encryption nor authentication, the CPU usage jumps from 7.16\% outide the tunnel to 42.60\% inside, and the throughput drops by 55\%, from 11.39MB/s to 5.18MB/s.
 
-\noindent Surprisingly enough, encrypting the data only changes the throughput by 8\%, but the CPU usage is almost doubled.
-A fair interpretation would be that the encryption is no the bottleneck, the transfer bewteen the user and kernel mode, as well as the fragmentation, are.
-However for the hardware, the performance collapse to 3.35MB/s.
+\noindent Encrypting the data only changes the throughput by 8\%, but the CPU usage is almost doubled.
+Such a small decrease of performance is coherent with the results of the ping benchmark for the chunck of data size OpenVPN is supposed to process: around 1kB.
+% A fair interpretation would be that the encryption is not the bottleneck, the transfer bewteen the user and kernel mode, as well as the fragmentation, are.
+However for the hardware, the performance collapse to 3.35MB/s, 35\% less than without encryption.
 
 Adding a MAC computation aside the encryption lowers the performance in software and hardware by respectively 20\% and 15\%, for the same CPU usage as without authentication.
 
@@ -322,7 +324,7 @@ The figure~\ref{fig:ipsec-ftp-bench} gathers the results of the file transfer ov
 \multicolumn{1}{|c|}{Software} & -- & -- & 8.83 & 63.74 & 6.47 & 74.64 & 5.09 & 89.66 \\ \hline
 \multicolumn{1}{|c|}{BA414E} & -- & -- & 8.52 & 14.87 & 5.80 & 17.25 & -- & -- \\ \hline
 \end{tabular}
-\caption{FTP file transfer over an IPsec tunnel}{The throughput is in MB/s.}
+\caption{FTP file transfer over an IPsec tunnel}{The throughput (Tp.) is in MB/s.}
 \label{tab:ipsec-ftp-bench}
 \end{table}
 
@@ -333,22 +335,22 @@ As for the throughput, it lowers respectively by 14\% and 17\%.
 What could have been expected for the hardware implementation is a more stable throughput, but an increase of CPU usage for the few operations undergone by the BA411E driver, especially considering the fact that it uses active polling on the hardware.
 Thus, even if the hardware is the bottleneck, the CPU usage should be higher.
 
-\noindent An explanation could be that the operating system prevent the driver to monopolizing the CPU with its polling and preempt it regularly, effectively lowering the ressource usage, but also limiting the performance.
+\noindent An explanation could be that the operating system prevents the driver from monopolizing the CPU with its polling and preempts it regularly, effectively lowering the ressource usage, but also limiting the performance.
 
-Adding the authentication yields expected results for : an increase of CPU usage and lower throughput.
+Adding the authentication yields expected results: an increase of CPU usage and lower throughput.
 Both implementation lose 2MB/s and a CPU usage increase of 20\% and 16\%.
 
 In both cases, the hardware implementation exhibited slightly lower performance, but a CPU usage three to four times lower.
 On embedded platforms, this is as important as the raw performance, because lower CPU usage means underclocked CPU, resulting in a lower power consumption.\newline{}
 
-The softaware GCM results allows to open a discussion on this mode used in conjunction with IPsec.
+The softaware GCM results allow to open a discussion on this mode used in conjunction with IPsec.
 The GCM performance presented clearly shows a drop of throughput and an increase of CPU usage, illustrating the fact that those operations are hard on the software.
-With an hardware offload, we could expect not only a drastic drop of the CPU usage, but an increase of throughput as well, since it's CPU-limited in those results.
+With a hardware offload, we could expect not only a drastic drop of the CPU usage, but an increase of throughput as well, since the performance of the software is CPU-limited.
 As we already discussed with the latency results in section~\ref{sec:lantecy-ipsec}, the results of a hardware implementation of GCM should be at least as good as those of AES-CBC wihtout authentication.
 If it were the case, we would increase the throughput by at least 67\% and the decrease the CPU usage by at least 84\%.
 
 Note that the software results for the GCM are achieved using a C-based implementation of galois-field multiplications.
-As we saw in chapter~\ref{chap:theory}, modern processor designers tend to add specialized instruction sets aimed at AES-GCM enhancement.
+Modern processor designers tend to add specialized instruction sets aimed at AES-GCM enhancement~\cite{intel-gcm2011}, making assembly implementation more efficient.
 Should further tests be conducted concerning IPsec paired with GCM, it would be wise to compare with an assembly implementation exploiting ARM NEON instruction set.
 Some are being developed~\cite{Conrado2013,Danilo2013}, but none have been committed to the Linux kernel repository yet.
 
@@ -357,7 +359,7 @@ Some are being developed~\cite{Conrado2013,Danilo2013}, but none have been commi
 The figure~\ref{fig:ftp-bench-comparison} summarizes the file transfer performance for all the implementations, using the most realistic configuration tested: AES-256-CBC with SHA-256.
 \begin{figure}[ht]
 \input{graphs/ftp-bench-comparison}
-\caption{Comparison of file transfer methods}{Out of the three methods, OpenSSH is to be prefered is the raw performance is the objective, but IPsec offers an higher effeciency. At the same time, OpenVPN is worse on all fronts. The background stripped bars are the CPU usage.}
+\caption{Comparison of file transfer methods}{Out of the three methods, OpenSSH is to be prefered if the raw performance is the objective, but IPsec offers a higher effeciency. At the same time, OpenVPN is worse on all fronts. The background stripped bars are the CPU usage.}
 \label{fig:ftp-bench-comparison}
 \end{figure}
 
@@ -370,7 +372,7 @@ OpenVPN is however losing on all fronts. Not only it has the lowest throughput, 
 
 \noindent The table~\ref{tab:ftp-fragmentation} shows to what size are fragmented the packets by OpenVPN and IPsec.
 A look at the figure~\ref{fig:openssl-speed} shows that fragmenting at small size is a bad idea, especially when the hardware is reached from the user space.
-OpenVPN sends one third of its packets at sizes that are highly ineffective, whilst IPsec manages it better and limit the small packets to less than 10\%.
+OpenVPN sends one third of its packets at sizes that are highly ineffective, whilst IPsec manages a better frafmentation and limits the small packets to less than 10\% of the total.
 
 \begin{table}
 \center
@@ -390,7 +392,7 @@ OpenVPN sends one third of its packets at sizes that are highly ineffective, whi
 
 \begin{figure}[ht]
 \input{graphs/openssl-speed}
-\caption{OpenSSL benchmark for AES-256-CBC}{compare a run of \texttt{openssl speed} for three implementation of AES: in software by OpenSSL (soft), in software by the standard Linux kernel module (soft-drv) and in hardware (hard). The last two have to go through cryptodev in order to be reached from the user space.}
+\caption{OpenSSL benchmark for AES-256-CBC}{compare a run of \texttt{openssl speed} for three implementations of AES: in software by OpenSSL (soft), in software by the standard Linux kernel module (soft-drv) and in hardware (hard). The last two have to go through cryptodev in order to be reached from the user space.}
 \label{fig:openssl-speed}
 \end{figure}
 

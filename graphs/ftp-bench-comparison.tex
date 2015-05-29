@@ -28,7 +28,7 @@
         (OpenVPN, 76.03)
         (IPSec, 74.64)
     };
-    \label{software}
+    \label{software-cpu}
 
 \addplot[style={black,fill=RedOrange,postaction={pattern=north east lines},mark=none}]
     coordinates {
@@ -37,7 +37,7 @@
         (OpenVPN, 80.89)
         (IPSec, 17.25)
     };
-    \label{ba411e}
+    \label{ba411e-cpu}
 
 \addplot[style={black,fill=gray,postaction={pattern=north east lines},mark=none}]
     coordinates {
@@ -46,8 +46,7 @@
         (OpenVPN, 0)
         (IPSec, 0)
     };
-    \label{out-of-tunnel}%"oot" for "out of tunnel"
-\legend{software, ba411e, out-of-tunnel}
+    \label{out-of-tunnel-cpu}%"oot" for "out of tunnel"
 \end{axis}
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -62,13 +61,13 @@
         bar width=8pt,
         enlarge x limits={abs=1},
         ymajorgrids = true,
-        ylabel = {Throughtput [MB/s]},
+        ylabel = {Throughput [MB/s]},
         xlabel = {},
         ymin=0, ymax=12,
         symbolic x coords={Out-of-tunnel, openSSH, OpenVPN, IPSec},
         xtick = data,
         scaled y ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
-        legend style={at={(0.5,-0.25)}, anchor=north,legend columns=2},
+        legend style={at={(0.5,-0.15)}, anchor=north,legend columns=4},
         enlarge x limits=0.1,
     ]
 
@@ -79,7 +78,7 @@
         (OpenVPN, 3.87)
         (IPSec, 6.47)
     };
-    \label{soft-tp}
+    \label{software}
 
 \addplot[style={black,fill=BrickRed,mark=none}]
     coordinates {
@@ -88,7 +87,7 @@
         (OpenVPN, 2.84)
         (IPSec, 5.80)
     };
-    \label{ba411e-tp}
+    \label{ba411e}
 
 \addplot[style={black,fill=black,mark=none}]
     coordinates {
@@ -97,8 +96,8 @@
         (OpenVPN, 0)
         (IPSec, 0)
     };
-    \label{oot-tp}%"tp" for "throughput"
-\legend{}
+    \label{out-of-tunnel}%"tp" for "throughput"
+\legend{software, ba411e, out-of-tunnel}
 \end{axis}
 
 \end{tikzpicture}
