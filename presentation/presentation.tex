@@ -69,6 +69,17 @@
 \titlegraphic{\includegraphics[width=1.5cm]{ulbnorm}}
 \titlegraphicii{\includegraphics[width=1.5cm]{logo-polytech-seul}}
 
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% data
+%%%%%%%%%%%%%%%%%%%%%%%%
+\def\temperaturedata{temperaturesOslo.txt}
+\tikzstyle{maxmark} = [mark=*,mark options={color=red,scale=15}]
+\tikzstyle{minmark} = [mark=*,mark options={color=blue,scale=15}]
+
+
 \begin{document}
 
 \begin{frame}[plain, noframenumbering]
@@ -78,6 +89,92 @@
 \begin{frame}
 	%\tableofcontents[hideallsubsections]
 	\tableofcontents
+\end{frame}
+
+\begin{frame}
+
+
+
+
+\begin{tikzpicture}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+% throughput
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{axis}[
+        title = {FTP transfer inside an IPSec tunnel},
+        width  = 0.5*\textwidth,
+        height = 0.75\paperheight,
+        major x tick style = transparent,
+        xbar=10pt,
+        bar width=8pt,
+        % enlarge x limits={abs=1},
+        % ymajorgrids = true,
+        xlabel = {Throughput [MB/s]},
+        ylabel = {},
+        xmin=0, xmax=12,
+        symbolic y coords={oot, none:none, aes256cbc:none, aes256cbc:sha256, aes256gcm},
+        ytick = data,
+        scaled x ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
+        legend style={at={(0.5,-0.15)}, anchor=north,legend columns=4},
+        % enlarge x limits=0.1,
+    ]
+
+\addplot[style={black,fill=ForestGreen,mark=none}]
+    coordinates {
+        (0,none:none)
+        (8.83,aes256cbc:none)
+        (6.47,aes256cbc:sha256)
+        (5.09,aes256gcm)
+    };
+    \label{software}
+
+\addplot[style={black,fill=BrickRed,mark=none}]
+    coordinates {
+        (0,none:none)
+        (8.52,aes256cbc:none)
+        (5.80,aes256cbc:sha256)
+        (0,aes256gcm)
+    };
+    \label{ba411e}
+
+\addplot[style={black,fill=black,mark=none}]
+    coordinates {
+        (11.39,none:none)
+        (0,aes256cbc:none)
+        (0,aes256cbc:sha256)
+        (0,aes256gcm)
+    };
+    \label{out-of-tunnel}%"tp" for "throughput"
+
+\addplot[style={black,fill=MidnightBlue,mark=none}]
+    coordinates {
+        (10.21,none:none)
+        (0,aes256cbc:none)
+        (0,aes256cbc:sha256)
+        (0,aes256gcm)
+    };
+    \label{inside tunnel}
+% \legend{software, ba411e, out-of-tunnel, inside tunnel}
+\end{axis}
+
+\end{tikzpicture}
+\end{frame}
+
+
+\begin{frame}
+\begin{tikzpicture}[xscale=0.01, yscale=0.01]
+  % Draw the zero line
+  \draw[ultra thin, black!50] (1,0)--(365,0);
+  % Draw average temperature
+  \draw[ultra thin, black!20] (1,7.5)--(365,5.5);
+  % Plot temperature data and mark the maximum temperature
+  \draw[ultra thin] plot[smooth,maxmark, mark indices={192} ] 
+    file {\temperaturedata};
+  % Draw the minimum temperature mark.     
+  \draw[ultra thin] plot[smooth,only marks, minmark, mark indices={61}] 
+    file {\temperaturedata};
+\end{tikzpicture}
 \end{frame}
 
 
