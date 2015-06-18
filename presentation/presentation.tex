@@ -91,6 +91,23 @@
 	\tableofcontents
 \end{frame}
 
+
+\newsavebox{\tempbox}
+\savebox{\tempbox}{%
+\begin{tikzpicture}[xscale=0.01, yscale=0.01]
+  % Draw the zero line
+  \draw[ultra thin, black!50] (1,0)--(365,0);
+  % Draw average temperature
+  \draw[ultra thin, black!20] (1,7.5)--(365,5.5);
+  % Plot temperature data and mark the maximum temperature
+  \draw[ultra thin] plot[smooth,maxmark, mark indices={192} ] 
+    file {\temperaturedata};
+  % Draw the minimum temperature mark.     
+  \draw[ultra thin] plot[smooth,only marks, minmark, mark indices={61}] 
+    file {\temperaturedata};
+\end{tikzpicture}
+}
+
 \begin{frame}
 
 
@@ -103,7 +120,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%
 \begin{axis}[
         title = {FTP transfer inside an IPSec tunnel},
-        width  = 0.5*\textwidth,
+        width  = 0.9*\textwidth,
         height = 0.75\paperheight,
         major x tick style = transparent,
         xbar=10pt,
@@ -112,7 +129,7 @@
         % ymajorgrids = true,
         xlabel = {Throughput [MB/s]},
         ylabel = {},
-        xmin=0, xmax=12,
+        xmin=0, xmax=20,
         symbolic y coords={oot, none:none, aes256cbc:none, aes256cbc:sha256, aes256gcm},
         ytick = data,
         scaled x ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
@@ -128,6 +145,9 @@
         (5.09,aes256gcm)
     };
     \label{software}
+
+% Note: PGFplots does not allow to nest axis environments.
+\draw (axis cs: 16,none:none)node{\usebox{\tempbox}};
 
 \addplot[style={black,fill=BrickRed,mark=none}]
     coordinates {
