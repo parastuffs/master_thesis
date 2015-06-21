@@ -1,0 +1,57 @@
+%%%%%%%%%%%%%%%%%%%%%%%%
+% throughput
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{axis}[
+        % title = {FTP transfer inside an IPSec tunnel},
+        width  = \textwidth,
+        height = 0.75\paperheight,
+        major x tick style = transparent,
+        xbar=2pt,
+        bar width=8pt,
+        % enlarge x limits={abs=1},
+        xmajorgrids = true,
+        xlabel = {Throughput [MB/s]},
+        ylabel = {},
+        ylabel near ticks,
+        yticklabel pos=right,
+        xmin=0, xmax=15,
+        symbolic y coords={cipher null, aes:none, aes:sha},
+        ytick = data,
+        scaled x ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
+        legend style={at={(0.5,-0.15)}, anchor=north,legend columns=4},
+        % enlarge x limits=0.1,
+    ]
+
+\addplot[style={black,fill=ForestGreen,mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
+    coordinates {
+        (0,cipher null)
+        (8.83,aes:none)
+        (6.47,aes:sha)
+    };
+    \label{software}
+
+\addplot[style={black,fill=black,mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
+    coordinates {
+        (11.39,cipher null)
+        (0,aes:none)
+        (0,aes:sha)
+    };
+    \label{out-of-tunnel}%"tp" for "throughput"
+
+\addplot[style={black,fill=BrickRed,mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
+    coordinates {
+        (0,cipher null)
+        (8.52,aes:none)
+        (5.80,aes:sha)
+    };
+    \label{ba411e}
+
+\addplot[style={black,fill=MidnightBlue,mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
+    coordinates {
+        (10.21,cipher null)
+        (0,aes:none)
+        (0,aes:sha)
+    };
+    \label{inside tunnel}
+% \legend{software, ba411e, out-of-tunnel, inside tunnel}
+\end{axis}

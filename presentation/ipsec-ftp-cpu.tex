@@ -1,0 +1,58 @@
+%%%%%%%%%%%%%%%%%%%%%%%%
+% throughput
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{axis}[
+        % title = {FTP transfer inside an IPSec tunnel},
+        width  = \textwidth,
+        height = 0.75\paperheight,
+        major x tick style = transparent,
+        xbar=2pt,
+        bar width=8pt,
+        % enlarge x limits={abs=1},
+        xmajorgrids = true,
+        xlabel = {CPU usage},
+        ylabel = {},
+        % ylabel near ticks,
+        % yticklabel pos=right,
+        xmin=0, xmax=100,
+        symbolic y coords={cipher null, aes:none, aes:sha},
+        ytick = data,
+        ymajorticks=false,
+        scaled x ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
+        legend style={at={(0.5,-0.15)}, anchor=north,legend columns=4},
+        % enlarge x limits=0.1,
+    ]
+
+\addplot[style={black,fill=LimeGreen,postaction={pattern=north east lines},mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
+    coordinates {
+        (0,cipher null)
+        (63.74,aes:none)
+        (74.64,aes:sha)
+    };
+    \label{software-cpu}
+
+\addplot[style={black,fill=gray,postaction={pattern=north east lines},mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
+    coordinates {
+        (7.16,cipher null)
+        (0,aes:none)
+        (0,aes:sha)
+    };
+    \label{out-of-tunnel-cpu}%"oot" for "out of tunnel"
+
+\addplot[style={black,fill=RedOrange,postaction={pattern=north east lines},mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
+    coordinates {
+        (0,cipher null)
+        (14.87,aes:none)
+        (17.25,aes:sha)
+    };
+    \label{ba411e-cpu}
+
+\addplot[style={black,fill=NavyBlue,postaction={pattern=north east lines},mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
+    coordinates {
+        (14.68,cipher null)
+        (0,aes:none)
+        (0,aes:sha)
+    };
+    \label{inside tunnel-cpu}%"it" for "in tunnel"
+% \legend{software, ba411e, out-of-tunnel, inside tunnel}
+\end{axis}
