@@ -25,9 +25,10 @@
 \addplot[style={black,fill=ForestGreen,mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
     coordinates {
         (0,cipher null)
-        (8.83,aes:none)
-        (6.47,aes:sha)
+        (4.78,aes:none)
+        (3.87,aes:sha)
     };
+    \label{software}
 
 \addplot[style={black,fill=black,mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
     coordinates {
@@ -35,19 +36,22 @@
         (0,aes:none)
         (0,aes:sha)
     };
+    \label{out-of-tunnel}%"tp" for "throughput"
 
 \addplot[style={black,fill=BrickRed,mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
     coordinates {
         (0,cipher null)
-        (8.52,aes:none)
-        (5.80,aes:sha)
+        (3.35,aes:none)
+        (2.84,aes:sha)
     };
+    \label{ba411e}
 
 \addplot[style={black,fill=MidnightBlue,mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
     coordinates {
-        (10.21,cipher null)
+        (5.18,cipher null)
         (0,aes:none)
         (0,aes:sha)
     };
-\legend{\small software, raw, ba411e, IPsec}
+    \label{inside tunnel}
+\legend{\small software, raw, ba411e, OpenVPN}
 \end{axis}
