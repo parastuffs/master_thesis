@@ -1,0 +1,43 @@
+%%%%%%%%%%%%%%%%%%%%%%%%
+% throughput
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{axis}[
+        % title = {FTP transfer inside an IPSec tunnel},
+        width  = \textwidth,
+        height = 0.65\paperheight,
+        major x tick style = transparent,
+        xbar=2pt,
+        bar width=8pt,
+        % enlarge x limits={abs=1},
+        xmajorgrids = true,
+        xlabel = {CPU usage},
+        ylabel = {},
+        % ylabel near ticks,
+        % yticklabel pos=right,
+        xmin=0, xmax=115,
+        xtick={50, 100},
+        symbolic y coords={RSA-1024, RSA-2048, RSA-4096},
+        ytick = data,
+        ymajorticks=false,
+        scaled x ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
+        legend style={at={(0.5,-0.15)}, anchor=north,legend columns=4},
+        % enlarge x limits=0.1,
+    ]
+
+\addplot[style={black,fill=LimeGreen,postaction={pattern=north east lines},mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
+    coordinates {
+        (40.32,RSA-1024)
+        (92.14,RSA-2048)
+        (81.97,RSA-4096)
+    };
+    \label{software}
+
+\addplot[style={black,fill=RedOrange,postaction={pattern=north east lines},mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
+    coordinates {
+        (13.29,RSA-1024)
+        (4.82,RSA-2048)
+        (4.78,RSA-4096)
+    };
+    \label{ba414e}
+% \legend{software, ba411e, out-of-tunnel, inside tunnel}
+\end{axis}

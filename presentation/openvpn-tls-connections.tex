@@ -1,0 +1,42 @@
+%%%%%%%%%%%%%%%%%%%%%%%%
+% throughput
+%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{axis}[
+        % title = {FTP transfer inside an IPSec tunnel},
+        width  = \textwidth,
+        height = 0.65\paperheight,
+        major x tick style = transparent,
+        xbar=2pt,
+        bar width=8pt,
+        % enlarge x limits={abs=1},
+        xmajorgrids = true,
+        xlabel = {Connections per minute},
+        ylabel = {},
+        ylabel near ticks,
+        yticklabel pos=right,
+        xmin=0, xmax=600,
+        xtick={0,100,200,300,400,500},
+        symbolic y coords={RSA-1024, RSA-2048, RSA-4096},
+        ytick = data,
+        scaled x ticks = false,%Disable the *10^4 exponent applied to all y axis markings.
+        legend style={at={(1.3,-0.1)}, anchor=north,legend columns=1},
+        % enlarge x limits=0.1,
+    ]
+
+\addplot[style={black,fill=ForestGreen,mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
+    coordinates {
+        (445.4,RSA-1024)
+        (155.6,RSA-2048)
+        (19.6,RSA-4096)
+    };
+    \label{soft-tp}
+
+\addplot[style={black,fill=BrickRed,mark=none}, nodes near coords={\pgfmathfloatifflags{\pgfplotspointmeta}{0}{}{\pgfmathprintnumber{\pgfplotspointmeta}}}]
+    coordinates {
+        (509.3,RSA-1024)
+        (420.9,RSA-2048)
+        (115.5,RSA-4096)
+    };
+    \label{ba411e-tp}
+\legend{\small software, ba411e}
+\end{axis}

@@ -91,6 +91,14 @@
 % Lists
 % \def\labelitemi{$\blacktriangleright$}
 
+% \AtBeginSection[]
+% {
+%   \begin{frame}
+%   \frametitle{Contents}
+%   \tableofcontents[currentsection]
+%   \end{frame}
+% }
+
 
 \begin{document}
 
@@ -99,8 +107,9 @@
 \end{frame}
 
 \begin{frame}
-	%\tableofcontents[hideallsubsections]
-	\tableofcontents
+	\frametitle{Contents}
+	\tableofcontents[hideallsubsections]
+	% \tableofcontents
 \end{frame}
 
 
@@ -108,7 +117,9 @@
 
 \subsection{Objectives}
 \begin{frame}
+\frametitle{Objectives}
 \begin{itemize}
+	\item Real life use cases.
 	\item Decrease CPU load.
 	\item Improve performance.
 \end{itemize}
@@ -116,15 +127,152 @@
 
 
 
+
+
+
+
+
+\section{Cryptographic protocols}
+% \begin{frame}
+% \frametitle{Contents}
+% \tableofcontents[currentsection]
+% \end{frame}
+
+\begin{frame}
+\frametitle{Cryptographic protocols}
+\begin{description}
+	\item[VPN]~\\
+		\begin{itemize}
+			\item TLS
+			\item IPsec
+		\end{itemize}
+	\item[Schemes]~\\
+		\begin{itemize}
+			\item AES
+			\item SHA-2
+			\item Diffie-Hellman
+			\item RSA
+		\end{itemize}
+\end{description}
+\end{frame}
+
+
+
+\section{Platform}
+\begin{frame}
+\frametitle{Contents}
+\tableofcontents[%
+	currentsection,
+	sectionstyle=show/shaded,
+	subsectionstyle=show/show/hide,
+	]
+\end{frame}
+
+\begin{frame}
+\frametitle{Linux structure}
+	\begin{center}
+	\includegraphics[height=7cm]{os-path-generic.png}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Linux structure (Cont'd)}
+	\begin{center}
+	\includegraphics[height=7cm]{os-path-specific.png}
+	\end{center}
+\end{frame}
+
+
+
+
+
+\section{Implementation}
+\begin{frame}
+\frametitle{Contents}
+\tableofcontents[%
+	currentsection,
+	sectionstyle=show/shaded,
+	subsectionstyle=show/show/hide,
+	]
+\end{frame}
+
+\subsection{OpenVPN}
+\begin{frame}
+\frametitle{OpenVPN}
+	\begin{figure}
+	\includegraphics[height=6cm]{openvpn-transfer.png}
+	\end{figure}
+\end{frame}
+
+\subsection{IPsec}
+\begin{frame}
+\frametitle{IPsec}
+	\begin{figure}
+	\includegraphics[height=5cm]{ipsec-transfer.png}
+	\end{figure}
+\end{frame}
+
+
+
+
 \section{Results}
+\begin{frame}
+\frametitle{Contents}
+\tableofcontents[%
+	currentsection,
+	sectionstyle=show/shaded,
+	subsectionstyle=show/show/hide,
+	]
+\end{frame}
+
 
 \subsection{TLS connections}
 
-\subsection{File transfer -- OpenVPN}
+\begin{frame}
+\frametitle{TLS connections -- Context}
+\begin{center}
+\includegraphics[height=3cm]{tls-bench.png}
+\end{center}
+\begin{itemize}
+	\item 1 server, 10 clients
+	\item 1-second connections
+	\item RSA-1024/2048/4096
+	\item OpenVPN
+\end{itemize}
+\end{frame}
 
-\subsection{File Transfer -- IPsec}
+\begin{frame}
+\frametitle{TLS connections -- OpenVPN}
+\Wider[1em]{%
+	\begin{minipage}[c]{.48\linewidth}
+		\begin{tikzpicture}
+		\input{openvpn-tls-connections}
+		\end{tikzpicture}
+	\end{minipage} \hfill
+	\begin{minipage}[c]{.44\linewidth}
+		\begin{tikzpicture}
+		\input{openvpn-tls-cpu}
+		\end{tikzpicture}
+		\vspace{0.5cm}
+	\end{minipage}
+}
+\end{frame}
 
 
+\subsection{File transfer}
+
+\begin{frame}
+\frametitle{File transfer -- Context}
+\begin{center}
+\includegraphics[height=3cm]{ftp-bench.png}
+\end{center}
+\begin{itemize}
+	\item 128MB file
+	\item AES-256-CBC/SHA-256
+	\item OpenVPN/IPsec
+\end{itemize}
+\end{frame}
 
 \begin{frame}
 \frametitle{File transfer -- OpenVPN}
@@ -162,6 +310,39 @@
 \end{frame}
 
 
+
+
+
+\section{Conclusion}
+
+\begin{frame}
+\frametitle{Conclusion}
+\begin{description}
+	\item[TLS connections]~\\
+		\begin{itemize}
+			\item 589\% connections
+			\item 5\% the CPU usage
+		\end{itemize}
+	\item[File transfer]~\\
+		\begin{itemize}
+			\item Drop OpenVPN
+			\item 89\% performance
+			\item 23\% the CPU usage
+		\end{itemize}
+\end{description}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Conclusion}
+\begin{itemize}
+	\item Ongoing development
+\end{itemize}
+
+\end{frame}
+
+
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % \section*{References}
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -169,6 +350,5 @@
 % \nocite*{}
 % \bibliographystyle{plain}
 % \bibliography{bibliography}
-		
 
 \end{document}
