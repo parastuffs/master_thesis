@@ -163,11 +163,28 @@
 \frametitle{Contents}
 \tableofcontents[%
 	currentsection,
-	sectionstyle=show/shaded,
-	subsectionstyle=show/show/hide,
+	sectionstyle=show/shaded,%Show the current section, shade the others
+	subsectionstyle=show/show/hide,%Show the current subsection, show the other subsections of the same section, hide the other other subsections.
 	]
 \end{frame}
 
+
+\subsection{Hardware}
+\begin{frame}
+\frametitle{SoCrates}
+	\begin{figure}
+	\includegraphics[height=4cm]{../socrates-photo.png}
+	\end{figure}
+	
+	\begin{itemize}
+		\item Dual core ARM Cortex A9 @ 800MHz
+		\item Altera Cyclone V
+		\item Gigabit Ethernet
+	\end{itemize}
+\end{frame}
+
+
+\subsection{Operating System}
 \begin{frame}
 \frametitle{Linux structure}
 	\begin{center}
