@@ -19,6 +19,7 @@
 % \usetheme{Boadilla}
 % \usetheme{Antibes}
 \usetheme{CambridgeUS}
+% \usecolortheme{dolphin}
 \usecolortheme{dolphin}
 % \usetheme{Berlin}
 % \usetheme{Madrid}
@@ -115,6 +116,13 @@
 
 \section{Context}
 
+\begin{frame}
+\begin{itemize}
+	\item Internet of things
+	\item Work done with Barco Silex
+\end{itemize}
+\end{frame}
+
 \subsection{Objectives}
 \begin{frame}
 \frametitle{Objectives}
@@ -124,7 +132,6 @@
 	\item Improve performance.
 \end{itemize}
 \end{frame}
-
 
 
 
@@ -173,14 +180,11 @@
 \begin{frame}
 \frametitle{SoCrates}
 	\begin{figure}
-	\includegraphics[height=4cm]{../socrates-photo.png}
+	\includegraphics[height=6cm]{socrates-annotated.png}
 	\end{figure}
-	
-	\begin{itemize}
-		\item Dual core ARM Cortex A9 @ 800MHz
-		\item Altera Cyclone V
-		\item Gigabit Ethernet
-	\end{itemize}
+	% Low-end FPGA. It's an affordable board that has been used as a proof-of-concept implementation.
+	% It can only get better with more expensive and more recent technologies.
+	% However, the Cortex A9 is nice already, so the software is already close to its full potential.
 \end{frame}
 
 
@@ -327,6 +331,15 @@
 \end{frame}
 
 
+\subsection{Interpretation}
+\begin{frame}
+\frametitle{Results interpretation}
+	\begin{itemize}
+		\item OpenVPN is single-threaded
+		\item OpenVPN software overhead
+	\end{itemize}
+\end{frame}
+
 
 
 
@@ -337,14 +350,14 @@
 \begin{description}
 	\item[TLS connections]~\\
 		\begin{itemize}
-			\item 589\% connections
-			\item 5\% the CPU usage
+			\item connections $\times 6$
+			\item CPU usage $\div 20$
 		\end{itemize}
 	\item[File transfer]~\\
 		\begin{itemize}
 			\item Drop OpenVPN
-			\item 89\% performance
-			\item 23\% the CPU usage
+			\item Performance $-10\%$
+			\item CPU usage $\div 4$
 		\end{itemize}
 \end{description}
 \end{frame}
@@ -354,10 +367,32 @@
 \frametitle{Conclusion}
 \begin{itemize}
 	\item Ongoing development
+	\begin{itemize}
+		\item Test better hardware
+		\item Improve the drivers
+	\end{itemize}
+	% Barco Silex took action during and after my results, improving the AES driver significantly. 
+	% Next step is also to use a better platform
+	\item GCM is comming
 \end{itemize}
 
 \end{frame}
 
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 				BACKUP SLIDES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}[noframenumbering]
+\frametitle{Software GCM}
+	\begin{figure}
+	\input{ipsec-ping-benchmark-gcm}
+	\caption{Software: asm kernel module mode GCM\newline{} Hardware: AES IP core mode CBC}
+	\end{figure}
+\end{frame}
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
