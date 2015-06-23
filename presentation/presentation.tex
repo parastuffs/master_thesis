@@ -11,6 +11,9 @@
 \usepackage{hyperref}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{array}
 
 
 \setbeamertemplate{bibliography item}{[\theenumiv]}
@@ -117,8 +120,11 @@
 \section{Context}
 
 \begin{frame}
+\frametitle{Context}
+\begin{figure}
+\includegraphics[height=5cm]{iot.jpg}%https://i.vimeocdn.com/video/454170756_640.jpg
+\end{figure}
 \begin{itemize}
-	\item Internet of things
 	\item More connections, less power, same security
 	% And this is essential to understand the complexity of the problem.
 	% How to ensure the same security level with less computing power at hand?
@@ -130,9 +136,11 @@
 \begin{frame}
 \frametitle{Objectives}
 \begin{itemize}
+\setlength\itemsep{1em}
+	\item Use a dedicated hardware.
 	\item Real life use cases.
-	\item Decrease CPU load.
-	\item Improve performance.
+	\item[$\rightarrow$] Decrease CPU load.
+	\item[$\rightarrow$] Improve performance.
 \end{itemize}
 \end{frame}
 
@@ -143,10 +151,15 @@
 
 
 \section{Cryptographic protocols}
-% \begin{frame}
-% \frametitle{Contents}
-% \tableofcontents[currentsection]
-% \end{frame}
+\begin{frame}
+\frametitle{Contents}
+\tableofcontents[%
+	currentsection,
+	sectionstyle=show/shaded,%Show the current section, shade the others
+	subsectionstyle=show/show/hide,%Show the current subsection, show the other subsections of the same section, hide the other other subsections.
+	]
+\end{frame}
+
 
 \begin{frame}
 \frametitle{Cryptographic protocols}
@@ -337,24 +350,11 @@
 \subsection{Interpretation}
 \begin{frame}
 \frametitle{Results interpretation}
-	\begin{itemize}
-		\item OpenVPN is single-threaded
-		\item OpenVPN software overhead
-	\end{itemize}
-\end{frame}
-
-
-
-
-\section{Conclusion}
-
-\begin{frame}
-\frametitle{Conclusion}
 \begin{description}
 	\item[TLS connections]~\\
 		\begin{itemize}
 			\item connections $\times 6$
-			\item CPU usage $\div 20$
+			\item CPU usage $\div 17$
 		\end{itemize}
 	\item[File transfer]~\\
 		\begin{itemize}
@@ -363,7 +363,16 @@
 			\item CPU usage $\div 4$
 		\end{itemize}
 \end{description}
+
+\begin{itemize}
+	\item OpenVPN is single-threaded
+	\item OpenVPN software overhead
+	\item IPsec works in kernel
+\end{itemize}
 \end{frame}
+
+
+\section{Conclusion}
 
 
 \begin{frame}
@@ -424,6 +433,25 @@
 	\end{figure}
 \end{frame}
 
+
+
+\begin{frame}[noframenumbering]
+\frametitle{TLS connection latency}
+\begin{table}[ht]
+\center
+% \small
+\begin{tabular}{ll|l|l} \cline{3-3}
+ & & Connection time [s] & \\ \hline
+\multicolumn{1}{|l|}{\multirow{2}{*}{RSA-1024}} & soft & 0.041921 & \multicolumn{1}{l|}{\multirow{2}{*}{$\div 2$}} \\ \cline{2-3}
+\multicolumn{1}{|l|}{} & BA411E & 0.020312 & \multicolumn{1}{|l|}{} \\ \hline
+\multicolumn{1}{|l|}{\multirow{2}{*}{RSA-2048}} & soft & 0.202945 & \multicolumn{1}{l|}{\multirow{2}{*}{$\div 5$}} \\ \cline{2-3}
+\multicolumn{1}{|l|}{} & BA411E & 0.039965 & \multicolumn{1}{|l|}{} \\ \hline
+\multicolumn{1}{|l|}{\multirow{2}{*}{RSA-4096}} & soft & 1.436743 & \multicolumn{1}{l|}{\multirow{2}{*}{$\div 7.8$}} \\ \cline{2-3}
+\multicolumn{1}{|l|}{} & BA411E & 0.183533 & \multicolumn{1}{|l|}{} \\ \hline
+\end{tabular}
+\caption{OpenVPN connection time necessary to establish an aes-256-cbc connection with DHE.}
+\end{table}
+\end{frame}
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
