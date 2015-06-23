@@ -119,6 +119,9 @@
 \begin{frame}
 \begin{itemize}
 	\item Internet of things
+	\item More connections, less power, same security
+	% And this is essential to understand the complexity of the problem.
+	% How to ensure the same security level with less computing power at hand?
 	\item Work done with Barco Silex
 \end{itemize}
 \end{frame}
@@ -394,6 +397,33 @@
 	\caption{Software: asm kernel module mode GCM\newline{} Hardware: AES IP core mode CBC}
 	\end{figure}
 \end{frame}
+
+\begin{frame}[noframenumbering]
+\frametitle{OpenVPN file transfer -- AES-256-CBC -- MAC none}
+	\begin{itemize}
+		\item Hardware top 3:
+		\begin{enumerate}
+			\item Kernel memory handling
+			\item Context switch
+			\item IRQ restore
+		\end{enumerate}
+		\item Software top 3:
+		\begin{enumerate}
+			\item AES encryption
+			\item IRQ restore
+			\item OpenVPN encryption routine
+		\end{enumerate}
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame}[noframenumbering]
+\frametitle{OpenSSL benchmark}
+	\begin{figure}
+	\input{openssl-speed.tex}
+	\end{figure}
+\end{frame}
+
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
